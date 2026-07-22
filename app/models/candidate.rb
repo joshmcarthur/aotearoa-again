@@ -3,6 +3,7 @@ class Candidate < ApplicationRecord
 
   belongs_to :source_item
   has_many :variants, dependent: :destroy
+  has_many :editions, through: :variants
   has_one_attached :original_image
 
   validates :status, inclusion: { in: STATUSES }
