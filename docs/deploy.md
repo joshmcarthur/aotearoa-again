@@ -79,3 +79,25 @@ If DigitalNZ/ATL request removal:
 ## Instagram / Facebook
 
 Do **not** upload Library images to Meta platforms in v1 (NatLib guidance).
+
+## Container releases
+
+Merges to `main` with [Conventional Commits](https://www.conventionalcommits.org/) messages (`feat:`, `fix:`, etc.) are picked up by [release-please](https://github.com/googleapis/release-please). It opens a release PR that bumps the version and changelog; merging that PR creates a GitHub release and tag (for example `v0.2.0`).
+
+Publishing a GitHub release triggers the **Publish Docker image** workflow, which builds the production `Dockerfile` and pushes to GitHub Container Registry:
+
+```text
+ghcr.io/joshmcarthur/aotearoa-again:<version>
+ghcr.io/joshmcarthur/aotearoa-again:latest
+```
+
+To deploy a tagged image with Kamal:
+
+```bash
+export KAMAL_REGISTRY_PASSWORD=<github-token-with-read:packages>
+bin/kamal deploy --version=<version>
+```
+
+The image repository is private by default. In GitHub, open **Packages → aotearoa-again → Package settings** and grant your account or org access before pulling on the host.
+
+To publish manually without a release, run the **Publish Docker image** workflow from the Actions tab and supply a tag.
