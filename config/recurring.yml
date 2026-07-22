@@ -1,0 +1,40 @@
+production:
+  harvest_candidates:
+    class: HarvestCandidatesJob
+    queue: default
+    schedule: at 1am every day
+
+  publish_edition:
+    class: PublishEditionJob
+    queue: default
+    schedule: at 7am every day
+
+  runway_alert:
+    class: RunwayAlertJob
+    queue: default
+    schedule: at 8am every day
+
+  refresh_ruby_llm_models:
+    class: RefreshRubyLlmModelsJob
+    queue: default
+    schedule: at 3am every monday
+
+  clear_solid_queue_finished_jobs:
+    command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
+    schedule: every hour at minute 12
+
+development:
+  harvest_candidates:
+    class: HarvestCandidatesJob
+    queue: default
+    schedule: at 1am every day
+
+  publish_edition:
+    class: PublishEditionJob
+    queue: default
+    schedule: at 7am every day
+
+  runway_alert:
+    class: RunwayAlertJob
+    queue: default
+    schedule: at 8am every day

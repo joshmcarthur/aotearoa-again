@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for?(:title) ? yield(:title) : "Aotearoa, Again" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : "Daily photographs from the Alexander Turnbull Library, seen again in colour." %>">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= yield :head %>
+    <link rel="alternate" type="application/atom+xml" title="Aotearoa, Again" href="<%= feed_path %>">
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body class="aa-body">
+    <header class="aa-header">
+      <div class="aa-header-inner">
+        <a href="<%= root_path %>" class="aa-brand">
+          <span class="aa-brand-name">Aotearoa, Again</span>
+          <span class="aa-brand-tagline">Daily photographs from the Alexander Turnbull Library, seen again in colour.</span>
+        </a>
+        <nav class="aa-nav">
+          <%= link_to "Archive", editions_path %>
+          <%= link_to "Feed", feed_path %>
+          <%= link_to "Subscribe", subscribe_path %>
+        </nav>
+      </div>
+    </header>
+    <main>
+      <%= yield %>
+    </main>
+    <footer class="aa-footer">
+      <p>Photographs courtesy of the Alexander Turnbull Library, via DigitalNZ. AI colourised — colours are interpretive.</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Source Sans 3", "Segoe UI", sans-serif;
+  --color-ink: #1c1914;
+  --color-paper: #f3efe6;
+  --color-paper-deep: #e5ddd0;
+  --color-sea: #1f4d4a;
+  --color-ember: #9a4a2a;
+}
+
+@layer base {
+  .aa-body {
+    @apply m-0 min-h-screen text-[var(--color-ink)];
+    font-family: var(--font-body);
+    background:
+      radial-gradient(1200px 600px at 10% -10%, rgba(31, 77, 74, 0.12), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(154, 74, 42, 0.10), transparent 55%),
+      linear-gradient(180deg, var(--color-paper) 0%, var(--color-paper-deep) 100%);
+  }
+}
+
+@layer components {
+  .aa-header {
+    @apply border-b border-black/10;
+  }
+
+  .aa-header-inner {
+    @apply mx-auto flex max-w-6xl flex-col gap-4 px-4 py-6 md:flex-row md:items-end md:justify-between;
+  }
+
+  .aa-brand {
+    @apply no-underline text-[var(--color-ink)];
+  }
+
+  .aa-brand-name {
+    font-family: var(--font-display);
+    @apply block text-4xl font-bold tracking-tight md:text-5xl;
+  }
+
+  .aa-brand-tagline {
+    @apply mt-2 block max-w-xl text-base text-black/70;
+  }
+
+  .aa-nav {
+    @apply flex gap-4 text-sm font-semibold uppercase tracking-wide;
+  }
+
+  .aa-nav a {
+    @apply text-[var(--color-sea)] no-underline hover:underline;
+  }
+
+  .aa-footer {
+    @apply mx-auto max-w-6xl px-4 py-10 text-sm text-black/60;
+  }
+
+  .aa-edition {
+    @apply mx-auto max-w-6xl px-4 py-8;
+  }
+
+  .aa-plate-date {
+    @apply text-sm font-semibold uppercase tracking-[0.18em] text-[var(--color-ember)];
+  }
+
+  .aa-title {
+    font-family: var(--font-display);
+    @apply mt-2 text-3xl font-semibold leading-tight md:text-4xl;
+  }
+
+  .aa-caption {
+    @apply mt-4 max-w-3xl text-lg leading-relaxed text-black/80;
+  }
+
+  .aa-compare {
+    @apply relative mt-8 overflow-hidden bg-black;
+    aspect-ratio: 4 / 3;
+  }
+
+  .aa-compare img {
+    @apply absolute inset-0 h-full w-full object-contain;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .aa-compare-colour {
+    @apply absolute inset-0 overflow-hidden;
+  }
+
+  .aa-compare-colour img {
+    @apply max-w-none;
+  }
+
+  .aa-compare-handle {
+    @apply absolute inset-y-0 z-10 w-1 cursor-ew-resize bg-white/90;
+  }
+
+  .aa-compare-handle::after {
+    content: "";
+    @apply absolute left-1/2 top-1/2 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-[var(--color-sea)];
+  }
+
+  .aa-meta {
+    @apply mt-8 grid gap-6 border-t border-black/10 pt-6 text-sm md:grid-cols-2;
+  }
+
+  .aa-meta h2 {
+    font-family: var(--font-display);
+    @apply text-lg font-semibold;
+  }
+
+  .aa-disclaimer {
+    @apply mt-6 border-l-4 border-[var(--color-ember)] pl-4 text-sm text-black/70;
+  }
+
+  .aa-archive-list {
+    @apply mx-auto max-w-6xl px-4 py-8;
+  }
+
+  .aa-archive-item {
+    @apply flex gap-4 border-b border-black/10 py-4 no-underline text-[var(--color-ink)];
+  }
+
+  .aa-archive-item img {
+    @apply h-24 w-32 object-cover;
+  }
+
+  .aa-empty {
+    @apply mx-auto max-w-2xl px-4 py-24 text-center;
+  }
+
+  .sr-only {
+    @apply absolute h-px w-px overflow-hidden whitespace-nowrap border-0 p-0;
+    clip: rect(0, 0, 0, 0);
+  }
+}
