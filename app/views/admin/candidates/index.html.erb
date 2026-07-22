@@ -1,0 +1,30 @@
+<div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-semibold">Review queue</h1>
+    <p class="text-sm text-stone-600">Ready candidates awaiting approval into the runway.</p>
+  </div>
+  <div class="rounded border border-stone-300 bg-white px-4 py-2 text-sm">
+    Runway: <strong><%= @runway_days %></strong> approved days ahead
+    <% if @runway_days < 7 %><span class="text-red-700">(low)</span><% end %>
+    · Pipeline pending: <%= @pending %>
+  </div>
+</div>
+
+<% if @candidates.empty? %>
+  <p class="text-stone-600">No ready candidates. Run harvest/colourise jobs.</p>
+<% else %>
+  <ul class="space-y-4">
+    <% @candidates.each do |candidate| %>
+      <li class="rounded border border-stone-300 bg-white p-4">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-semibold"><%= candidate.source_item.title %></h2>
+            <p class="text-sm text-stone-600"><%= [candidate.source_item.display_date, candidate.source_item.placename].compact.join(" · ") %></p>
+            <p class="mt-1 text-sm"><%= truncate(candidate.source_item.description.to_s, length: 180) %></p>
+          </div>
+          <%= link_to "Review", admin_candidate_path(candidate), class: "rounded bg-stone-900 px-3 py-2 text-sm text-white" %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

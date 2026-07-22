@@ -1,0 +1,25 @@
+<div class="mb-6 flex items-end justify-between">
+  <h1 class="text-2xl font-semibold">Editions</h1>
+  <p class="text-sm">Runway: <strong><%= @runway_days %></strong> days</p>
+</div>
+
+<table class="w-full border-collapse text-sm">
+  <thead>
+    <tr class="border-b border-stone-400 text-left">
+      <th class="py-2">Publish on</th>
+      <th>Title</th>
+      <th>State</th>
+      <th>Model</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @editions.each do |edition| %>
+      <tr class="border-b border-stone-200">
+        <td class="py-2"><%= edition.publish_on %></td>
+        <td><%= edition.source_item.title %></td>
+        <td><%= edition.state %></td>
+        <td><%= edition.variant.model.model_id %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

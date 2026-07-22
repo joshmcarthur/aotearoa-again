@@ -1,0 +1,31 @@
+<div class="mb-6 flex items-center justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-semibold">Colourise models</h1>
+    <p class="text-sm text-stone-600">Preferred models are used for new candidates. Registry powered by RubyLLM.</p>
+  </div>
+  <%= button_to "Refresh registry", refresh_admin_models_path, class: "rounded bg-stone-900 px-3 py-2 text-sm text-white" %>
+</div>
+
+<h2 class="mb-2 text-lg font-semibold">Preferred</h2>
+<ul class="mb-8 space-y-2">
+  <% @preferred.each do |model| %>
+    <li class="flex items-center justify-between rounded border border-stone-300 bg-white px-3 py-2 text-sm">
+      <span><%= model.name %> <code class="text-stone-500"><%= model.model_id %></code></span>
+      <%= button_to "Unprefer", toggle_preferred_admin_model_path(model), method: :patch, class: "underline" %>
+    </li>
+  <% end %>
+</ul>
+
+<h2 class="mb-2 text-lg font-semibold">OpenRouter image-capable</h2>
+<ul class="space-y-2">
+  <% @image_models.each do |model| %>
+    <li class="flex items-center justify-between rounded border border-stone-200 bg-white px-3 py-2 text-sm">
+      <span>
+        <%= model.name %>
+        <code class="text-stone-500"><%= model.model_id %></code>
+        <% if model.preferred_for_colourise %><span class="ml-2 text-emerald-700">preferred</span><% end %>
+      </span>
+      <%= button_to(model.preferred_for_colourise? ? "Unprefer" : "Prefer", toggle_preferred_admin_model_path(model), method: :patch, class: "underline") %>
+    </li>
+  <% end %>
+</ul>

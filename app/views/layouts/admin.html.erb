@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Admin — Aotearoa, Again</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body class="min-h-screen bg-stone-100 text-stone-900">
+    <header class="border-b border-stone-300 bg-white">
+      <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+        <div class="flex items-baseline gap-3">
+          <span class="text-lg font-semibold tracking-tight">Aotearoa, Again</span>
+          <span class="text-sm text-stone-500">Admin</span>
+        </div>
+        <nav class="flex gap-4 text-sm">
+          <%= link_to "Candidates", admin_candidates_path, class: "hover:underline" %>
+          <%= link_to "Models", admin_models_path, class: "hover:underline" %>
+          <%= link_to "Editions", admin_editions_path, class: "hover:underline" %>
+          <%= link_to "Site", root_path, class: "hover:underline" %>
+        </nav>
+      </div>
+    </header>
+    <% if notice.present? %>
+      <p class="mx-auto max-w-6xl px-4 py-2 text-sm text-emerald-800"><%= notice %></p>
+    <% end %>
+    <% if alert.present? %>
+      <p class="mx-auto max-w-6xl px-4 py-2 text-sm text-red-800"><%= alert %></p>
+    <% end %>
+    <main class="mx-auto max-w-6xl px-4 py-6">
+      <%= yield %>
+    </main>
+  </body>
+</html>
