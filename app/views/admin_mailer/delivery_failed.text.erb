@@ -1,0 +1,5 @@
+Delivery failed for edition <%= @edition.publish_on %> (state: <%= @edition.state %>).
+
+<% @edition.deliveries.each do |delivery| %>
+- <%= delivery.channel %>: <%= delivery.status %><% if delivery.error_message.present? %> — <%= delivery.error_message %><% end %>
+<% end %>

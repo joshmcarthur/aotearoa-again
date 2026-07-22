@@ -1,0 +1,26 @@
+<section class="aa-archive-list">
+  <h1 class="aa-title">Archive</h1>
+  <p class="aa-caption">Past editions of the daily plate.</p>
+
+  <% if @editions.empty? %>
+    <p class="mt-8 text-black/60">No published editions yet.</p>
+  <% else %>
+    <div class="mt-8">
+      <% @editions.each do |edition| %>
+        <% source = edition.source_item %>
+        <%= link_to edition_path(edition), class: "aa-archive-item" do %>
+          <% if edition.variant.colourised_image.attached? %>
+            <%= image_tag edition.variant.colourised_image.variant(resize_to_limit: [320, 240]), alt: source.title %>
+          <% end %>
+          <div>
+            <p class="aa-plate-date"><%= l(edition.publish_on, format: :long) %></p>
+            <h2 class="text-xl font-semibold" style="font-family: var(--font-display)"><%= source.title %></h2>
+            <% if source.display_date.present? || source.placename.present? %>
+              <p class="text-sm text-black/60"><%= [source.display_date, source.placename].compact.join(" · ") %></p>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</section>

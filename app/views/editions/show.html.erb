@@ -1,0 +1,66 @@
+<% copy = @copy %>
+<% source = @edition.source_item %>
+<% content_for :title, "#{copy.title} — Aotearoa, Again" %>
+<% content_for :meta_description, copy.caption.to_s.truncate(160) %>
+<% content_for :head do %>
+  <meta property="og:title" content="<%= copy.title %>">
+  <meta property="og:description" content="<%= copy.caption.to_s.truncate(160) %>">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="<%= edition_url(@edition) %>">
+  <% if @edition.variant.colourised_image.attached? %>
+    <meta property="og:image" content="<%= url_for(@edition.variant.colourised_image) %>">
+  <% end %>
+<% end %>
+
+<article class="aa-edition">
+  <p class="aa-plate-date">Edition · <%= l(@edition.publish_on, format: :long) %></p>
+  <h1 class="aa-title"><%= copy.title %></h1>
+  <p class="aa-caption"><%= copy.caption %></p>
+
+  <div class="aa-compare" data-controller="compare-slider">
+    <% if @edition.variant.candidate.original_image.attached? %>
+      <%= image_tag @edition.variant.candidate.original_image, alt: "Original photograph: #{copy.title}" %>
+    <% end %>
+    <div class="aa-compare-colour" data-compare-slider-target="colour">
+      <% if @edition.variant.colourised_image.attached? %>
+        <%= image_tag @edition.variant.colourised_image, alt: "AI colourised photograph: #{copy.title}" %>
+      <% end %>
+    </div>
+    <div class="aa-compare-handle" data-compare-slider-target="handle"></div>
+    <label class="sr-only" for="compare-range">Compare original and colourised</label>
+    <input
+      id="compare-range"
+      class="absolute inset-0 z-20 m-0 h-full w-full cursor-ew-resize opacity-0"
+      type="range"
+      min="0"
+      max="100"
+      value="50"
+      data-compare-slider-target="range"
+      data-action="input->compare-slider#slide"
+      aria-label="Compare original and colourised photograph"
+    >
+  </div>
+  <p class="mt-2 text-sm text-black/60">Drag to compare original and colourised plates.</p>
+
+  <div class="aa-meta">
+    <div>
+      <h2>Plate details</h2>
+      <ul class="mt-2 space-y-1">
+        <% if source.display_date.present? %><li>Date: <%= source.display_date %></li><% end %>
+        <% if source.placename.present? %><li>Place: <%= source.placename %></li><% end %>
+        <% if source.creator.present? %><li>Creator: <%= source.creator %></li><% end %>
+      </ul>
+    </div>
+    <div>
+      <h2>Archive & rights</h2>
+      <ul class="mt-2 space-y-1">
+        <li><%= source.content_partner.presence || "Alexander Turnbull Library" %></li>
+        <% if source.rights_text.present? %><li>Rights: <%= source.rights_text %></li><% end %>
+        <li><%= link_to "View library record", source.record_url, target: "_blank", rel: "noopener" %></li>
+        <li>via DigitalNZ</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="aa-disclaimer"><%= copy.ai_notice %></p>
+</article>

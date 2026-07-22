@@ -1,0 +1,34 @@
+# Aotearoa, Again
+
+Daily photographs from the Alexander Turnbull Library, seen again in colour.
+
+A small Rails app that harvests reusable ATL images via DigitalNZ, AI-colourises them with RubyLLM (OpenRouter), human-reviews into a ~30-day runway, and publishes to the web, Atom feed, and Buttondown.
+
+## Setup
+
+```bash
+bin/setup
+bin/rails credentials:edit --environment development
+# fill openrouter / buttondown / admin / app (digitalnz key optional)
+bin/rails ruby_llm:load_models
+bin/rails db:seed
+bin/dev
+```
+
+Environment-specific credentials live in `config/credentials/<env>.yml.enc`.
+Edit with `bin/rails credentials:edit --environment <env>`.
+
+- Public site: http://localhost:3000  
+- Admin: http://localhost:3000/admin (HTTP Basic from credentials)  
+- Feed: http://localhost:3000/feed.xml  
+
+See `config/initializers/app_config.rb` for the credentials shape.
+
+## Pipeline
+
+1. `HarvestCandidatesJob` — DigitalNZ ATL images with Modify usage  
+2. `ColouriseCandidateJob` — RubyLLM.paint via preferred `Model` rows  
+3. Admin approve → schedule `Edition`  
+4. `PublishEditionJob` (07:00 NZ) — web + Buttondown  
+
+See [docs/deploy.md](docs/deploy.md) for home hosting + Cloudflare Tunnel.
