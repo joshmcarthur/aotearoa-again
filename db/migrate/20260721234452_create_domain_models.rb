@@ -10,11 +10,11 @@ class CreateDomainModels < ActiveRecord::Migration[8.1]
       t.string :creator
       t.string :content_partner
       t.text :rights_text
-      t.jsonb :usage_flags, null: false, default: []
+      t.json :usage_flags, null: false, default: []
       t.string :record_url, null: false
       t.string :image_url
       t.string :dedupe_key, null: false
-      t.jsonb :raw_metadata, null: false, default: {}
+      t.json :raw_metadata, null: false, default: {}
       t.datetime :discarded_at
 
       t.timestamps

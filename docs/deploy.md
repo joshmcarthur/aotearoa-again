@@ -5,9 +5,9 @@ Home-hosted Rails app with public ingress via Cloudflare Tunnel.
 ## Stack on the host
 
 - Ruby 3.4+ / Rails 8
-- PostgreSQL
+- SQLite (files under `storage/` — primary plus Solid Cache/Queue/Cable DBs in production)
 - Solid Queue (set `SOLID_QUEUE_IN_PUMA=true` or run `bin/jobs`)
-- Active Storage on local disk (`storage/`) — back this up
+- Active Storage on local disk (`storage/`) — back this directory up
 - Timezone: `Pacific/Auckland`
 
 ## Credentials
@@ -67,7 +67,7 @@ Recurring schedules are in `config/recurring.yml` (harvest 01:00, publish 07:00,
 1. Install `cloudflared` on the host.
 2. Create a tunnel pointing `https://your-domain` → `http://127.0.0.1:3000`.
 3. Optional: Cloudflare Access policy on path `/admin*`.
-4. Set `APP_HOST` to the public hostname.
+4. Set credentials `app.host` to the public hostname (no protocol).
 
 ## Takedown
 
@@ -101,10 +101,12 @@ docker run -d \
   -p 127.0.0.1:3000:80 \
   -e RAILS_MASTER_KEY=<production.key> \
   -e RAILS_ENV=production \
+  -e SOLID_QUEUE_IN_PUMA=true \
+  -v aotearoa_again_storage:/rails/storage \
   ghcr.io/joshmcarthur/aotearoa-again:<version>
 ```
 
-Point the Cloudflare Tunnel at `http://127.0.0.1:3000`. Persist `storage/` (and the database, if it runs in the container) with a volume or bind mount as needed.
+Point the Cloudflare Tunnel at `http://127.0.0.1:3000`. The `/rails/storage` volume holds SQLite databases and Active Storage blobs — back it up.
 
 The image repository is private by default. In GitHub, open **Packages → aotearoa-again → Package settings** and grant your account or org access before pulling on the host.
 

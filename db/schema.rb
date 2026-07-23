@@ -11,9 +11,6 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[8.1].define(version: 2026_07_22_235722) do
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "pg_catalog.plpgsql"
-
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -45,7 +42,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_22_235722) do
   create_table "candidates", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "rejection_reason"
-    t.bigint "source_item_id", null: false
+    t.integer "source_item_id", null: false
     t.string "status", default: "pending_colour", null: false
     t.datetime "updated_at", null: false
     t.index ["source_item_id"], name: "index_candidates_on_source_item_id"
@@ -54,7 +51,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_22_235722) do
 
   create_table "chats", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.bigint "model_id"
+    t.integer "model_id"
     t.datetime "updated_at", null: false
     t.index ["model_id"], name: "index_chats_on_model_id"
   end
@@ -64,7 +61,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_22_235722) do
     t.string "channel", null: false
     t.datetime "created_at", null: false
     t.datetime "delivered_at"
-    t.bigint "edition_id", null: false
+    t.integer "edition_id", null: false
     t.text "error_message"
     t.string "external_id"
     t.string "status", default: "pending", null: false
@@ -80,7 +77,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_22_235722) do
     t.datetime "published_at"
     t.string "state", default: "scheduled", null: false
     t.datetime "updated_at", null: false
-    t.bigint "variant_id", null: false
+    t.integer "variant_id", null: false
     t.index ["publish_on"], name: "index_editions_on_publish_on", unique: true
     t.index ["state"], name: "index_editions_on_state"
     t.index ["variant_id"], name: "index_editions_on_variant_id"
@@ -89,18 +86,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_22_235722) do
   create_table "messages", force: :cascade do |t|
     t.integer "cache_creation_tokens"
     t.integer "cached_tokens"
-    t.bigint "chat_id", null: false
+    t.integer "chat_id", null: false
     t.text "content"
     t.json "content_raw"
     t.datetime "created_at", null: false
     t.integer "input_tokens"
-    t.bigint "model_id"
+    t.integer "model_id"
     t.integer "output_tokens"
     t.string "role", null: false
     t.text "thinking_signature"
     t.text "thinking_text"
     t.integer "thinking_tokens"
-    t.bigint "tool_call_id"
+    t.integer "tool_call_id"
     t.datetime "updated_at", null: false
     t.index ["chat_id"], name: "index_messages_on_chat_id"
     t.index ["model_id"], name: "index_messages_on_model_id"
@@ -109,24 +106,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_22_235722) do
   end
 
   create_table "models", force: :cascade do |t|
-    t.jsonb "capabilities", default: []
+    t.json "capabilities", default: []
     t.integer "context_window"
     t.datetime "created_at", null: false
     t.string "family"
     t.date "knowledge_cutoff"
     t.integer "max_output_tokens"
-    t.jsonb "metadata", default: {}
-    t.jsonb "modalities", default: {}
+    t.json "metadata", default: {}
+    t.json "modalities", default: {}
     t.datetime "model_created_at"
     t.string "model_id", null: false
     t.string "name", null: false
     t.boolean "preferred_for_colourise", default: false, null: false
-    t.jsonb "pricing", default: {}
+    t.json "pricing", default: {}
     t.string "provider", null: false
     t.datetime "updated_at", null: false
-    t.index ["capabilities"], name: "index_models_on_capabilities", using: :gin
     t.index ["family"], name: "index_models_on_family"
-    t.index ["modalities"], name: "index_models_on_modalities", using: :gin
     t.index ["preferred_for_colourise"], name: "index_models_on_preferred_for_colourise"
     t.index ["provider", "model_id"], name: "index_models_on_provider_and_model_id", unique: true
     t.index ["provider"], name: "index_models_on_provider"
@@ -136,7 +131,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_22_235722) do
     t.string "code", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "variant_id", null: false
+    t.integer "variant_id", null: false
     t.index ["code"], name: "index_share_links_on_code", unique: true
     t.index ["variant_id"], name: "index_share_links_on_variant_id", unique: true
   end
@@ -273,12 +268,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_22_235722) do
     t.string "display_date"
     t.string "image_url"
     t.string "placename"
-    t.jsonb "raw_metadata", default: {}, null: false
+    t.json "raw_metadata", default: {}, null: false
     t.string "record_url", null: false
     t.text "rights_text"
     t.string "title", null: false
     t.datetime "updated_at", null: false
-    t.jsonb "usage_flags", default: [], null: false
+    t.json "usage_flags", default: [], null: false
     t.integer "year"
     t.index ["dedupe_key"], name: "index_source_items_on_dedupe_key", unique: true
     t.index ["digitalnz_id"], name: "index_source_items_on_digitalnz_id", unique: true
@@ -286,9 +281,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_22_235722) do
   end
 
   create_table "tool_calls", force: :cascade do |t|
-    t.jsonb "arguments", default: {}
+    t.json "arguments", default: {}
     t.datetime "created_at", null: false
-    t.bigint "message_id", null: false
+    t.integer "message_id", null: false
     t.string "name", null: false
     t.text "thought_signature"
     t.string "tool_call_id", null: false
@@ -299,10 +294,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_22_235722) do
   end
 
   create_table "variants", force: :cascade do |t|
-    t.bigint "candidate_id", null: false
+    t.integer "candidate_id", null: false
     t.boolean "chosen", default: false, null: false
     t.datetime "created_at", null: false
-    t.bigint "model_id", null: false
+    t.integer "model_id", null: false
     t.text "prompt", null: false
     t.datetime "updated_at", null: false
     t.index ["candidate_id", "chosen"], name: "index_variants_on_candidate_id_and_chosen"
