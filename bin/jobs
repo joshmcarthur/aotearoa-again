@@ -1,12 +1,22 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env sh
+set -e
 
-# macOS: Core Text/UIFont can initialize while loading libvips fonts (share image
-# composition). Solid Queue then forks workers, and objc aborts without this flag.
-if RUBY_PLATFORM.include?("darwin")
-  ENV["OBJC_DISABLE_INITIALIZE_FORK_SAFETY"] ||= "YES"
-end
+# Always run from the app root so config/environment resolves.
+APP_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+cd "$APP_ROOT"
+export APP_ROOT
 
-require_relative "../config/environment"
-require "solid_queue/cli"
+# macOS: OBJC fork-safety must be set *before* Ruby starts (setting ENV in Ruby is too late).
+# libvips text/fonts initialize CoreText/UIFont; Solid Queue's default fork mode then crashes.
+# Prefer async supervisor mode locally so workers run in-process on threads instead of fork().
+if [ "$(uname -s)" = "Darwin" ]; then
+  export OBJC_DISABLE_INITIALIZE_FORK_SAFETY="${OBJC_DISABLE_INITIALIZE_FORK_SAFETY:-YES}"
+  export SOLID_QUEUE_SUPERVISOR_MODE="${SOLID_QUEUE_SUPERVISOR_MODE:-async}"
+fi
 
-SolidQueue::Cli.start(ARGV)
+exec ruby -e '
+  Dir.chdir(ENV.fetch("APP_ROOT"))
+  require File.join(ENV.fetch("APP_ROOT"), "config/environment")
+  require "solid_queue/cli"
+  SolidQueue::Cli.start(ARGV)
+' -- "$@"
