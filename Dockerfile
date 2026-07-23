@@ -70,9 +70,15 @@ USER 1000:1000
 COPY --chown=rails:rails --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --chown=rails:rails --from=build /rails /rails
 
+# Foreman supervises Thruster (web) and Solid Queue (jobs + recurring schedules).
+USER root
+RUN gem install foreman
+USER 1000:1000
+RUN chmod +x /rails/bin/server
+
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
-# Start server via Thruster by default, this can be overwritten at runtime
+# Start web + jobs via Foreman; override CMD at runtime if needed.
 EXPOSE 80
-CMD ["./bin/thrust", "./bin/rails", "server"]
+CMD ["./bin/server"]

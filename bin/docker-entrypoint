@@ -1,7 +1,8 @@
 #!/bin/bash -e
 
-# If running the rails server then create or migrate existing database
-if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
+# Prepare the database when starting the app (Foreman or Thruster + Puma).
+if [ "${1}" == "./bin/server" ] || \
+   { [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; }; then
   ./bin/rails db:prepare
 fi
 

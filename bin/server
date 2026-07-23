@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+
+if ! gem list foreman -i --silent; then
+  echo "Installing foreman..."
+  gem install foreman
+fi
+
+export PORT="${PORT:-80}"
+export PANGOCAIRO_BACKEND="${PANGOCAIRO_BACKEND:-fontconfig}"
+
+exec foreman start -f Procfile "$@"
