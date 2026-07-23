@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.3.0...v0.4.0) (2026-07-23)
+
+
+### Features
+
+* run Thruster and Solid Queue via Foreman in Docker ([#20](https://github.com/joshmcarthur/aotearoa-again/issues/20)) ([072d42e](https://github.com/joshmcarthur/aotearoa-again/commit/072d42ef7ca1348b922df336d8f31832adb9857f))
+
 ## [0.3.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.2.1...v0.3.0) (2026-07-23)
 
 
