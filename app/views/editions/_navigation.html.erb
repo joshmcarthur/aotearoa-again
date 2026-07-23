@@ -6,7 +6,11 @@
       <span class="aa-edition-nav-empty" aria-hidden="true">&nbsp;</span>
     <% end %>
   </div>
-  <p class="aa-plate-date" aria-current="page">Edition · <%= l(@edition.publish_on, format: :long) %></p>
+  <% if block_given? %>
+    <%= yield %>
+  <% else %>
+    <span class="aa-edition-nav-empty" aria-hidden="true">&nbsp;</span>
+  <% end %>
   <div class="aa-edition-nav-next">
     <% if @next_edition %>
       <%= link_to "#{l(@next_edition.publish_on, format: :long)} →", edition_path(@next_edition) %>

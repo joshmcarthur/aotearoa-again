@@ -14,7 +14,9 @@
 
 <article class="aa-edition">
   <header class="aa-edition-header">
-    <%= render "navigation" %>
+    <%= render "navigation" do %>
+      <p class="aa-plate-date" aria-current="page">Edition · <%= l(@edition.publish_on, format: :long) %></p>
+    <% end %>
   </header>
   <h1 class="aa-title"><%= copy.title %></h1>
   <p class="aa-caption"><%= copy.caption %></p>
@@ -43,6 +45,10 @@
     >
   </div>
   <p class="mt-2 text-sm text-black/60">Drag to compare original and colourised plates.</p>
+
+  <div class="mt-8">
+    <%= render "navigation" %>
+  </div>
 
   <div class="aa-meta">
     <div>
