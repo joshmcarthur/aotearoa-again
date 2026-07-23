@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/joshmcarthur/aotearoa-again/compare/v0.2.0...v0.2.1) (2026-07-23)
+
+
+### Bug Fixes
+
+* use Fraunces on branded share images under macOS ([#14](https://github.com/joshmcarthur/aotearoa-again/issues/14)) ([dcc89f8](https://github.com/joshmcarthur/aotearoa-again/commit/dcc89f82e4a3960ea1c629f5e26f0a1da33e0c8f))
+
 ## [0.2.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.1.0...v0.2.0) (2026-07-23)
 
 
