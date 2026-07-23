@@ -15,7 +15,11 @@ class EditionsController < ApplicationController
   end
 
   def show
-    @edition = Edition.published.find_by!(publish_on: params[:publish_on])
+    @edition = Edition.find_by!(publish_on: params[:publish_on])
+    unless @edition.state == "published"
+      render :not_published, status: :not_found and return
+    end
+
     @copy = Editions::Copy.new(@edition.source_item)
   end
 end
