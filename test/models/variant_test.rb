@@ -20,4 +20,12 @@ class VariantTest < ActiveSupport::TestCase
     attach_fixture_image(@variant, name: :share_image)
     assert_equal @variant.share_image.blob_id, @variant.distribution_image.blob_id
   end
+
+  test "archive_image prefers unbranded composite_image" do
+    attach_fixture_image(@variant, name: :colourised_image)
+    assert_equal @variant.colourised_image.blob_id, @variant.archive_image.blob_id
+
+    attach_fixture_image(@variant, name: :composite_image)
+    assert_equal @variant.composite_image.blob_id, @variant.archive_image.blob_id
+  end
 end

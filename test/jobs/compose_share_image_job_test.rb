@@ -15,12 +15,14 @@ class ComposeShareImageJobTest < ActiveJob::TestCase
     attach_fixture_image(@variant, name: :colourised_image)
   end
 
-  test "creates share link and attaches share image" do
+  test "creates share link and attaches composite and share images" do
     ComposeShareImageJob.perform_now(@variant.id)
 
     @variant.reload
     assert @variant.share_link.present?
+    assert @variant.composite_image.attached?
     assert @variant.share_image.attached?
+    assert_equal "image/jpeg", @variant.composite_image.content_type
     assert_equal "image/jpeg", @variant.share_image.content_type
   end
 end

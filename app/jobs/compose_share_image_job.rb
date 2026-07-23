@@ -18,10 +18,15 @@ class ComposeShareImageJob < ApplicationJob
           short_url: share_link.url
         ).call
 
+        variant.composite_image.attach(
+          io: result.composite.io,
+          filename: result.composite.filename,
+          content_type: result.composite.content_type
+        )
         variant.share_image.attach(
-          io: result.io,
-          filename: result.filename,
-          content_type: result.content_type
+          io: result.share.io,
+          filename: result.share.filename,
+          content_type: result.share.content_type
         )
       end
     end

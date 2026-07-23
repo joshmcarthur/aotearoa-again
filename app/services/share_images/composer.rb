@@ -12,7 +12,8 @@ module ShareImages
     BRAND = "Aotearoa, Again"
     FONT_PATH = Rails.root.join("app/assets/fonts/Fraunces-Bold.ttf")
 
-    Result = Data.define(:io, :filename, :content_type)
+    ImageResult = Data.define(:io, :filename, :content_type)
+    Result = Data.define(:composite, :share)
 
     def initialize(original_path:, colourised_path:, short_url:)
       @original_path = original_path
@@ -41,20 +42,27 @@ module ShareImages
         colour = colour.thumbnail_image(width, height: height, size: :force)
       end
 
-      blended = soft_diagonal_blend(bw, colour, width, height)
+      # Materialize once — we write the unbranded composite and a branded copy.
+      blended = soft_diagonal_blend(bw, colour, width, height).copy_memory
       stamped = add_corner_chip(blended, width, height)
 
-      buffer = stamped.jpegsave_buffer(Q: 88)
       Result.new(
-        io: StringIO.new(buffer),
-        filename: "share.jpg",
-        content_type: "image/jpeg"
+        composite: jpeg_result(blended, "composite.jpg"),
+        share: jpeg_result(stamped, "share.jpg")
       )
     rescue Vips::Error => e
       raise Error, e.message
     end
 
     private
+
+    def jpeg_result(image, filename)
+      ImageResult.new(
+        io: StringIO.new(image.jpegsave_buffer(Q: 88)),
+        filename: filename,
+        content_type: "image/jpeg"
+      )
+    end
 
     def load_rgb(path)
       image = Vips::Image.new_from_file(path.to_s, access: :sequential)
