@@ -16,7 +16,7 @@
     <% @editions.each do |edition| %>
       <tr class="border-b border-stone-200">
         <td class="py-2"><%= edition.publish_on %></td>
-        <td><%= edition.source_item.title %></td>
+        <td><%= link_to edition.source_item.title, admin_edition_path(edition), class: "underline hover:text-stone-700" %></td>
         <td><%= edition.state %></td>
         <td><%= edition.variant.model.model_id %></td>
       </tr>
