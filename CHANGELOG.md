@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.5.0...v0.6.0) (2026-07-23)
+
+
+### Features
+
+* add date-labelled prev/next navigation between editions ([#24](https://github.com/joshmcarthur/aotearoa-again/issues/24)) ([398f576](https://github.com/joshmcarthur/aotearoa-again/commit/398f576f5cf88bfc8003b504e4089af4b4b13584))
+
+
+### Bug Fixes
+
+* match iOS browser chrome to paper background ([#26](https://github.com/joshmcarthur/aotearoa-again/issues/26)) ([31c9d39](https://github.com/joshmcarthur/aotearoa-again/commit/31c9d3964300a904f15cb0827632b870b5aabebc))
+
 ## [0.5.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.4.0...v0.5.0) (2026-07-23)
 
 
