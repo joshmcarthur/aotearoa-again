@@ -8,12 +8,26 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write
 
 jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
       - name: Create or update release PR
+        id: release
         uses: googleapis/release-please-action@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      # GITHUB_TOKEN-created releases do not trigger other workflows' `release` events.
+      # workflow_dispatch is an explicit exception, so publish Docker that way instead.
+      - name: Dispatch Docker publish
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run docker-publish.yml \
+            --repo "${{ github.repository }}" \
+            --ref "${{ steps.release.outputs.tag_name }}" \
+            -f tag="${{ steps.release.outputs.version }}"
