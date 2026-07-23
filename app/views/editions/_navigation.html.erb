@@ -1,0 +1,17 @@
+<nav class="aa-edition-nav" aria-label="Edition navigation">
+  <div class="aa-edition-nav-prev">
+    <% if @previous_edition %>
+      <%= link_to "← #{l(@previous_edition.publish_on, format: :long)}", edition_path(@previous_edition) %>
+    <% else %>
+      <span class="aa-edition-nav-empty" aria-hidden="true">&nbsp;</span>
+    <% end %>
+  </div>
+  <p class="aa-plate-date" aria-current="page">Edition · <%= l(@edition.publish_on, format: :long) %></p>
+  <div class="aa-edition-nav-next">
+    <% if @next_edition %>
+      <%= link_to "#{l(@next_edition.publish_on, format: :long)} →", edition_path(@next_edition) %>
+    <% else %>
+      <span class="aa-edition-nav-empty" aria-hidden="true">&nbsp;</span>
+    <% end %>
+  </div>
+</nav>
