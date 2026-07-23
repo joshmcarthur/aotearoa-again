@@ -8,8 +8,9 @@ atom_feed(language: "en-NZ", root_url: root_url, url: feed_url) do |feed|
     feed.entry(edition, url: edition_url(edition), id: edition_url(edition), published: edition.publish_on.to_time, updated: edition.updated_at) do |entry|
       entry.title(copy.title)
       entry.summary(copy.rss_summary, type: "text")
-      if edition.variant.colourised_image.attached?
-        entry.link(rel: "enclosure", type: edition.variant.colourised_image.content_type, href: rails_blob_url(edition.variant.colourised_image))
+      image = edition.variant.distribution_image
+      if image.attached?
+        entry.link(rel: "enclosure", type: image.content_type, href: rails_blob_url(image))
       end
       entry.author do |author|
         author.name(edition.source_item.content_partner.presence || "Alexander Turnbull Library")

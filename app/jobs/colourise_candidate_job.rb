@@ -28,6 +28,7 @@ class ColouriseCandidateJob < ApplicationJob
         filename: result[:filename],
         content_type: result[:content_type]
       )
+      ComposeShareImageJob.perform_later(variant.id)
     end
 
     candidate.mark_ready!

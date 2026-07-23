@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_21_234453) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_22_235722) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -130,6 +130,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_21_234453) do
     t.index ["preferred_for_colourise"], name: "index_models_on_preferred_for_colourise"
     t.index ["provider", "model_id"], name: "index_models_on_provider_and_model_id", unique: true
     t.index ["provider"], name: "index_models_on_provider"
+  end
+
+  create_table "share_links", force: :cascade do |t|
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "variant_id", null: false
+    t.index ["code"], name: "index_share_links_on_code", unique: true
+    t.index ["variant_id"], name: "index_share_links_on_variant_id", unique: true
   end
 
   create_table "solid_queue_blocked_executions", force: :cascade do |t|
@@ -310,6 +319,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_21_234453) do
   add_foreign_key "messages", "chats"
   add_foreign_key "messages", "models"
   add_foreign_key "messages", "tool_calls"
+  add_foreign_key "share_links", "variants"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

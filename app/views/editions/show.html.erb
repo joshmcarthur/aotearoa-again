@@ -7,8 +7,8 @@
   <meta property="og:description" content="<%= copy.caption.to_s.truncate(160) %>">
   <meta property="og:type" content="article">
   <meta property="og:url" content="<%= edition_url(@edition) %>">
-  <% if @edition.variant.colourised_image.attached? %>
-    <meta property="og:image" content="<%= url_for(@edition.variant.colourised_image) %>">
+  <% if @edition.variant.distribution_image.attached? %>
+    <meta property="og:image" content="<%= url_for(@edition.variant.distribution_image) %>">
   <% end %>
 <% end %>
 

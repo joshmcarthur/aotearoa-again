@@ -24,6 +24,8 @@ Edit with `bin/rails credentials:edit --environment <env>`.
 
 See `config/initializers/app_config.rb` for the credentials shape.
 
+On macOS, `bin/jobs` exports `OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` **before** starting Ruby and defaults Solid Queue to `--mode async` (no `fork()`). Fork mode crashes after libvips/CoreText loads for branded share images. Override with `SOLID_QUEUE_SUPERVISOR_MODE=fork` if you need fork mode.
+
 ## Pipeline
 
 1. `HarvestCandidatesJob` — DigitalNZ ATL images with Modify usage  

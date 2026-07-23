@@ -1,0 +1,14 @@
+<% content_for :title, "Not published yet — Aotearoa, Again" %>
+<% content_for :head do %>
+  <meta http-equiv="refresh" content="3;url=<%= root_path %>">
+<% end %>
+
+<section class="aa-empty">
+  <h1 class="aa-title">Not published yet</h1>
+  <p class="aa-caption mx-auto">
+    This plate isn’t live yet. Taking you to today’s edition.
+  </p>
+  <p class="mt-6">
+    <%= link_to "Go to today’s edition", root_path, class: "font-semibold text-[var(--color-sea)] underline" %>
+  </p>
+</section>
