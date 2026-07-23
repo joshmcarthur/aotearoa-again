@@ -4,12 +4,15 @@ module Admin
 
     def index
       @runway_days = Edition.approved_runway_days
-      @candidates = Candidate.ready.includes(:source_item, variants: :model).order(created_at: :desc)
+      @candidates = Candidate.ready
+        .includes(:source_item, variants: [ :model, :edition ], editions: { variant: :model })
+        .order(created_at: :desc)
       @pending = Candidate.where(status: %w[pending_colour colouring]).count
     end
 
     def show
-      @variants = @candidate.variants.includes(:model)
+      @variants = @candidate.variants.includes(:model, :edition)
+      @review_history = @candidate.review_history
     end
 
     def approve
