@@ -34,6 +34,9 @@ gem "bootsnap", require: false
 # Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
 gem "thruster", require: false
 
+# Multi-process startup (Docker, local dev via bin/dev and bin/server)
+gem "foreman", require: false
+
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 2.0"
 # Soft dependency of image_processing 2.x; required for ShareImages::Composer (`require "vips"`)

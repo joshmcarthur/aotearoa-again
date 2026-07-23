@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+export PORT="${PORT:-80}"
+export PANGOCAIRO_BACKEND="${PANGOCAIRO_BACKEND:-fontconfig}"
+
+exec bundle exec foreman start -f Procfile "$@"

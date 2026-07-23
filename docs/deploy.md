@@ -101,12 +101,11 @@ docker run -d \
   -p 127.0.0.1:3000:80 \
   -e RAILS_MASTER_KEY=<production.key> \
   -e RAILS_ENV=production \
-  -e SOLID_QUEUE_IN_PUMA=true \
   -v aotearoa_again_storage:/rails/storage \
   ghcr.io/joshmcarthur/aotearoa-again:<version>
 ```
 
-Point the Cloudflare Tunnel at `http://127.0.0.1:3000`. The `/rails/storage` volume holds SQLite databases and Active Storage blobs — back it up.
+The image starts **Foreman** with two processes: Thruster (web) and `bin/jobs` (Solid Queue workers plus recurring schedules from `config/recurring.yml`). You do not need `SOLID_QUEUE_IN_PUMA` in the container.
 
 The image repository is private by default. In GitHub, open **Packages → aotearoa-again → Package settings** and grant your account or org access before pulling on the host.
 
