@@ -1,0 +1,92 @@
+<% content_for :title, "About — Aotearoa, Again" %>
+<% content_for :meta_description, "What Aotearoa, Again is, how it works, and an honest look at the trade-offs of using AI to colourise historical photographs." %>
+
+<article class="aa-edition">
+  <h1 class="aa-title">About</h1>
+  <p class="aa-lead">
+    Daily photographs from the Alexander Turnbull Library, seen again in colour.
+    This is a small experiment in making Aotearoa&rsquo;s visual history easier to notice and enjoy.
+  </p>
+
+  <section class="aa-about-section">
+    <h2>What is this?</h2>
+    <p>
+      Every day we publish one historical photograph from the Alexander Turnbull Library,
+      sourced through <%= link_to "DigitalNZ", "https://digitalnz.org/", target: "_blank", rel: "noopener", class: "font-semibold text-[var(--color-sea)] underline" %>.
+      Each plate is AI colourised and reviewed before it goes live on the site, in the feed, and in the newsletter.
+    </p>
+    <p>
+      The originals remain in the archive. We are not replacing them &mdash; we are offering another way in.
+    </p>
+  </section>
+
+  <section class="aa-about-section">
+    <h2>Why we think it is worth doing</h2>
+    <ol class="aa-about-list">
+      <li>
+        <strong>It surfaces material that often stays in the stacks.</strong>
+        The library holds an enormous record of New Zealand life. Colour can help a photograph feel closer to the present,
+        and a daily edition gives people a reason to stop and look.
+      </li>
+      <li>
+        <strong>It helps people connect with the past.</strong>
+        Black-and-white can feel distant. A colourised plate is not history as it was lived,
+        but it can invite curiosity about who was in the frame, where they were, and what was happening that day.
+      </li>
+      <li>
+        <strong>A small team can keep it going.</strong>
+        Finding, colourising, and publishing one plate a day by hand would be a full-time job.
+        AI makes a steady rhythm possible without a large studio behind it.
+      </li>
+      <li>
+        <strong>We keep the archive in the picture.</strong>
+        Every edition links back to the library record, credits the creator where known,
+        and states the rights. The source always comes first.
+      </li>
+    </ol>
+  </section>
+
+  <section class="aa-about-section">
+    <h2>What to keep in mind</h2>
+    <ol class="aa-about-list">
+      <li>
+        <strong>Colours are interpretive, not documentary.</strong>
+        AI guesses at colour from a greyscale original. It cannot know what a dress, a sky, or a hillside really looked like.
+        Treat every colourised plate as an impression, not evidence.
+      </li>
+      <li>
+        <strong>AI is not a historian.</strong>
+        It can miss context, oversimplify, or get details wrong without showing its working.
+        If you need certainty, read the official record &mdash; not our daily plate.
+      </li>
+      <li>
+        <strong>Using AI has a cost.</strong>
+        Colourising photographs takes compute, and compute uses energy.
+        We publish one plate a day rather than colourising everything we can find, partly for that reason.
+      </li>
+      <li>
+        <strong>Human review is a gate, not a guarantee.</strong>
+        We check each edition before it ships, but we cannot promise perfection on every hue or caption.
+      </li>
+    </ol>
+  </section>
+
+  <section class="aa-about-section">
+    <h2>How we do it</h2>
+    <ol class="aa-about-list">
+      <li>Find reusable photographs from the Alexander Turnbull Library via DigitalNZ.</li>
+      <li>Send the image to an AI colourisation model, with a human in the loop before anything is published.</li>
+      <li>Publish one edition each morning (New Zealand time), with attribution, rights, and a link to the original record.</li>
+    </ol>
+    <p>
+      If a plate is not to your taste, drag the compare slider on any edition to see the untouched original beside the colourised version.
+    </p>
+  </section>
+
+  <section class="aa-about-section">
+    <p>
+      On balance, we think the good outweighs the caveats &mdash; if we are clear about what AI can and cannot do,
+      and if we always point you back to the archive. If you have questions or corrections, we would like to hear them.
+    </p>
+  </section>
+</article>
