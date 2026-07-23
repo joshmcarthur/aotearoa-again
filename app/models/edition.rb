@@ -44,4 +44,12 @@ class Edition < ApplicationRecord
   def to_param
     publish_on.iso8601
   end
+
+  def previous_published
+    self.class.published.where("publish_on > ?", publish_on).order(:publish_on).first
+  end
+
+  def next_published
+    self.class.published.where("publish_on < ?", publish_on).order(publish_on: :desc).first
+  end
 end

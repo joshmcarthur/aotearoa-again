@@ -62,4 +62,37 @@ class EditionsControllerTest < ActionDispatch::IntegrationTest
     og_image = response.body[/property="og:image" content="([^"]+)"/, 1]
     assert_includes og_image, @variant.share_image.blob.signed_id
   end
+
+  test "show renders adjacent edition navigation" do
+    older_source = create_source_item(title: "Older plate")
+    older_candidate = older_source.candidates.create!(status: "ready")
+    attach_fixture_image(older_candidate)
+    older_variant = older_candidate.variants.create!(model: @model, prompt: "colourise", chosen: true)
+    attach_fixture_image(older_variant, name: :colourised_image)
+    older = Edition.create!(
+      variant: older_variant,
+      publish_on: 1.day.ago.to_date,
+      state: "published",
+      published_at: 1.day.ago
+    )
+
+    newer_source = create_source_item(title: "Newer plate")
+    newer_candidate = newer_source.candidates.create!(status: "ready")
+    attach_fixture_image(newer_candidate)
+    newer_variant = newer_candidate.variants.create!(model: @model, prompt: "colourise", chosen: true)
+    attach_fixture_image(newer_variant, name: :colourised_image)
+    newer = Edition.create!(
+      variant: newer_variant,
+      publish_on: Time.zone.tomorrow,
+      state: "published",
+      published_at: Time.current
+    )
+
+    get edition_url(@edition)
+    assert_response :success
+    assert_match I18n.l(newer.publish_on, format: :long), response.body
+    assert_match I18n.l(older.publish_on, format: :long), response.body
+    assert_match edition_path(newer), response.body
+    assert_match edition_path(older), response.body
+  end
 end

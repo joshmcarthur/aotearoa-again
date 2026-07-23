@@ -48,4 +48,33 @@ class EditionTest < ActiveSupport::TestCase
     assert_equal 1, Edition.where(publish_on: publish_on).count
     assert_equal 1, Edition.joins(:variant).where(variants: { candidate_id: @candidate.id }).count
   end
+
+  test "previous_published returns newer published edition" do
+    older = Edition.create!(variant: @variant, publish_on: 2.days.ago.to_date, state: "published", published_at: 2.days.ago)
+    middle = Edition.create!(variant: @variant, publish_on: 1.day.ago.to_date, state: "published", published_at: 1.day.ago)
+    newer = Edition.create!(variant: @variant, publish_on: Time.zone.today, state: "published", published_at: Time.current)
+
+    assert_equal newer, middle.previous_published
+    assert_equal middle, older.previous_published
+    assert_nil newer.previous_published
+  end
+
+  test "next_published returns older published edition" do
+    older = Edition.create!(variant: @variant, publish_on: 2.days.ago.to_date, state: "published", published_at: 2.days.ago)
+    middle = Edition.create!(variant: @variant, publish_on: 1.day.ago.to_date, state: "published", published_at: 1.day.ago)
+    newer = Edition.create!(variant: @variant, publish_on: Time.zone.today, state: "published", published_at: Time.current)
+
+    assert_equal middle, newer.next_published
+    assert_equal older, middle.next_published
+    assert_nil older.next_published
+  end
+
+  test "adjacent published methods ignore unpublished editions" do
+    published = Edition.create!(variant: @variant, publish_on: 2.days.ago.to_date, state: "published", published_at: 2.days.ago)
+    Edition.create!(variant: @variant, publish_on: 1.day.ago.to_date, state: "scheduled")
+    current = Edition.create!(variant: @variant, publish_on: Time.zone.today, state: "published", published_at: Time.current)
+
+    assert_equal published, current.next_published
+    assert_nil published.next_published
+  end
 end
