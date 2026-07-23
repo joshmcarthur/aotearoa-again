@@ -37,7 +37,7 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 2.0"
 # Soft dependency of image_processing 2.x; required for ShareImages::Composer (`require "vips"`)
-gem "ruby-vips", "~> 2.2"
+gem "ruby-vips", "~> 2.2", require: false
 
 gem "ruby_llm"
 gem "faraday"
