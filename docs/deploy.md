@@ -91,12 +91,20 @@ ghcr.io/joshmcarthur/aotearoa-again:<version>
 ghcr.io/joshmcarthur/aotearoa-again:latest
 ```
 
-To deploy a tagged image with Kamal:
+To run a tagged image on the host:
 
 ```bash
-export KAMAL_REGISTRY_PASSWORD=<github-token-with-read:packages>
-bin/kamal deploy --version=<version>
+echo <github-token-with-read:packages> | docker login ghcr.io -u USERNAME --password-stdin
+docker pull ghcr.io/joshmcarthur/aotearoa-again:<version>
+docker run -d \
+  --name aotearoa-again \
+  -p 127.0.0.1:3000:80 \
+  -e RAILS_MASTER_KEY=<production.key> \
+  -e RAILS_ENV=production \
+  ghcr.io/joshmcarthur/aotearoa-again:<version>
 ```
+
+Point the Cloudflare Tunnel at `http://127.0.0.1:3000`. Persist `storage/` (and the database, if it runs in the container) with a volume or bind mount as needed.
 
 The image repository is private by default. In GitHub, open **Packages → aotearoa-again → Package settings** and grant your account or org access before pulling on the host.
 
