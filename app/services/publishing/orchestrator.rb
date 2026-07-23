@@ -36,7 +36,7 @@ module Publishing
         host: AppConfig.app_host,
         protocol: AppConfig.protocol
       )
-      image_url = colourised_url
+      image_url = distribution_image_url
 
       payload = @buttondown.create_draft(
         subject: copy.title,
@@ -47,8 +47,8 @@ module Publishing
       delivery.fail!(e.message)
     end
 
-    def colourised_url
-      image = @edition.variant.colourised_image
+    def distribution_image_url
+      image = @edition.variant.distribution_image
       return unless image.attached?
 
       Rails.application.routes.url_helpers.rails_blob_url(
