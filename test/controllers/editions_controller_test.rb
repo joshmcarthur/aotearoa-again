@@ -63,6 +63,3 @@ class EditionsControllerTest < ActionDispatch::IntegrationTest
     assert_includes og_image, @variant.share_image.blob.signed_id
   end
 end
-
-
-
