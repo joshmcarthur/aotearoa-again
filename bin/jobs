@@ -6,6 +6,10 @@ APP_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 cd "$APP_ROOT"
 export APP_ROOT
 
+# libvips text needs the fontconfig pango backend so `fontfile` (Fraunces) is
+# honoured. On macOS the default CoreText backend ignores fontfile.
+export PANGOCAIRO_BACKEND="${PANGOCAIRO_BACKEND:-fontconfig}"
+
 # macOS: OBJC fork-safety must be set *before* Ruby starts (setting ENV in Ruby is too late).
 # libvips text/fonts initialize CoreText/UIFont; Solid Queue's default fork mode then crashes.
 # Prefer async supervisor mode locally so workers run in-process on threads instead of fork().

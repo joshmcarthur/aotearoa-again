@@ -2,6 +2,10 @@ require "rqrcode"
 require "stringio"
 require "vips"
 
+# Pango on macOS defaults to CoreText, which ignores `fontfile` and silently
+# falls back to Helvetica. Force fontconfig before any Vips::Image.text call.
+ENV["PANGOCAIRO_BACKEND"] ||= "fontconfig"
+
 module ShareImages
   class Composer
     class Error < StandardError; end
@@ -135,6 +139,8 @@ module ShareImages
     end
 
     def brand_text(max_width, max_height)
+      raise Error, "brand font missing: #{FONT_PATH}" unless FONT_PATH.exist?
+
       text = Vips::Image.text(
         BRAND,
         font: "Fraunces Bold",

@@ -1,4 +1,6 @@
 ENV["RAILS_ENV"] ||= "test"
+# Must be set before any Vips::Image.text call (CoreText locks the backend).
+ENV["PANGOCAIRO_BACKEND"] ||= "fontconfig"
 require_relative "../config/environment"
 require "rails/test_help"
 require "webmock/minitest"
