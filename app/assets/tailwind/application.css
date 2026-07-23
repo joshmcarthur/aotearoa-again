@@ -11,6 +11,10 @@
 }
 
 @layer base {
+  html {
+    background-color: var(--color-paper);
+  }
+
   .aa-body {
     @apply m-0 min-h-screen text-[var(--color-ink)];
     font-family: var(--font-body);
