@@ -55,6 +55,10 @@
     @apply mx-auto max-w-6xl px-4 py-10 text-sm text-black/60;
   }
 
+  .aa-footer-link {
+    @apply font-semibold text-[var(--color-sea)] underline;
+  }
+
   .aa-edition {
     @apply mx-auto max-w-6xl px-4 py-8;
   }
@@ -70,6 +74,10 @@
 
   .aa-caption {
     @apply mt-4 max-w-3xl text-lg leading-relaxed text-black/80;
+  }
+
+  .aa-lead {
+    @apply mt-4 max-w-3xl text-xl leading-relaxed text-black/75 md:text-2xl;
   }
 
   .aa-compare {
@@ -111,6 +119,27 @@
 
   .aa-disclaimer {
     @apply mt-6 border-l-4 border-[var(--color-ember)] pl-4 text-sm text-black/70;
+  }
+
+  .aa-about-section {
+    @apply mt-10 max-w-3xl;
+  }
+
+  .aa-about-section h2 {
+    font-family: var(--font-display);
+    @apply text-xl font-semibold;
+  }
+
+  .aa-about-section p {
+    @apply mt-3 leading-relaxed text-black/80;
+  }
+
+  .aa-about-list {
+    @apply mt-4 list-decimal space-y-4 pl-5 leading-relaxed text-black/80;
+  }
+
+  .aa-about-list strong {
+    @apply text-[var(--color-ink)];
   }
 
   .aa-archive-list {

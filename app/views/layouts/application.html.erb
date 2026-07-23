@@ -25,6 +25,7 @@
         </a>
         <nav class="aa-nav">
           <%= link_to "Archive", editions_path %>
+          <%= link_to "About", about_path %>
           <%= link_to "Feed", feed_path %>
           <%= link_to "Subscribe", subscribe_path %>
         </nav>
@@ -34,7 +35,10 @@
       <%= yield %>
     </main>
     <footer class="aa-footer">
-      <p>Photographs courtesy of the Alexander Turnbull Library, via DigitalNZ. AI colourised — colours are interpretive.</p>
+      <p>
+        Photographs courtesy of the Alexander Turnbull Library, via DigitalNZ. AI colourised — colours are interpretive.
+        <span aria-hidden="true"> · </span><%= link_to "About", about_path, class: "aa-footer-link" %>
+      </p>
     </footer>
   </body>
 </html>

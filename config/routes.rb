@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   resources :editions, only: %i[index show], param: :publish_on
   get "/s/:code", to: "share_links#show", as: :share_link
   get "/feed.xml", to: "feeds#show", as: :feed
+  get "/about", to: "pages#about", as: :about
   get "/subscribe", to: "pages#subscribe", as: :subscribe
 
   namespace :admin do

@@ -1,4 +1,7 @@
 class PagesController < ApplicationController
+  def about
+  end
+
   def subscribe
     url = AppConfig.buttondown_subscribe_url.presence
     if url
