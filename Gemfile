@@ -72,3 +72,6 @@ group :test do
   gem "vcr"
   gem "webmock"
 end
+
+gem "rqrcode", "~> 3.2"
+gem "chunky_png", "~> 1.4"
