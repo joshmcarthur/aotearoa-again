@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.4.0...v0.5.0) (2026-07-23)
+
+
+### Features
+
+* add About page with balanced project overview ([#22](https://github.com/joshmcarthur/aotearoa-again/issues/22)) ([faaf92c](https://github.com/joshmcarthur/aotearoa-again/commit/faaf92c2130bb8c2ae5972e38d86eaa4727da49d))
+
 ## [0.4.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.3.0...v0.4.0) (2026-07-23)
 
 
