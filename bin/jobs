@@ -1,5 +1,11 @@
 #!/usr/bin/env ruby
 
+# macOS: Core Text/UIFont can initialize while loading libvips fonts (share image
+# composition). Solid Queue then forks workers, and objc aborts without this flag.
+if RUBY_PLATFORM.include?("darwin")
+  ENV["OBJC_DISABLE_INITIALIZE_FORK_SAFETY"] ||= "YES"
+end
+
 require_relative "../config/environment"
 require "solid_queue/cli"
 

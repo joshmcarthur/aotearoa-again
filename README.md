@@ -24,6 +24,8 @@ Edit with `bin/rails credentials:edit --environment <env>`.
 
 See `config/initializers/app_config.rb` for the credentials shape.
 
+On macOS, `bin/jobs` and `bin/dev` set `OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` so Solid Queue’s forked workers don’t crash after libvips/font initialization (used for branded share images).
+
 ## Pipeline
 
 1. `HarvestCandidatesJob` — DigitalNZ ATL images with Modify usage  

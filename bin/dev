@@ -8,9 +8,16 @@ fi
 # Default to port 3000 if not specified
 export PORT="${PORT:-3000}"
 
+# macOS + forked Solid Queue/Puma workers: avoid UIFont/CoreText fork crashes
+# (e.g. after libvips text/fonts load during share image composition).
+if [ "$(uname -s)" = "Darwin" ]; then
+  export OBJC_DISABLE_INITIALIZE_FORK_SAFETY="${OBJC_DISABLE_INITIALIZE_FORK_SAFETY:-YES}"
+fi
+
+
 # Let the debug gem allow remote connections,
 # but avoid loading until `debugger` is called
 export RUBY_DEBUG_OPEN="true"
 export RUBY_DEBUG_LAZY="true"
-
+true
 exec foreman start -f Procfile.dev "$@"
