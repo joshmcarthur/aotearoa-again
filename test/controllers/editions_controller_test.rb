@@ -29,6 +29,18 @@ class EditionsControllerTest < ActionDispatch::IntegrationTest
     assert_match "Alexander Turnbull Library", response.body
   end
 
+  test "today without edition for today shows unavailable with link to latest" do
+    @edition.update!(publish_on: 2.days.ago.to_date)
+
+    get root_url
+    assert_response :not_found
+    assert_match "Today's edition isn't ready yet", response.body
+    assert_match I18n.l(Time.zone.today, format: :long), response.body
+    assert_match I18n.l(@edition.publish_on, format: :long), response.body
+    assert_match edition_path(@edition), response.body
+    assert_no_match "Published plate", response.body
+  end
+
   test "archive lists editions with unbranded composite thumb" do
     attach_fixture_image(@variant, name: :composite_image)
     attach_fixture_image(@variant, name: :share_image)
