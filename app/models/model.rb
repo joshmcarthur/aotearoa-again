@@ -5,7 +5,10 @@ class Model < ApplicationRecord
 
   scope :preferred_for_colourise, -> { where(preferred_for_colourise: true) }
   scope :image_capable, -> {
-    where("modalities -> 'output' @> ?", [ "image" ].to_json)
+    where(
+      "EXISTS (SELECT 1 FROM json_each(models.modalities, '$.output') WHERE json_each.value = ?)",
+      "image"
+    )
   }
   scope :openrouter, -> { where(provider: "openrouter") }
 
