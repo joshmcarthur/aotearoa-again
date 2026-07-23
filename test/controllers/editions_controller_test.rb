@@ -29,11 +29,16 @@ class EditionsControllerTest < ActionDispatch::IntegrationTest
     assert_match "Alexander Turnbull Library", response.body
   end
 
-  test "archive lists editions" do
+  test "archive lists editions with unbranded composite thumb" do
+    attach_fixture_image(@variant, name: :composite_image)
+    attach_fixture_image(@variant, name: :share_image)
+
     get editions_url
     assert_response :success
     assert_match "Published plate", response.body
+    assert_includes response.body, @variant.composite_image.blob.signed_id
   end
+
 
   test "feed includes edition" do
     get feed_url
