@@ -16,7 +16,7 @@ Rails.application.routes.draw do
         post :regenerate
       end
     end
-    resources :editions, only: %i[index]
+    resources :editions, only: %i[index show]
     resources :models, only: %i[index] do
       member do
         patch :toggle_preferred
