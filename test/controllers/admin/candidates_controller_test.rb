@@ -45,6 +45,14 @@ module Admin
       assert_match "Colourised", response.body
     end
 
+    test "index excludes ready candidates already in editions" do
+      Edition.create!(variant: @variant, publish_on: Time.zone.tomorrow, state: "scheduled")
+
+      get admin_candidates_url, headers: basic_auth
+      assert_response :success
+      assert_no_match @source.title, response.body
+    end
+
     test "approve schedules edition" do
       post approve_admin_candidate_url(@candidate), params: { variant_id: @variant.id }, headers: basic_auth
       assert_redirected_to admin_candidates_path
