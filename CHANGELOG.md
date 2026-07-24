@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1](https://github.com/joshmcarthur/aotearoa-again/compare/v0.6.0...v0.6.1) (2026-07-24)
+
+
+### Bug Fixes
+
+* exclude edition candidates from harvest pipeline ([#30](https://github.com/joshmcarthur/aotearoa-again/issues/30)) ([1321ce0](https://github.com/joshmcarthur/aotearoa-again/commit/1321ce00299ef4a645318c9887cc2182790d2a66))
+
 ## [0.6.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.5.0...v0.6.0) (2026-07-23)
 
 
