@@ -24,4 +24,8 @@ class Candidate < ApplicationRecord
   def reject!(reason: nil)
     update!(status: "rejected", rejection_reason: reason)
   end
+
+  def review_history
+    Candidates::ReviewHistory.new(self)
+  end
 end
