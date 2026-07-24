@@ -1,11 +1,12 @@
 class EditionsController < ApplicationController
   def today
-    @edition = Edition.published.find_by(publish_on: Time.zone.today) ||
-               Edition.published.order(publish_on: :desc).first
+    @edition = Edition.published.find_by(publish_on: Time.zone.today)
     if @edition
       @copy = Editions::Copy.new(@edition.source_item)
       set_adjacent_editions
       render :show
+    elsif (@latest_edition = Edition.published.order(publish_on: :desc).first)
+      render :unavailable, status: :not_found
     else
       render :empty
     end

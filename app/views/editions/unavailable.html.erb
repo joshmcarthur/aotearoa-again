@@ -1,0 +1,11 @@
+<% content_for :title, "Today's edition isn't ready yet — Aotearoa, Again" %>
+
+<section class="aa-empty">
+  <h1 class="aa-title">Today's edition isn't ready yet</h1>
+  <p class="aa-caption mx-auto">
+    There isn't a plate for <%= l(Time.zone.today, format: :long) %> yet. We publish each morning from the Alexander Turnbull Library.
+  </p>
+  <p class="mt-6">
+    <%= link_to "View the latest edition (#{l(@latest_edition.publish_on, format: :long)})", edition_path(@latest_edition), class: "font-semibold text-[var(--color-sea)] underline" %>
+  </p>
+</section>

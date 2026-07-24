@@ -11,8 +11,8 @@ class Edition < ApplicationRecord
 
   scope :scheduled, -> { where(state: "scheduled") }
   scope :published, -> { where(state: "published") }
-  scope :upcoming, -> { scheduled.where("publish_on >= ?", Date.current).order(:publish_on) }
-  scope :past, -> { published.where("publish_on < ?", Date.current).order(publish_on: :desc) }
+  scope :upcoming, -> { scheduled.where("publish_on >= ?", Time.zone.today).order(:publish_on) }
+  scope :past, -> { published.where("publish_on < ?", Time.zone.today).order(publish_on: :desc) }
 
   def self.for_date(date)
     find_by(publish_on: date)
