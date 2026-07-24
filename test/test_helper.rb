@@ -3,6 +3,7 @@ ENV["RAILS_ENV"] ||= "test"
 ENV["PANGOCAIRO_BACKEND"] ||= "fontconfig"
 require_relative "../config/environment"
 require "rails/test_help"
+require "minitest/mock"
 require "webmock/minitest"
 require "vcr"
 
