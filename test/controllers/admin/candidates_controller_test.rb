@@ -28,21 +28,21 @@ module Admin
       assert_match "Needs review", response.body
     end
 
-    test "index shows scheduled status for approved candidate" do
-      @variant.update!(chosen: true)
-      Edition.create!(variant: @variant, publish_on: Time.zone.tomorrow, state: "scheduled")
-
-      get admin_candidates_url, headers: basic_auth
-      assert_response :success
-      assert_match "Scheduled", response.body
-      assert_match Time.zone.tomorrow.to_s, response.body
-    end
-
     test "show displays history timeline" do
       get admin_candidate_url(@candidate), headers: basic_auth
       assert_response :success
       assert_match "History", response.body
       assert_match "Colourised", response.body
+    end
+
+    test "show displays scheduled status for approved candidate" do
+      @variant.update!(chosen: true)
+      Edition.create!(variant: @variant, publish_on: Time.zone.tomorrow, state: "scheduled")
+
+      get admin_candidate_url(@candidate), headers: basic_auth
+      assert_response :success
+      assert_match "Scheduled", response.body
+      assert_match Time.zone.tomorrow.to_s, response.body
     end
 
     test "index excludes ready candidates already in editions" do
