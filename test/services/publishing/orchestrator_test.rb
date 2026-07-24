@@ -9,7 +9,7 @@ module Publishing
         @calls = []
       end
 
-      def create_draft(subject:, body:)
+      def create_and_send(subject:, body:)
         @calls << { subject: subject, body: body }
         { "id" => "bd_123" }
       end

@@ -16,11 +16,10 @@ module Publishing
       end
     end
 
-    # Creates a draft only — never queues a send. Promote via Buttondown UI
-    # or a later PATCH to status "about_to_send" / "scheduled".
-    def create_draft(subject:, body:)
-      # Path must be relative (no leading slash) so Faraday keeps BASE_URL's /v1.
-      response = @http.post("emails") do |req|
+    # Creates an email draft, then publishes it immediately (no UI step).
+    def create_and_send(subject:, body:)
+      # Paths must be relative (no leading slash) so Faraday keeps BASE_URL's /v1.
+      create_response = @http.post("emails") do |req|
         req.headers["Authorization"] = "Token #{@api_key}"
         req.body = {
           subject: subject,
@@ -28,7 +27,15 @@ module Publishing
           status: "draft"
         }
       end
-      JSON.parse(response.body)
+      payload = JSON.parse(create_response.body)
+      email_id = payload.fetch("id")
+
+      @http.post("emails/#{email_id}/publish") do |req|
+        req.headers["Authorization"] = "Token #{@api_key}"
+        req.body = {}
+      end
+
+      payload
     rescue Faraday::Error => e
       raise Error, "Buttondown request failed: #{e.message}"
     end
