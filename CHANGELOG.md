@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.6.1...v0.7.0) (2026-07-24)
+
+
+### Features
+
+* send Buttondown emails immediately on publish ([#32](https://github.com/joshmcarthur/aotearoa-again/issues/32)) ([4c6d63f](https://github.com/joshmcarthur/aotearoa-again/commit/4c6d63f269171195caeb68af813a8e07186ef149))
+
 ## [0.6.1](https://github.com/joshmcarthur/aotearoa-again/compare/v0.6.0...v0.6.1) (2026-07-24)
 
 
