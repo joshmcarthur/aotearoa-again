@@ -38,7 +38,7 @@ module Publishing
       )
       image_url = distribution_image_url
 
-      payload = @buttondown.create_draft(
+      payload = @buttondown.create_and_send(
         subject: copy.title,
         body: copy.email_markdown(edition_url: edition_url, image_url: image_url)
       )
