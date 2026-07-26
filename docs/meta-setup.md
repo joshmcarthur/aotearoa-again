@@ -12,7 +12,7 @@ Meta credentials are **optional**. Instagram and Facebook are gated independentl
 
 When a channel is not configured (or the item is not commercial-use), Approver skips that delivery and Orchestrator skips publishing for it (web + email still publish).
 
-Preferred credentials shape:
+Credentials shape:
 
 ```yaml
 meta:
@@ -22,8 +22,6 @@ meta:
 app:
   host: your.public.hostname      # no https:// — must be reachable by Meta
 ```
-
-**Legacy fallback:** if `meta.page_access_token` / `meta.instagram_user_id` are blank, AppConfig still reads `instagram.access_token` / `instagram.user_id`. Prefer migrating to `meta:`.
 
 Meta fetches `https://YOUR_HOST/editions/YYYY-MM-DD/share.jpg` at publish time. **localhost will not work** unless you expose the app with a public HTTPS tunnel and set `app.host` to that hostname.
 
@@ -199,7 +197,7 @@ Expired tokens surface as Instagram/Facebook delivery failures → `AdminMailer.
 
 | Symptom | Fix |
 |---|---|
-| Missing credentials on boot/publish | Add `meta.*` (or legacy `instagram.*`) to env credentials |
+| Missing credentials on boot/publish | Add `meta.*` to env credentials |
 | `instagram_business_account` null | Professional IG + linked Page |
 | Image / media create errors | Public HTTPS `app.host` + working `/share.jpg` |
 | Permission errors | Wrong scopes (need `pages_manage_posts` for Facebook), or user not a role on the Dev-mode app |

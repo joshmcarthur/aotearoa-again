@@ -40,7 +40,6 @@ Files:
 | `meta.page_access_token` | Optional — Page access token; Meta deliveries skipped if blank |
 | `meta.page_id` | Optional — Facebook Page id (enables Facebook Page posting) |
 | `meta.instagram_user_id` | Optional — Instagram professional account id (enables Instagram) |
-| `instagram.access_token` / `instagram.user_id` | Legacy fallback if `meta.*` token/IG user blank |
 | `admin.username` / `admin.password` | HTTP Basic for `/admin` |
 | `admin.alert_email` | Runway / delivery alerts |
 | `app.host` | Public hostname (no protocol), e.g. `aotearoa-again.example` |

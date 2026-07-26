@@ -21,10 +21,6 @@
 #     page_access_token: ...   # Page access token from /me/accounts
 #     page_id: ...             # enables Facebook Page posting
 #     instagram_user_id: ...   # enables Instagram Content Publishing
-#   # Legacy (still read if meta.* blank):
-#   # instagram:
-#   #   access_token: ...
-#   #   user_id: ...
 #   admin:
 #     username: admin
 #     password: ...
@@ -50,23 +46,11 @@ module AppConfig
 
   def buttondown_subscribe_url = dig(:buttondown, :subscribe_url)
 
-  def meta_page_access_token
-    dig(:meta, :page_access_token).presence || dig(:instagram, :access_token)
-  end
+  def meta_page_access_token = dig(:meta, :page_access_token)
 
   def meta_page_id = dig(:meta, :page_id)
 
-  def meta_instagram_user_id
-    dig(:meta, :instagram_user_id).presence || dig(:instagram, :user_id)
-  end
-
-  def instagram_access_token = meta_page_access_token
-
-  def instagram_user_id = meta_instagram_user_id
-
-  def facebook_page_id = meta_page_id
-
-  def facebook_access_token = meta_page_access_token
+  def meta_instagram_user_id = dig(:meta, :instagram_user_id)
 
   def instagram_configured?
     meta_page_access_token.present? && meta_instagram_user_id.present?
