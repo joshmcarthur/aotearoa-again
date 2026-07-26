@@ -90,6 +90,22 @@ module Publishing
       assert_equal "succeeded", @edition.deliveries.find_by(channel: "email").status
     end
 
+    test "skips instagram without commercial use" do
+      @source.update!(usage_flags: %w[Modify Share])
+      buttondown = FakeButtondown.new
+      instagram = FakeInstagram.new
+
+      AppConfig.stub(:instagram_configured?, true) do
+        Orchestrator.new(@edition, buttondown: buttondown, instagram: instagram).call
+      end
+
+      @edition.reload
+      assert_equal "published", @edition.state
+      assert_nil @edition.deliveries.find_by(channel: "instagram")
+      assert_equal 0, instagram.calls.size
+      assert_equal "succeeded", @edition.deliveries.find_by(channel: "email").status
+    end
+
     test "fails edition when instagram delivery fails" do
       AppConfig.stub(:instagram_configured?, true) do
         buttondown = FakeButtondown.new

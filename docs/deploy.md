@@ -82,7 +82,7 @@ If DigitalNZ/ATL request removal:
 
 Harvest is limited to NatLib's Meta-upload-eligible ATL subset (DigitalNZ **Use commercially** + **Modify**). See [natlib-social-media.md](natlib-social-media.md) for caption, people/tikanga, and takedown rules.
 
-Optional Instagram delivery via the Meta Graph API Content Publishing flow. Credentials are optional — when blank, Approver skips creating an Instagram delivery and Orchestrator skips the channel (web + email still publish).
+Optional Instagram delivery via the Meta Graph API Content Publishing flow. Credentials are optional — when blank, or when the source item lacks DigitalNZ **Use commercially** (`SourceItem#commercial_use?`), Approver skips creating an Instagram delivery and Orchestrator skips the channel (web + email still publish).
 
 ### Meta app setup (own account)
 

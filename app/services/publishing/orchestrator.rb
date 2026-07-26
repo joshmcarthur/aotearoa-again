@@ -49,8 +49,8 @@ module Publishing
     end
 
     def deliver_instagram
-      unless AppConfig.instagram_configured?
-        skip_unconfigured_instagram_delivery
+      unless instagram_delivery?
+        skip_instagram_delivery
         return
       end
 
@@ -74,7 +74,11 @@ module Publishing
       delivery.fail!(e.message)
     end
 
-    def skip_unconfigured_instagram_delivery
+    def instagram_delivery?
+      AppConfig.instagram_configured? && @edition.source_item.commercial_use?
+    end
+
+    def skip_instagram_delivery
       delivery = @edition.deliveries.find_by(channel: "instagram")
       return unless delivery
       return if delivery.status == "succeeded"

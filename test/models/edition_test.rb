@@ -40,6 +40,14 @@ class EditionTest < ActiveSupport::TestCase
     end
   end
 
+  test "approver omits instagram delivery without commercial use" do
+    @source.update!(usage_flags: %w[Modify Share])
+    AppConfig.stub(:instagram_configured?, true) do
+      edition = Editions::Approver.new(@candidate, variant: @variant).call
+      assert_equal %w[email web], edition.deliveries.order(:channel).pluck(:channel)
+    end
+  end
+
   test "approver replaces existing edition variant instead of scheduling another" do
     existing = Editions::Approver.new(@candidate, variant: @variant).call
     publish_on = existing.publish_on

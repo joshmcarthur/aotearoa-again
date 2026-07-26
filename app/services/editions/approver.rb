@@ -33,10 +33,14 @@ module Editions
       )
       edition.deliveries.create!(channel: "web", status: "pending")
       edition.deliveries.create!(channel: "email", status: "pending")
-      if AppConfig.instagram_configured?
+      if instagram_delivery?
         edition.deliveries.create!(channel: "instagram", status: "pending")
       end
       edition
+    end
+
+    def instagram_delivery?
+      AppConfig.instagram_configured? && @candidate.source_item.commercial_use?
     end
   end
 end
