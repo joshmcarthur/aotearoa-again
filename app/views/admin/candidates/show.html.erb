@@ -6,10 +6,10 @@
     <span class="rounded border px-2 py-0.5 text-xs font-medium <%= candidate_review_status_classes(@review_history.status) %>">
       <%= @review_history.status_label %>
     </span>
-    <% if source.meta_upload_eligible? %>
-      <span class="rounded border border-sky-400 bg-sky-50 px-2 py-0.5 text-xs font-medium text-sky-900">Meta upload eligible</span>
+    <% if source.commercial_use? %>
+      <span class="rounded border border-sky-400 bg-sky-50 px-2 py-0.5 text-xs font-medium text-sky-900">Commercial use</span>
     <% else %>
-      <span class="rounded border border-amber-400 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-900">Not Meta upload eligible</span>
+      <span class="rounded border border-amber-400 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-900">Not commercial use</span>
     <% end %>
   </div>
   <p class="text-sm text-stone-600"><%= [source.display_date, source.placename, source.creator].compact.join(" · ") %></p>

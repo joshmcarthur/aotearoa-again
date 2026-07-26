@@ -52,8 +52,7 @@ module Digitalnz
         record_url: "https://example.com",
         dedupe_key: "digitalnz:99",
         rights_text: "x",
-        usage_flags: [ "Modify", "Use commercially" ],
-        meta_upload_eligible: true
+        usage_flags: [ "Modify", "Use commercially" ]
       )
 
       selector = RandomSelector.new(client: FakeClient.new, exclude_ids: SourceItem.pluck(:digitalnz_id))

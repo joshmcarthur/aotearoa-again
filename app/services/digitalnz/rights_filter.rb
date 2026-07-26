@@ -2,7 +2,7 @@ module Digitalnz
   class RightsFilter
     REQUIRED_USAGE = "Modify".freeze
     # NatLib free-download / Meta-upload-eligible ATL subset.
-    META_UPLOAD_USAGE = "Use commercially".freeze
+    COMMERCIAL_USAGE = "Use commercially".freeze
     PREFERRED_USAGE = "Share".freeze
     COLOUR_KEYWORDS = /\b(colour|color|coloured|colored|hand[- ]?coloured|hand[- ]?colored)\b/i
 
@@ -17,7 +17,7 @@ module Digitalnz
     def acceptable?
       rights.present? &&
         usage_includes?(REQUIRED_USAGE) &&
-        usage_includes?(META_UPLOAD_USAGE) &&
+        commercial_use? &&
         !colour_keyword_hit?
     end
 
@@ -30,8 +30,8 @@ module Digitalnz
         @record[:rights_url].presence
     end
 
-    def meta_upload_eligible?
-      usage_includes?(META_UPLOAD_USAGE)
+    def commercial_use?
+      usage_includes?(COMMERCIAL_USAGE)
     end
 
     private

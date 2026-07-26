@@ -10,7 +10,7 @@ module Digitalnz
         usage: [ "Modify", "Share", "Use commercially" ]
       }
       assert RightsFilter.acceptable?(record)
-      assert RightsFilter.new(record).meta_upload_eligible?
+      assert RightsFilter.new(record).commercial_use?
     end
 
     test "rejects missing rights" do
@@ -34,7 +34,7 @@ module Digitalnz
         usage: %w[Modify Share]
       }
       assert_not RightsFilter.acceptable?(record)
-      assert_not RightsFilter.new(record).meta_upload_eligible?
+      assert_not RightsFilter.new(record).commercial_use?
     end
 
     test "rejects colour keyword titles" do

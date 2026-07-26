@@ -28,20 +28,6 @@ module Digitalnz
       assert_equal "https://example.com/large.jpg", attrs[:image_url]
       assert_includes attrs[:usage_flags], "Modify"
       assert_includes attrs[:usage_flags], "Use commercially"
-      assert attrs[:meta_upload_eligible]
-    end
-
-    test "marks meta upload ineligible without Use commercially" do
-      record = {
-        "id" => 43,
-        "title" => "Restricted plate",
-        "rights" => [ "No known copyright restrictions" ],
-        "usage" => %w[Modify Share],
-        "landing_url" => "https://natlib.govt.nz/records/124"
-      }
-
-      attrs = RecordMapper.to_source_attributes(record)
-      assert_not attrs[:meta_upload_eligible]
     end
   end
 end

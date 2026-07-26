@@ -35,10 +35,10 @@ module Admin
       assert_match "Colourised", response.body
     end
 
-    test "show displays meta eligibility and tikanga reminder" do
+    test "show displays commercial use and tikanga reminder" do
       get admin_candidate_url(@candidate), headers: basic_auth
       assert_response :success
-      assert_match "Meta upload eligible", response.body
+      assert_match "Commercial use", response.body
       assert_match "People / tikanga", response.body
     end
 
