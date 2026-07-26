@@ -17,6 +17,9 @@
 #   buttondown:
 #     api_key: ...
 #     subscribe_url: https://buttondown.com/...
+#   instagram:                 # optional — Instagram delivery skipped when blank
+#     access_token: ...
+#     user_id: ...
 #   admin:
 #     username: admin
 #     password: ...
@@ -41,6 +44,14 @@ module AppConfig
   def buttondown_api_key = required(:buttondown, :api_key)
 
   def buttondown_subscribe_url = dig(:buttondown, :subscribe_url)
+
+  def instagram_access_token = dig(:instagram, :access_token)
+
+  def instagram_user_id = dig(:instagram, :user_id)
+
+  def instagram_configured?
+    instagram_access_token.present? && instagram_user_id.present?
+  end
 
   def admin_username = dig(:admin, :username).presence || "admin"
 

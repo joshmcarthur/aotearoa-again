@@ -3,6 +3,7 @@ Rails.application.routes.draw do
 
   root "editions#today"
   resources :editions, only: %i[index show], param: :publish_on
+  get "editions/:publish_on/share.jpg", to: "editions#share_image", as: :edition_share_image
   get "/s/:code", to: "share_links#show", as: :share_link
   get "/feed.xml", to: "feeds#show", as: :feed
   get "/about", to: "pages#about", as: :about

@@ -1,6 +1,7 @@
 module Editions
   class Copy
     AI_NOTICE = "AI colourised — colours are interpretive.".freeze
+    INSTAGRAM_CAPTION_LIMIT = 2200
 
     def initialize(source_item)
       @source_item = source_item
@@ -41,25 +42,48 @@ module Editions
       [ caption, attribution_text, ai_notice ].compact.join("\n\n")
     end
 
+    # Shared narrative used by email and Instagram (title / image / link formatting differ).
+    def body_text
+      parts = []
+      parts << caption if caption.present?
+      meta = []
+      meta << @source_item.display_date if @source_item.display_date.present?
+      meta << @source_item.placename if @source_item.placename.present?
+      parts << meta.join(" · ") if meta.any?
+      parts << "" if parts.any?
+      parts << attribution_text
+      parts.join("\n")
+    end
+
     def email_markdown(edition_url:, image_url: nil)
       parts = []
       parts << "# #{title}"
       parts << ""
       parts << "![#{title}](#{image_url})" if image_url.present?
       parts << ""
-      parts << caption if caption.present?
-      parts << ""
-      meta = []
-      meta << @source_item.display_date if @source_item.display_date.present?
-      meta << @source_item.placename if @source_item.placename.present?
-      parts << meta.join(" · ") if meta.any?
-      parts << ""
-      parts << attribution_text
+      parts << body_text
       parts << ""
       parts << "_#{ai_notice}_"
       parts << ""
       parts << "[View this plate](#{edition_url})"
       parts.join("\n")
+    end
+
+    # Same narrative as email, plain text for Instagram (≤ 2,200 chars).
+    def instagram_caption(edition_url:)
+      [
+        title,
+        "",
+        body_text,
+        "",
+        ai_notice,
+        "",
+        edition_url.to_s
+      ].join("\n").truncate(INSTAGRAM_CAPTION_LIMIT)
+    end
+
+    def alt_text
+      [ title, caption ].compact.join(". ").truncate(1000)
     end
 
     private

@@ -1,5 +1,5 @@
 class Delivery < ApplicationRecord
-  CHANNELS = %w[web email].freeze
+  CHANNELS = %w[web email instagram].freeze
   STATUSES = %w[pending succeeded failed].freeze
 
   belongs_to :edition

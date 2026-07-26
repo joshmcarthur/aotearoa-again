@@ -24,11 +24,28 @@ class EditionTest < ActiveSupport::TestCase
     assert_equal tomorrow + 1.day, Edition.next_free_publish_on
   end
 
-  test "approver schedules edition and deliveries" do
-    edition = Editions::Approver.new(@candidate, variant: @variant).call
-    assert_equal "scheduled", edition.state
-    assert_equal Time.zone.tomorrow, edition.publish_on
-    assert_equal %w[email web], edition.deliveries.order(:channel).pluck(:channel)
+  test "approver schedules edition and deliveries including instagram when configured" do
+    AppConfig.stub(:instagram_configured?, true) do
+      edition = Editions::Approver.new(@candidate, variant: @variant).call
+      assert_equal "scheduled", edition.state
+      assert_equal Time.zone.tomorrow, edition.publish_on
+      assert_equal %w[email instagram web], edition.deliveries.order(:channel).pluck(:channel)
+    end
+  end
+
+  test "approver omits instagram delivery when not configured" do
+    AppConfig.stub(:instagram_configured?, false) do
+      edition = Editions::Approver.new(@candidate, variant: @variant).call
+      assert_equal %w[email web], edition.deliveries.order(:channel).pluck(:channel)
+    end
+  end
+
+  test "approver omits instagram delivery without commercial use" do
+    @source.update!(usage_flags: %w[Modify Share])
+    AppConfig.stub(:instagram_configured?, true) do
+      edition = Editions::Approver.new(@candidate, variant: @variant).call
+      assert_equal %w[email web], edition.deliveries.order(:channel).pluck(:channel)
+    end
   end
 
   test "approver replaces existing edition variant instead of scheduling another" do
