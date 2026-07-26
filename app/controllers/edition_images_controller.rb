@@ -1,7 +1,4 @@
-# Inherit from ActionController::Base so mail/social fetchers are not blocked by
-# ApplicationController's allow_browser check (Gmail's GoogleImageProxy UA is
-# parsed as Firefox 11 and gets HTTP 406).
-class EditionImagesController < ActionController::Base
+class EditionImagesController < ApplicationController
   # Stable public JPEGs for published artifacts (email, Instagram, Atom, OG).
   # Signed blob URLs expire and break mail clients and Meta fetchers.
   # Allowed for scheduled editions too — Orchestrator delivers before publish!.
