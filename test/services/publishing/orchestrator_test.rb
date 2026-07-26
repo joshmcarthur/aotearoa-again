@@ -9,8 +9,8 @@ module Publishing
         @calls = []
       end
 
-      def create_and_send(subject:, body:)
-        @calls << { subject: subject, body: body }
+      def create_and_send(subject:, body:, canonical_url: nil)
+        @calls << { subject: subject, body: body, canonical_url: canonical_url }
         { "id" => "bd_123" }
       end
     end
@@ -44,6 +44,9 @@ module Publishing
       assert_equal "bd_123", email.external_id
       assert_equal 1, fake.calls.size
       assert_equal @source.title, fake.calls.first[:subject]
+      assert_includes fake.calls.first[:body], "View the archive"
+      assert_includes fake.calls.first[:body], "/editions"
+      assert_equal fake.calls.first[:canonical_url], fake.calls.first[:body][/\[View this plate\]\(([^)]+)\)/, 1]
 
       Orchestrator.new(@edition, buttondown: fake).call
       assert_equal 1, fake.calls.size

@@ -14,7 +14,8 @@ module Publishing
           body: hash_including(
             "subject" => "Harbour scene",
             "body" => "Hello",
-            "status" => "draft"
+            "status" => "draft",
+            "canonical_url" => "https://example.com/editions/2026-07-26"
           )
         )
         .to_return(
@@ -34,7 +35,11 @@ module Publishing
           body: { id: "bd_456", status: "about_to_send" }.to_json
         )
 
-      payload = @client.create_and_send(subject: "Harbour scene", body: "Hello")
+      payload = @client.create_and_send(
+        subject: "Harbour scene",
+        body: "Hello",
+        canonical_url: "https://example.com/editions/2026-07-26"
+      )
 
       assert_equal "bd_456", payload["id"]
       assert_requested(create_stub)

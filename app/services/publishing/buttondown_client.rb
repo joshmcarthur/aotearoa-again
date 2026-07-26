@@ -17,7 +17,7 @@ module Publishing
     end
 
     # Creates an email draft, then publishes it immediately (no UI step).
-    def create_and_send(subject:, body:)
+    def create_and_send(subject:, body:, canonical_url: nil)
       # Paths must be relative (no leading slash) so Faraday keeps BASE_URL's /v1.
       create_response = @http.post("emails") do |req|
         req.headers["Authorization"] = "Token #{@api_key}"
@@ -26,6 +26,7 @@ module Publishing
           body: body,
           status: "draft"
         }
+        req.body[:canonical_url] = canonical_url if canonical_url.present?
       end
       payload = JSON.parse(create_response.body)
       email_id = payload.fetch("id")

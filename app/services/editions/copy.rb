@@ -41,7 +41,7 @@ module Editions
       [ caption, attribution_text, ai_notice ].compact.join("\n\n")
     end
 
-    def email_markdown(edition_url:, image_url: nil)
+    def email_markdown(edition_url:, archive_url:, image_url: nil)
       parts = []
       parts << "# #{title}"
       parts << ""
@@ -59,6 +59,8 @@ module Editions
       parts << "_#{ai_notice}_"
       parts << ""
       parts << "[View this plate](#{edition_url})"
+      parts << ""
+      parts << "[View the archive](#{archive_url})"
       parts.join("\n")
     end
 

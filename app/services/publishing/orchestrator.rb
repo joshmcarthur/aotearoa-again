@@ -31,16 +31,16 @@ module Publishing
       return if delivery.status == "succeeded" && delivery.external_id.present?
 
       copy = Editions::Copy.new(@edition.source_item)
-      edition_url = Rails.application.routes.url_helpers.edition_url(
-        @edition,
-        host: AppConfig.app_host,
-        protocol: AppConfig.protocol
-      )
+      url_options = { host: AppConfig.app_host, protocol: AppConfig.protocol }
+      routes = Rails.application.routes.url_helpers
+      edition_url = routes.edition_url(@edition, **url_options)
+      archive_url = routes.editions_url(**url_options)
       image_url = distribution_image_url
 
       payload = @buttondown.create_and_send(
         subject: copy.title,
-        body: copy.email_markdown(edition_url: edition_url, image_url: image_url)
+        body: copy.email_markdown(edition_url: edition_url, archive_url: archive_url, image_url: image_url),
+        canonical_url: edition_url
       )
       delivery.succeed!(external_id: payload["id"].to_s)
     rescue ButtondownClient::Error => e
