@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.7.0...v0.8.0) (2026-07-26)
+
+
+### Features
+
+* publish editions to Instagram via Meta Graph API ([#36](https://github.com/joshmcarthur/aotearoa-again/issues/36)) ([5227676](https://github.com/joshmcarthur/aotearoa-again/commit/5227676b5c21f3a2b6007000e2622765f415e0a5))
+* require Use commercially for DigitalNZ harvest ([#35](https://github.com/joshmcarthur/aotearoa-again/issues/35)) ([29d9cbd](https://github.com/joshmcarthur/aotearoa-again/commit/29d9cbdeb7dc5b8999304930f04bf07bd094eeb7))
+
 ## [0.7.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.6.1...v0.7.0) (2026-07-24)
 
 
