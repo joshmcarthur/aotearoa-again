@@ -72,4 +72,28 @@ class EditionImagesControllerTest < ActionDispatch::IntegrationTest
     get edition_composite_image_url(@edition)
     assert_response :not_found
   end
+
+  test "share image is served to Gmail image proxy user agent" do
+    attach_fixture_image(@variant, name: :share_image)
+
+    get edition_share_image_url(@edition),
+      headers: {
+        "HTTP_USER_AGENT" => "Mozilla/5.0 (Windows NT 5.1; rv:11.0) Gecko Firefox/11.0 (via ggpht.com GoogleImageProxy)"
+      }
+
+    assert_response :success
+    assert_equal "image/jpeg", response.media_type
+  end
+
+  test "composite image is served to Gmail image proxy user agent" do
+    attach_fixture_image(@variant, name: :composite_image)
+
+    get edition_composite_image_url(@edition),
+      headers: {
+        "HTTP_USER_AGENT" => "Mozilla/5.0 (Windows NT 5.1; rv:11.0) Gecko Firefox/11.0 (via ggpht.com GoogleImageProxy)"
+      }
+
+    assert_response :success
+    assert_equal "image/jpeg", response.media_type
+  end
 end
