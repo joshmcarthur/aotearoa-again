@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.8.0...v0.9.0) (2026-07-26)
+
+
+### Features
+
+* publish editions to Facebook Page via unified Meta client ([#38](https://github.com/joshmcarthur/aotearoa-again/issues/38)) ([bf7913c](https://github.com/joshmcarthur/aotearoa-again/commit/bf7913c71c1e385d5f14337dcc23c158540ca681))
+
 ## [0.8.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.7.0...v0.8.0) (2026-07-26)
 
 
