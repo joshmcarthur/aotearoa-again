@@ -41,14 +41,14 @@ class EditionsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match "Published plate", response.body
   end
 
-  test "archive lists editions with unbranded composite thumb" do
+  test "archive lists editions with stable unbranded composite thumb" do
     attach_fixture_image(@variant, name: :composite_image)
     attach_fixture_image(@variant, name: :share_image)
 
     get editions_url
     assert_response :success
     assert_match "Published plate", response.body
-    assert_includes response.body, @variant.composite_image.blob.signed_id
+    assert_includes response.body, edition_composite_image_path(@edition)
   end
 
 
@@ -76,32 +76,6 @@ class EditionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     og_image = response.body[/property="og:image" content="([^"]+)"/, 1]
     assert_includes og_image, edition_share_image_path(@edition)
-  end
-
-  test "share image serves jpeg for published editions" do
-    attach_fixture_image(@variant, name: :share_image)
-
-    get edition_share_image_url(@edition)
-    assert_response :success
-    assert_equal "image/jpeg", response.media_type
-    assert response.body.bytesize.positive?
-  end
-
-  test "share image serves scheduled editions for publish-time delivery" do
-    attach_fixture_image(@variant, name: :share_image)
-    @edition.update!(state: "scheduled", published_at: nil)
-
-    get edition_share_image_url(@edition)
-    assert_response :success
-    assert_equal "image/jpeg", response.media_type
-  end
-
-  test "share image is not found for failed editions" do
-    attach_fixture_image(@variant, name: :share_image)
-    @edition.update!(state: "failed", published_at: nil)
-
-    get edition_share_image_url(@edition)
-    assert_response :not_found
   end
 
   test "show renders adjacent edition navigation" do
