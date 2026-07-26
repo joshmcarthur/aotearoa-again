@@ -39,7 +39,7 @@ module ActiveSupport
         creator: "Unknown",
         content_partner: "Alexander Turnbull Library",
         rights_text: "No known copyright restrictions",
-        usage_flags: %w[Modify Share],
+        usage_flags: [ "Modify", "Share", "Use commercially" ],
         record_url: "https://digitalnz.org/records/123",
         image_url: "https://example.com/photo.jpg",
         dedupe_key: "digitalnz:#{SecureRandom.hex(4)}",

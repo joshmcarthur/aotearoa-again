@@ -13,4 +13,9 @@ class SourceItem < ApplicationRecord
   def discard!
     update!(discarded_at: Time.current)
   end
+
+  # DigitalNZ "Use commercially" — NatLib free-download / Meta-upload-eligible subset.
+  def commercial_use?
+    Array(usage_flags).any? { |flag| flag.to_s.casecmp?("Use commercially") }
+  end
 end

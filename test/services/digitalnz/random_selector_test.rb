@@ -22,7 +22,7 @@ module Digitalnz
                   "id" => 99,
                   "title" => "Wharf",
                   "rights" => [ "No known copyright restrictions" ],
-                  "usage" => %w[Modify Share]
+                  "usage" => [ "Modify", "Share", "Use commercially" ]
                 }
               ]
             }
@@ -36,7 +36,7 @@ module Digitalnz
                   "id" => 99,
                   "title" => "Wharf",
                   "rights" => [ "No known copyright restrictions" ],
-                  "usage" => %w[Modify Share]
+                  "usage" => [ "Modify", "Share", "Use commercially" ]
                 }
               ]
             }
@@ -52,7 +52,7 @@ module Digitalnz
         record_url: "https://example.com",
         dedupe_key: "digitalnz:99",
         rights_text: "x",
-        usage_flags: %w[Modify]
+        usage_flags: [ "Modify", "Use commercially" ]
       )
 
       selector = RandomSelector.new(client: FakeClient.new, exclude_ids: SourceItem.pluck(:digitalnz_id))

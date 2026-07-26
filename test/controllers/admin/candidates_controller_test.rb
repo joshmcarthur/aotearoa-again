@@ -35,6 +35,13 @@ module Admin
       assert_match "Colourised", response.body
     end
 
+    test "show displays commercial use and tikanga reminder" do
+      get admin_candidate_url(@candidate), headers: basic_auth
+      assert_response :success
+      assert_match "Commercial use", response.body
+      assert_match "People / tikanga", response.body
+    end
+
     test "show displays scheduled status for approved candidate" do
       @variant.update!(chosen: true)
       Edition.create!(variant: @variant, publish_on: Time.zone.tomorrow, state: "scheduled")
