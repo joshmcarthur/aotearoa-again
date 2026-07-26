@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.9.0...v0.10.0) (2026-07-26)
+
+
+### Features
+
+* non-stamped email image linked to edition page ([#40](https://github.com/joshmcarthur/aotearoa-again/issues/40)) ([a58a45e](https://github.com/joshmcarthur/aotearoa-again/commit/a58a45e6bb0a2f2a24bdf125bb4ff11903c2610e))
+
 ## [0.9.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.8.0...v0.9.0) (2026-07-26)
 
 
