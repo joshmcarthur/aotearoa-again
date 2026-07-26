@@ -1,5 +1,6 @@
 class EditionImagesController < ApplicationController
-  # Stable public JPEGs for email, Instagram, Atom, OG, and archive (signed blob URLs expire).
+  # Stable public JPEGs for published artifacts (email, Instagram, Atom, OG).
+  # Signed blob URLs expire and break mail clients and Meta fetchers.
   # Allowed for scheduled editions too — Orchestrator delivers before publish!.
 
   def share

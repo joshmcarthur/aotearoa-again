@@ -31,7 +31,7 @@ module Editions
       assert_includes body, "Alexander Turnbull Library"
       assert_includes body, source.record_url
 
-      email = copy.email_markdown(edition_url: edition_url, image_url: "https://example.com/share.jpg")
+      email = copy.email_markdown(edition_url: edition_url, image_url: "https://example.com/composite.jpg")
       ig = copy.instagram_caption(edition_url: edition_url)
       fb = copy.facebook_caption(edition_url: edition_url)
 
@@ -39,7 +39,7 @@ module Editions
       assert_includes ig, body
       assert_includes fb, body
       assert_includes email, "# #{source.title}"
-      assert_includes email, "![#{source.title}](https://example.com/share.jpg)"
+      assert_includes email, "[![#{source.title}](https://example.com/composite.jpg)](#{edition_url})"
       assert_includes email, "[View this plate](#{edition_url})"
       assert_includes ig, source.title
       assert_includes ig, Copy::AI_NOTICE

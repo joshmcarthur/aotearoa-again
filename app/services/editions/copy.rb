@@ -59,7 +59,9 @@ module Editions
       parts = []
       parts << "# #{title}"
       parts << ""
-      parts << "![#{title}](#{image_url})" if image_url.present?
+      if image_url.present?
+        parts << "[![#{title}](#{image_url})](#{edition_url})"
+      end
       parts << ""
       parts << body_text
       parts << ""

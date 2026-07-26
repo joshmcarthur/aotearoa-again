@@ -46,6 +46,7 @@ module Publishing
       attach_fixture_image(@candidate)
       @variant = @candidate.variants.create!(model: @model, prompt: "colourise", chosen: true)
       attach_fixture_image(@variant, name: :colourised_image)
+      attach_fixture_image(@variant, name: :composite_image)
       attach_fixture_image(@variant, name: :share_image)
       @edition = Edition.create!(variant: @variant, publish_on: Time.zone.today, state: "scheduled")
       @edition.deliveries.create!(channel: "web", status: "pending")
@@ -77,7 +78,10 @@ module Publishing
           assert_equal 1, meta.instagram_calls.size
           assert_equal 1, meta.facebook_calls.size
           assert_equal @source.title, buttondown.calls.first[:subject]
-          assert_includes buttondown.calls.first[:body], "/share.jpg"
+          edition_url = Rails.application.routes.url_helpers.edition_url(@edition)
+          assert_includes buttondown.calls.first[:body], "/composite.jpg"
+          assert_includes buttondown.calls.first[:body], "[![#{@source.title}]"
+          assert_includes buttondown.calls.first[:body], "](#{edition_url})"
           assert_includes meta.instagram_calls.first[:image_url], "/share.jpg"
           assert_includes meta.instagram_calls.first[:caption], @source.title
           assert_includes meta.facebook_calls.first[:image_url], "/share.jpg"

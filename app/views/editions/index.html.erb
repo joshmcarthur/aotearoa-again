@@ -10,7 +10,7 @@
         <% source = edition.source_item %>
         <%= link_to edition_path(edition), class: "aa-archive-item" do %>
           <% if edition.variant.archive_image.attached? %>
-            <%= image_tag edition_composite_image_url(edition), alt: source.title %>
+            <%= image_tag edition.variant.archive_image.variant(resize_to_limit: [320, 240]), alt: source.title %>
           <% end %>
           <div>
             <p class="aa-plate-date"><%= l(edition.publish_on, format: :long) %></p>

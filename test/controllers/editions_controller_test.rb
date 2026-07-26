@@ -41,14 +41,14 @@ class EditionsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match "Published plate", response.body
   end
 
-  test "archive lists editions with stable unbranded composite thumb" do
+  test "archive lists editions with unbranded composite thumb" do
     attach_fixture_image(@variant, name: :composite_image)
     attach_fixture_image(@variant, name: :share_image)
 
     get editions_url
     assert_response :success
     assert_match "Published plate", response.body
-    assert_includes response.body, edition_composite_image_path(@edition)
+    assert_includes response.body, @variant.composite_image.blob.signed_id
   end
 
 
