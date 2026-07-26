@@ -21,6 +21,7 @@ module Digitalnz
         content_partner: Array(@record[:content_partner]).first,
         rights_text: filter.rights,
         usage_flags: filter.usage_list,
+        meta_upload_eligible: MetaEligibility.eligible?(@record),
         record_url: canonical_record_url,
         image_url: preferred_image_url,
         dedupe_key: "digitalnz:#{@record[:id]}",

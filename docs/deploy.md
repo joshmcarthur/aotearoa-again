@@ -78,7 +78,7 @@ If DigitalNZ/ATL request removal:
 
 ## Instagram / Facebook
 
-Do **not** upload Library images to Meta platforms in v1 (NatLib guidance).
+Harvest is limited to NatLib's Meta-upload-eligible ATL subset (DigitalNZ **Use commercially** + **Modify**). See [natlib-social-media.md](natlib-social-media.md) for caption, people/tikanga, and takedown rules. Uploading transformed files to Meta platforms remains out of scope until a dedicated Instagram delivery channel lands.
 
 ## Container releases
 

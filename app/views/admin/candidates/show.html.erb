@@ -6,12 +6,21 @@
     <span class="rounded border px-2 py-0.5 text-xs font-medium <%= candidate_review_status_classes(@review_history.status) %>">
       <%= @review_history.status_label %>
     </span>
+    <% if source.meta_upload_eligible? %>
+      <span class="rounded border border-sky-400 bg-sky-50 px-2 py-0.5 text-xs font-medium text-sky-900">Meta upload eligible</span>
+    <% else %>
+      <span class="rounded border border-amber-400 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-900">Not Meta upload eligible</span>
+    <% end %>
   </div>
   <p class="text-sm text-stone-600"><%= [source.display_date, source.placename, source.creator].compact.join(" · ") %></p>
   <p class="mt-2 max-w-3xl text-sm"><%= source.description %></p>
   <p class="mt-2 text-sm">
     Rights: <%= source.rights_text %> ·
     <%= link_to "Library record", source.record_url, target: "_blank", rel: "noopener", class: "underline" %>
+  </p>
+  <p class="mt-3 max-w-3xl rounded border border-stone-300 bg-stone-50 px-3 py-2 text-sm text-stone-700">
+    <strong>People / tikanga:</strong> If people are visible, approve only when overlays respect dignity and mana
+    (avoid cropping or blending through faces). Seek community advice if unsure.
   </p>
 </div>
 

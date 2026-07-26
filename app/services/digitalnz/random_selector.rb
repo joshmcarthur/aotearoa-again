@@ -1,9 +1,13 @@
 module Digitalnz
   class RandomSelector
+    # Modify: colourisation allowed. Use commercially: NatLib free-download /
+    # Meta-upload-eligible ATL subset (see docs/natlib-social-media.md).
+    # Use "and[usage]" (not "and[usage][]") so Faraday NestedParamsEncoder
+    # emits and[usage][]=Modify&and[usage][]=Use+commercially.
     BASE_FILTERS = {
       "and[content_partner][]" => "Alexander Turnbull Library",
       "and[category][]" => "Images",
-      "and[usage][]" => "Modify"
+      "and[usage]" => [ "Modify", "Use commercially" ]
     }.freeze
 
     PER_PAGE = 20

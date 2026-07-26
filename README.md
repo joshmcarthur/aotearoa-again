@@ -2,7 +2,7 @@
 
 Daily photographs from the Alexander Turnbull Library, seen again in colour.
 
-A small Rails app that harvests reusable ATL images via DigitalNZ, AI-colourises them with RubyLLM (OpenRouter), human-reviews into a ~30-day runway, and publishes to the web, Atom feed, and Buttondown.
+A small Rails app that harvests reusable ATL images via DigitalNZ (Modify + Use commercially — NatLib Meta-upload-eligible subset), AI-colourises them with RubyLLM (OpenRouter), human-reviews into a ~30-day runway, and publishes to the web, Atom feed, and Buttondown.
 
 ## Setup
 
@@ -30,9 +30,10 @@ Share image composition also needs `PANGOCAIRO_BACKEND=fontconfig` (exported by 
 
 ## Pipeline
 
-1. `HarvestCandidatesJob` — DigitalNZ ATL images with Modify usage  
+1. `HarvestCandidatesJob` — DigitalNZ ATL images with Modify + Use commercially  
 2. `ColouriseCandidateJob` — RubyLLM.paint via preferred `Model` rows  
 3. Admin approve → schedule `Edition`  
 4. `PublishEditionJob` (07:00 NZ) — web + Buttondown  
 
-See [docs/deploy.md](docs/deploy.md) for home hosting + Cloudflare Tunnel.
+See [docs/deploy.md](docs/deploy.md) for home hosting + Cloudflare Tunnel.  
+See [docs/natlib-social-media.md](docs/natlib-social-media.md) for NatLib social media rules.

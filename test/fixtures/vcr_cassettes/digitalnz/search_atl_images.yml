@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://api.digitalnz.org/v3/records.json?and%5Bcategory%5D%5B%5D=Images&and%5Bcontent_partner%5D%5B%5D=Alexander+Turnbull+Library&and%5Busage%5D%5B%5D=Modify&api_key=<DIGITALNZ_API_KEY>&page=1&per_page=1
+    uri: https://api.digitalnz.org/v3/records.json?and%5Bcategory%5D%5B%5D=Images&and%5Bcontent_partner%5D%5B%5D=Alexander+Turnbull+Library&and%5Busage%5D%5B%5D=Modify&and%5Busage%5D%5B%5D=Use+commercially&page=1&per_page=1
     body:
       encoding: US-ASCII
       string: ''
@@ -18,6 +18,6 @@ http_interactions:
       - application/json; charset=utf-8
     body:
       encoding: UTF-8
-      string: '{"search":{"result_count":1,"results":[{"id":12345,"title":"VCR fixture photograph","description":["A harbour"],"rights":["No known copyright restrictions"],"usage":["Modify","Share"],"content_partner":["Alexander Turnbull Library"],"landing_url":"https://digitalnz.org/records/12345","large_thumbnail_url":["https://example.com/fixture.jpg"]}]}}'
+      string: '{"search":{"result_count":1,"results":[{"id":12345,"title":"VCR fixture photograph","description":["A harbour"],"rights":["No known copyright restrictions"],"usage":["Modify","Share","Use commercially"],"content_partner":["Alexander Turnbull Library"],"landing_url":"https://digitalnz.org/records/12345","large_thumbnail_url":["https://example.com/fixture.jpg"]}]}}'
   recorded_at: Wed, 22 Jul 2026 00:00:00 GMT
 recorded_with: VCR 6.4.0
