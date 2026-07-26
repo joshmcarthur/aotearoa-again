@@ -3,7 +3,7 @@
 This app posts via **Instagram API with Facebook Login** (`graph.facebook.com/v21.0`).  
 It does **not** use Instagram Login (`graph.instagram.com`).
 
-Instagram credentials are **optional**. If either value is blank, Approver skips creating an Instagram delivery and Orchestrator skips Instagram (web + email still publish).
+Instagram credentials are **optional**. If either value is blank, or the source item is not DigitalNZ **Use commercially** (`commercial_use?`), Approver skips creating an Instagram delivery and Orchestrator skips Instagram (web + email still publish).
 
 When you want Instagram:
 
