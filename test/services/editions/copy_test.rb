@@ -21,7 +21,7 @@ module Editions
       assert_includes copy.caption, "Dunedin"
     end
 
-    test "email and instagram share the same narrative body" do
+    test "email instagram and facebook share the same narrative body" do
       source = create_source_item
       copy = Copy.new(source)
       edition_url = "https://example.com/editions/2026-07-25"
@@ -33,15 +33,20 @@ module Editions
 
       email = copy.email_markdown(edition_url: edition_url, image_url: "https://example.com/share.jpg")
       ig = copy.instagram_caption(edition_url: edition_url)
+      fb = copy.facebook_caption(edition_url: edition_url)
 
       assert_includes email, body
       assert_includes ig, body
+      assert_includes fb, body
       assert_includes email, "# #{source.title}"
       assert_includes email, "![#{source.title}](https://example.com/share.jpg)"
       assert_includes email, "[View this plate](#{edition_url})"
       assert_includes ig, source.title
       assert_includes ig, Copy::AI_NOTICE
       assert_includes ig, edition_url
+      assert_includes fb, source.title
+      assert_includes fb, Copy::AI_NOTICE
+      assert_includes fb, edition_url
       assert_no_match(/Branded share image/, ig)
       assert_operator ig.length, :<=, Copy::INSTAGRAM_CAPTION_LIMIT
     end
