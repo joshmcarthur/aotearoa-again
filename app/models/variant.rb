@@ -18,7 +18,7 @@ class Variant < ApplicationRecord
     end
   end
 
-  # Branded composite for OG / Atom / email.
+  # Branded composite for OG / Atom / email / Instagram.
   def distribution_image
     share_image.attached? ? share_image : colourised_image
   end

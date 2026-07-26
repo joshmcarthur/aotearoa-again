@@ -13,6 +13,7 @@ VCR.configure do |config|
   config.filter_sensitive_data("<DIGITALNZ_API_KEY>") { AppConfig.dig(:digitalnz, :api_key) }
   config.filter_sensitive_data("<OPENROUTER_API_KEY>") { AppConfig.openrouter_api_key }
   config.filter_sensitive_data("<BUTTONDOWN_API_KEY>") { AppConfig.dig(:buttondown, :api_key) }
+  config.filter_sensitive_data("<INSTAGRAM_ACCESS_TOKEN>") { AppConfig.dig(:instagram, :access_token) }
   config.ignore_localhost = true
   config.allow_http_connections_when_no_cassette = false
 end

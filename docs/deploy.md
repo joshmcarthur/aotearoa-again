@@ -37,6 +37,8 @@ Files:
 | `openrouter.api_key` | RubyLLM colourisation |
 | `buttondown.api_key` | Email list publish |
 | `buttondown.subscribe_url` | Public subscribe redirect |
+| `instagram.access_token` | Optional — long-lived Meta Graph token; Instagram delivery skipped if blank |
+| `instagram.user_id` | Optional — Instagram professional account ID (with token) |
 | `admin.username` / `admin.password` | HTTP Basic for `/admin` |
 | `admin.alert_email` | Runway / delivery alerts |
 | `app.host` | Public hostname (no protocol), e.g. `aotearoa-again.example` |
@@ -78,7 +80,17 @@ If DigitalNZ/ATL request removal:
 
 ## Instagram / Facebook
 
-Harvest is limited to NatLib's Meta-upload-eligible ATL subset (DigitalNZ **Use commercially** + **Modify**). See [natlib-social-media.md](natlib-social-media.md) for caption, people/tikanga, and takedown rules. Uploading transformed files to Meta platforms remains out of scope until a dedicated Instagram delivery channel lands.
+Harvest is limited to NatLib's Meta-upload-eligible ATL subset (DigitalNZ **Use commercially** + **Modify**). See [natlib-social-media.md](natlib-social-media.md) for caption, people/tikanga, and takedown rules.
+
+Optional Instagram delivery via the Meta Graph API Content Publishing flow. Credentials are optional — when blank, Approver skips creating an Instagram delivery and Orchestrator skips the channel (web + email still publish).
+
+### Meta app setup (own account)
+
+Step-by-step: **[instagram-meta-setup.md](instagram-meta-setup.md)**.
+
+Summary: Professional IG + linked Facebook Page → Meta app (Facebook Login path) → long-lived token → store `instagram.access_token` + `instagram.user_id`. App Review not required for your own account. Tokens last ~60 days; refresh before expiry. Failed Instagram deliveries alert via `AdminMailer.delivery_failed`.
+
+`PublishEditionJob` posts the branded `share_image` via the Graph API two-step container flow. Email, Instagram, Atom enclosures, and `og:image` all use `/editions/:publish_on/share.jpg` (Meta and mail clients cannot use expired signed blob URLs). **Does not cross-post to the Facebook Page feed.**
 
 ## Container releases
 

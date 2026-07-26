@@ -52,10 +52,13 @@ class EditionsControllerTest < ActionDispatch::IntegrationTest
   end
 
 
-  test "feed includes edition" do
+  test "feed includes edition with stable share image enclosure" do
+    attach_fixture_image(@variant, name: :share_image)
+
     get feed_url
     assert_response :success
     assert_match "Published plate", response.body
+    assert_includes response.body, edition_share_image_path(@edition)
   end
 
   test "scheduled edition show renders not published interstitial" do
@@ -66,13 +69,39 @@ class EditionsControllerTest < ActionDispatch::IntegrationTest
     assert_match "Not published yet", response.body
   end
 
-  test "og image prefers share_image when attached" do
+  test "og image uses stable share image url" do
     attach_fixture_image(@variant, name: :share_image)
 
     get edition_url(@edition)
     assert_response :success
     og_image = response.body[/property="og:image" content="([^"]+)"/, 1]
-    assert_includes og_image, @variant.share_image.blob.signed_id
+    assert_includes og_image, edition_share_image_path(@edition)
+  end
+
+  test "share image serves jpeg for published editions" do
+    attach_fixture_image(@variant, name: :share_image)
+
+    get edition_share_image_url(@edition)
+    assert_response :success
+    assert_equal "image/jpeg", response.media_type
+    assert response.body.bytesize.positive?
+  end
+
+  test "share image serves scheduled editions for publish-time delivery" do
+    attach_fixture_image(@variant, name: :share_image)
+    @edition.update!(state: "scheduled", published_at: nil)
+
+    get edition_share_image_url(@edition)
+    assert_response :success
+    assert_equal "image/jpeg", response.media_type
+  end
+
+  test "share image is not found for failed editions" do
+    attach_fixture_image(@variant, name: :share_image)
+    @edition.update!(state: "failed", published_at: nil)
+
+    get edition_share_image_url(@edition)
+    assert_response :not_found
   end
 
   test "show renders adjacent edition navigation" do

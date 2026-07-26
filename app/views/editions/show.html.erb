@@ -8,7 +8,7 @@
   <meta property="og:type" content="article">
   <meta property="og:url" content="<%= edition_url(@edition) %>">
   <% if @edition.variant.distribution_image.attached? %>
-    <meta property="og:image" content="<%= url_for(@edition.variant.distribution_image) %>">
+    <meta property="og:image" content="<%= edition_share_image_url(@edition) %>">
   <% end %>
 <% end %>
 

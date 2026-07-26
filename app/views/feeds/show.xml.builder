@@ -10,7 +10,7 @@ atom_feed(language: "en-NZ", root_url: root_url, url: feed_url) do |feed|
       entry.summary(copy.rss_summary, type: "text")
       image = edition.variant.distribution_image
       if image.attached?
-        entry.link(rel: "enclosure", type: image.content_type, href: rails_blob_url(image))
+        entry.link(rel: "enclosure", type: image.content_type, href: edition_share_image_url(edition))
       end
       entry.author do |author|
         author.name(edition.source_item.content_partner.presence || "Alexander Turnbull Library")
