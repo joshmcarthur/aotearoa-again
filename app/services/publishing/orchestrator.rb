@@ -34,15 +34,16 @@ module Publishing
       return if delivery.status == "succeeded" && delivery.external_id.present?
 
       copy = Editions::Copy.new(@edition.source_item)
-      image_url = share_image_url
+      edition_url = public_edition_url
+      image_url = composite_image_url
       unless image_url
-        delivery.fail!("Share image missing")
+        delivery.fail!("Composite image missing")
         return
       end
 
       payload = @buttondown.create_and_send(
         subject: copy.title,
-        body: copy.email_markdown(edition_url: public_edition_url, image_url: image_url)
+        body: copy.email_markdown(edition_url: edition_url, image_url: image_url)
       )
       delivery.succeed!(external_id: payload["id"].to_s)
     rescue ButtondownClient::Error => e
@@ -132,7 +133,19 @@ module Publishing
       image = @edition.variant.distribution_image
       return unless image.attached?
 
-      Rails.application.routes.url_helpers.edition_share_image_url(
+      edition_image_url(:edition_share_image_url)
+    end
+
+    def composite_image_url
+      image = @edition.variant.archive_image
+      return unless image.attached?
+
+      edition_image_url(:edition_composite_image_url)
+    end
+
+    def edition_image_url(helper_name)
+      Rails.application.routes.url_helpers.public_send(
+        helper_name,
         @edition,
         host: AppConfig.app_host,
         protocol: AppConfig.protocol

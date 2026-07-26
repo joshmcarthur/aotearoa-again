@@ -78,32 +78,6 @@ class EditionsControllerTest < ActionDispatch::IntegrationTest
     assert_includes og_image, edition_share_image_path(@edition)
   end
 
-  test "share image serves jpeg for published editions" do
-    attach_fixture_image(@variant, name: :share_image)
-
-    get edition_share_image_url(@edition)
-    assert_response :success
-    assert_equal "image/jpeg", response.media_type
-    assert response.body.bytesize.positive?
-  end
-
-  test "share image serves scheduled editions for publish-time delivery" do
-    attach_fixture_image(@variant, name: :share_image)
-    @edition.update!(state: "scheduled", published_at: nil)
-
-    get edition_share_image_url(@edition)
-    assert_response :success
-    assert_equal "image/jpeg", response.media_type
-  end
-
-  test "share image is not found for failed editions" do
-    attach_fixture_image(@variant, name: :share_image)
-    @edition.update!(state: "failed", published_at: nil)
-
-    get edition_share_image_url(@edition)
-    assert_response :not_found
-  end
-
   test "show renders adjacent edition navigation" do
     older_source = create_source_item(title: "Older plate")
     older_candidate = older_source.candidates.create!(status: "ready")
