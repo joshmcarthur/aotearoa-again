@@ -36,11 +36,18 @@ module Editions
       if instagram_delivery?
         edition.deliveries.create!(channel: "instagram", status: "pending")
       end
+      if facebook_delivery?
+        edition.deliveries.create!(channel: "facebook", status: "pending")
+      end
       edition
     end
 
     def instagram_delivery?
       AppConfig.instagram_configured? && @candidate.source_item.commercial_use?
+    end
+
+    def facebook_delivery?
+      AppConfig.facebook_configured? && @candidate.source_item.commercial_use?
     end
   end
 end

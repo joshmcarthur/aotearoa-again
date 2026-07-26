@@ -71,6 +71,21 @@ module Editions
 
     # Same narrative as email, plain text for Instagram (≤ 2,200 chars).
     def instagram_caption(edition_url:)
+      social_caption(edition_url: edition_url).truncate(INSTAGRAM_CAPTION_LIMIT)
+    end
+
+    # Same narrative as Instagram; Facebook allows a much longer message.
+    def facebook_caption(edition_url:)
+      social_caption(edition_url: edition_url)
+    end
+
+    def alt_text
+      [ title, caption ].compact.join(". ").truncate(1000)
+    end
+
+    private
+
+    def social_caption(edition_url:)
       [
         title,
         "",
@@ -79,14 +94,8 @@ module Editions
         ai_notice,
         "",
         edition_url.to_s
-      ].join("\n").truncate(INSTAGRAM_CAPTION_LIMIT)
+      ].join("\n")
     end
-
-    def alt_text
-      [ title, caption ].compact.join(". ").truncate(1000)
-    end
-
-    private
 
     def fallback_caption
       [ title, @source_item.display_date, @source_item.placename ].compact.join(" — ")

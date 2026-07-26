@@ -24,27 +24,33 @@ class EditionTest < ActiveSupport::TestCase
     assert_equal tomorrow + 1.day, Edition.next_free_publish_on
   end
 
-  test "approver schedules edition and deliveries including instagram when configured" do
+  test "approver schedules edition and deliveries including meta channels when configured" do
     AppConfig.stub(:instagram_configured?, true) do
-      edition = Editions::Approver.new(@candidate, variant: @variant).call
-      assert_equal "scheduled", edition.state
-      assert_equal Time.zone.tomorrow, edition.publish_on
-      assert_equal %w[email instagram web], edition.deliveries.order(:channel).pluck(:channel)
+      AppConfig.stub(:facebook_configured?, true) do
+        edition = Editions::Approver.new(@candidate, variant: @variant).call
+        assert_equal "scheduled", edition.state
+        assert_equal Time.zone.tomorrow, edition.publish_on
+        assert_equal %w[email facebook instagram web], edition.deliveries.order(:channel).pluck(:channel)
+      end
     end
   end
 
-  test "approver omits instagram delivery when not configured" do
+  test "approver omits meta deliveries when not configured" do
     AppConfig.stub(:instagram_configured?, false) do
-      edition = Editions::Approver.new(@candidate, variant: @variant).call
-      assert_equal %w[email web], edition.deliveries.order(:channel).pluck(:channel)
+      AppConfig.stub(:facebook_configured?, false) do
+        edition = Editions::Approver.new(@candidate, variant: @variant).call
+        assert_equal %w[email web], edition.deliveries.order(:channel).pluck(:channel)
+      end
     end
   end
 
-  test "approver omits instagram delivery without commercial use" do
+  test "approver omits meta deliveries without commercial use" do
     @source.update!(usage_flags: %w[Modify Share])
     AppConfig.stub(:instagram_configured?, true) do
-      edition = Editions::Approver.new(@candidate, variant: @variant).call
-      assert_equal %w[email web], edition.deliveries.order(:channel).pluck(:channel)
+      AppConfig.stub(:facebook_configured?, true) do
+        edition = Editions::Approver.new(@candidate, variant: @variant).call
+        assert_equal %w[email web], edition.deliveries.order(:channel).pluck(:channel)
+      end
     end
   end
 

@@ -15,16 +15,22 @@ module Publishing
       end
     end
 
-    class FakeInstagram
-      attr_reader :calls
+    class FakeMeta
+      attr_reader :instagram_calls, :facebook_calls
 
       def initialize
-        @calls = []
+        @instagram_calls = []
+        @facebook_calls = []
       end
 
-      def publish_photo(image_url:, caption:, alt_text: nil)
-        @calls << { image_url: image_url, caption: caption, alt_text: alt_text }
+      def publish_instagram_photo(image_url:, caption:, alt_text: nil)
+        @instagram_calls << { image_url: image_url, caption: caption, alt_text: alt_text }
         "ig_456"
+      end
+
+      def publish_facebook_photo(image_url:, caption:)
+        @facebook_calls << { image_url: image_url, caption: caption }
+        "fb_789"
       end
     end
 
@@ -45,83 +51,124 @@ module Publishing
       @edition.deliveries.create!(channel: "web", status: "pending")
       @edition.deliveries.create!(channel: "email", status: "pending")
       @edition.deliveries.create!(channel: "instagram", status: "pending")
+      @edition.deliveries.create!(channel: "facebook", status: "pending")
     end
 
-    test "publishes web email and instagram idempotently" do
+    test "publishes web email instagram and facebook idempotently" do
       AppConfig.stub(:instagram_configured?, true) do
-        buttondown = FakeButtondown.new
-        instagram = FakeInstagram.new
-        Orchestrator.new(@edition, buttondown: buttondown, instagram: instagram).call
+        AppConfig.stub(:facebook_configured?, true) do
+          buttondown = FakeButtondown.new
+          meta = FakeMeta.new
+          Orchestrator.new(@edition, buttondown: buttondown, meta: meta).call
 
-        @edition.reload
-        assert_equal "published", @edition.state
-        assert_equal "succeeded", @edition.deliveries.find_by(channel: "web").status
-        email = @edition.deliveries.find_by(channel: "email")
-        assert_equal "succeeded", email.status
-        assert_equal "bd_123", email.external_id
-        ig = @edition.deliveries.find_by(channel: "instagram")
-        assert_equal "succeeded", ig.status
-        assert_equal "ig_456", ig.external_id
-        assert_equal 1, buttondown.calls.size
-        assert_equal 1, instagram.calls.size
-        assert_equal @source.title, buttondown.calls.first[:subject]
-        assert_includes buttondown.calls.first[:body], "/share.jpg"
-        assert_includes instagram.calls.first[:image_url], "/share.jpg"
-        assert_includes instagram.calls.first[:caption], @source.title
+          @edition.reload
+          assert_equal "published", @edition.state
+          assert_equal "succeeded", @edition.deliveries.find_by(channel: "web").status
+          email = @edition.deliveries.find_by(channel: "email")
+          assert_equal "succeeded", email.status
+          assert_equal "bd_123", email.external_id
+          ig = @edition.deliveries.find_by(channel: "instagram")
+          assert_equal "succeeded", ig.status
+          assert_equal "ig_456", ig.external_id
+          fb = @edition.deliveries.find_by(channel: "facebook")
+          assert_equal "succeeded", fb.status
+          assert_equal "fb_789", fb.external_id
+          assert_equal 1, buttondown.calls.size
+          assert_equal 1, meta.instagram_calls.size
+          assert_equal 1, meta.facebook_calls.size
+          assert_equal @source.title, buttondown.calls.first[:subject]
+          assert_includes buttondown.calls.first[:body], "/share.jpg"
+          assert_includes meta.instagram_calls.first[:image_url], "/share.jpg"
+          assert_includes meta.instagram_calls.first[:caption], @source.title
+          assert_includes meta.facebook_calls.first[:image_url], "/share.jpg"
+          assert_includes meta.facebook_calls.first[:caption], @source.title
 
-        Orchestrator.new(@edition, buttondown: buttondown, instagram: instagram).call
-        assert_equal 1, buttondown.calls.size
-        assert_equal 1, instagram.calls.size
+          Orchestrator.new(@edition, buttondown: buttondown, meta: meta).call
+          assert_equal 1, buttondown.calls.size
+          assert_equal 1, meta.instagram_calls.size
+          assert_equal 1, meta.facebook_calls.size
+        end
       end
     end
 
-    test "skips instagram when not configured" do
+    test "skips instagram and facebook when not configured" do
       buttondown = FakeButtondown.new
-      instagram = FakeInstagram.new
+      meta = FakeMeta.new
 
       AppConfig.stub(:instagram_configured?, false) do
-        Orchestrator.new(@edition, buttondown: buttondown, instagram: instagram).call
+        AppConfig.stub(:facebook_configured?, false) do
+          Orchestrator.new(@edition, buttondown: buttondown, meta: meta).call
+        end
       end
 
       @edition.reload
       assert_equal "published", @edition.state
       assert_nil @edition.deliveries.find_by(channel: "instagram")
-      assert_equal 0, instagram.calls.size
+      assert_nil @edition.deliveries.find_by(channel: "facebook")
+      assert_equal 0, meta.instagram_calls.size
+      assert_equal 0, meta.facebook_calls.size
       assert_equal "succeeded", @edition.deliveries.find_by(channel: "email").status
     end
 
-    test "skips instagram without commercial use" do
+    test "skips meta channels without commercial use" do
       @source.update!(usage_flags: %w[Modify Share])
       buttondown = FakeButtondown.new
-      instagram = FakeInstagram.new
+      meta = FakeMeta.new
 
       AppConfig.stub(:instagram_configured?, true) do
-        Orchestrator.new(@edition, buttondown: buttondown, instagram: instagram).call
+        AppConfig.stub(:facebook_configured?, true) do
+          Orchestrator.new(@edition, buttondown: buttondown, meta: meta).call
+        end
       end
 
       @edition.reload
       assert_equal "published", @edition.state
       assert_nil @edition.deliveries.find_by(channel: "instagram")
-      assert_equal 0, instagram.calls.size
+      assert_nil @edition.deliveries.find_by(channel: "facebook")
+      assert_equal 0, meta.instagram_calls.size
+      assert_equal 0, meta.facebook_calls.size
       assert_equal "succeeded", @edition.deliveries.find_by(channel: "email").status
     end
 
     test "fails edition when instagram delivery fails" do
       AppConfig.stub(:instagram_configured?, true) do
-        buttondown = FakeButtondown.new
-        instagram = Object.new
-        def instagram.publish_photo(**)
-          raise InstagramClient::Error, "token expired"
+        AppConfig.stub(:facebook_configured?, false) do
+          buttondown = FakeButtondown.new
+          meta = Object.new
+          def meta.publish_instagram_photo(**)
+            raise MetaClient::Error, "token expired"
+          end
+
+          Orchestrator.new(@edition, buttondown: buttondown, meta: meta).call
+
+          @edition.reload
+          assert_equal "failed", @edition.state
+          assert_equal "succeeded", @edition.deliveries.find_by(channel: "email").status
+          ig = @edition.deliveries.find_by(channel: "instagram")
+          assert_equal "failed", ig.status
+          assert_match(/token expired/, ig.error_message)
         end
+      end
+    end
 
-        Orchestrator.new(@edition, buttondown: buttondown, instagram: instagram).call
+    test "fails edition when facebook delivery fails" do
+      AppConfig.stub(:instagram_configured?, false) do
+        AppConfig.stub(:facebook_configured?, true) do
+          buttondown = FakeButtondown.new
+          meta = Object.new
+          def meta.publish_facebook_photo(**)
+            raise MetaClient::Error, "pages_manage_posts missing"
+          end
 
-        @edition.reload
-        assert_equal "failed", @edition.state
-        assert_equal "succeeded", @edition.deliveries.find_by(channel: "email").status
-        ig = @edition.deliveries.find_by(channel: "instagram")
-        assert_equal "failed", ig.status
-        assert_match(/token expired/, ig.error_message)
+          Orchestrator.new(@edition, buttondown: buttondown, meta: meta).call
+
+          @edition.reload
+          assert_equal "failed", @edition.state
+          assert_equal "succeeded", @edition.deliveries.find_by(channel: "email").status
+          fb = @edition.deliveries.find_by(channel: "facebook")
+          assert_equal "failed", fb.status
+          assert_match(/pages_manage_posts missing/, fb.error_message)
+        end
       end
     end
   end

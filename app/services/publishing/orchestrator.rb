@@ -1,15 +1,16 @@
 module Publishing
   class Orchestrator
-    def initialize(edition, buttondown: ButtondownClient.new, instagram: nil)
+    def initialize(edition, buttondown: ButtondownClient.new, meta: nil)
       @edition = edition
       @buttondown = buttondown
-      @instagram = instagram
+      @meta = meta
     end
 
     def call
       deliver_web
       deliver_email
       deliver_instagram
+      deliver_facebook
       if @edition.deliveries.reload.all? { |d| d.status == "succeeded" }
         @edition.publish!
       else
@@ -50,7 +51,7 @@ module Publishing
 
     def deliver_instagram
       unless instagram_delivery?
-        skip_instagram_delivery
+        skip_delivery("instagram")
         return
       end
 
@@ -64,13 +65,38 @@ module Publishing
       end
 
       copy = Editions::Copy.new(@edition.source_item)
-      media_id = instagram_client.publish_photo(
+      media_id = meta_client.publish_instagram_photo(
         image_url: image_url,
         caption: copy.instagram_caption(edition_url: public_edition_url),
         alt_text: copy.alt_text
       )
       delivery.succeed!(external_id: media_id.to_s)
-    rescue InstagramClient::Error => e
+    rescue MetaClient::Error => e
+      delivery.fail!(e.message)
+    end
+
+    def deliver_facebook
+      unless facebook_delivery?
+        skip_delivery("facebook")
+        return
+      end
+
+      delivery = @edition.deliveries.find_or_create_by!(channel: "facebook")
+      return if delivery.status == "succeeded" && delivery.external_id.present?
+
+      image_url = share_image_url
+      unless image_url
+        delivery.fail!("Share image missing")
+        return
+      end
+
+      copy = Editions::Copy.new(@edition.source_item)
+      post_id = meta_client.publish_facebook_photo(
+        image_url: image_url,
+        caption: copy.facebook_caption(edition_url: public_edition_url)
+      )
+      delivery.succeed!(external_id: post_id.to_s)
+    rescue MetaClient::Error => e
       delivery.fail!(e.message)
     end
 
@@ -78,16 +104,20 @@ module Publishing
       AppConfig.instagram_configured? && @edition.source_item.commercial_use?
     end
 
-    def skip_instagram_delivery
-      delivery = @edition.deliveries.find_by(channel: "instagram")
+    def facebook_delivery?
+      AppConfig.facebook_configured? && @edition.source_item.commercial_use?
+    end
+
+    def skip_delivery(channel)
+      delivery = @edition.deliveries.find_by(channel: channel)
       return unless delivery
       return if delivery.status == "succeeded"
 
       delivery.destroy!
     end
 
-    def instagram_client
-      @instagram ||= InstagramClient.new
+    def meta_client
+      @meta ||= MetaClient.new
     end
 
     def public_edition_url

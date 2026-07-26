@@ -17,9 +17,10 @@
 #   buttondown:
 #     api_key: ...
 #     subscribe_url: https://buttondown.com/...
-#   instagram:                 # optional — Instagram delivery skipped when blank
-#     access_token: ...
-#     user_id: ...
+#   meta:                      # optional — Instagram/Facebook deliveries skipped when blank
+#     page_access_token: ...   # Page access token from /me/accounts
+#     page_id: ...             # enables Facebook Page posting
+#     instagram_user_id: ...   # enables Instagram Content Publishing
 #   admin:
 #     username: admin
 #     password: ...
@@ -45,12 +46,18 @@ module AppConfig
 
   def buttondown_subscribe_url = dig(:buttondown, :subscribe_url)
 
-  def instagram_access_token = dig(:instagram, :access_token)
+  def meta_page_access_token = dig(:meta, :page_access_token)
 
-  def instagram_user_id = dig(:instagram, :user_id)
+  def meta_page_id = dig(:meta, :page_id)
+
+  def meta_instagram_user_id = dig(:meta, :instagram_user_id)
 
   def instagram_configured?
-    instagram_access_token.present? && instagram_user_id.present?
+    meta_page_access_token.present? && meta_instagram_user_id.present?
+  end
+
+  def facebook_configured?
+    meta_page_access_token.present? && meta_page_id.present?
   end
 
   def admin_username = dig(:admin, :username).presence || "admin"
