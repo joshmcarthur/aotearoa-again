@@ -18,13 +18,19 @@ module Publishing
           return
         end
 
-        post_id = meta_client.publish_facebook_photo(
+        post_id = client.publish_photo(
           image_url: image_url,
           caption: copy.facebook_caption(edition_url: public_edition_url)
         )
         delivery.succeed!(external_id: post_id.to_s)
-      rescue Meta::Client::Error => e
+      rescue Client::Error => e
         delivery.fail!(e.message)
+      end
+
+      private
+
+      def client
+        @client ||= Client.new
       end
     end
   end

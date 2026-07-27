@@ -9,10 +9,9 @@ module Publishing
         false
       end
 
-      def initialize(edition, meta: nil, buttondown: nil)
+      def initialize(edition, client: nil)
         @edition = edition
-        @meta = meta
-        @buttondown = buttondown
+        @client = client
       end
 
       def call
@@ -25,14 +24,6 @@ module Publishing
 
       def channel
         self.class.channel
-      end
-
-      def meta_client
-        @meta ||= Meta::Client.new
-      end
-
-      def buttondown_client
-        @buttondown ||= ButtondownClient.new
       end
 
       def find_or_create_delivery

@@ -7,16 +7,18 @@ module Publishing
       Deliveries::Facebook
     ].freeze
 
-    def initialize(edition, buttondown: ButtondownClient.new, meta: nil)
+    def initialize(edition, email_client: nil, instagram_client: nil, facebook_client: nil)
       @edition = edition
-      @buttondown = buttondown
-      @meta = meta
+      @email_client = email_client
+      @instagram_client = instagram_client
+      @facebook_client = facebook_client
     end
 
     def call
-      DELIVERERS.each do |deliverer|
-        deliverer.new(@edition, meta: meta_client, buttondown: @buttondown).call
-      end
+      Deliveries::Web.new(@edition).call
+      Deliveries::Email.new(@edition, client: @email_client).call
+      Deliveries::Instagram.new(@edition, client: @instagram_client).call
+      Deliveries::Facebook.new(@edition, client: @facebook_client).call
 
       if deliveries_ready_to_publish?
         @edition.publish!
@@ -36,10 +38,6 @@ module Publishing
         delivery.status == "succeeded" ||
           (optional_channels.include?(delivery.channel) && delivery.status == "failed")
       end
-    end
-
-    def meta_client
-      @meta ||= Meta::Client.new
     end
   end
 end

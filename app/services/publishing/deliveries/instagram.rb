@@ -18,14 +18,20 @@ module Publishing
           return
         end
 
-        media_id = meta_client.publish_instagram_photo(
+        media_id = client.publish_photo(
           image_url: image_url,
           caption: copy.instagram_caption(edition_url: public_edition_url),
           alt_text: copy.alt_text
         )
         delivery.succeed!(external_id: media_id.to_s)
-      rescue Meta::Client::Error => e
+      rescue Client::Error => e
         delivery.fail!(e.message)
+      end
+
+      private
+
+      def client
+        @client ||= Client.new
       end
     end
   end
