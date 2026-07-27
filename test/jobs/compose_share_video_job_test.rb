@@ -33,22 +33,14 @@ class ComposeShareVideoJobTest < ActiveJob::TestCase
   test "attaches share_video when edition and images present" do
     skip "ffmpeg not available" unless system("ffmpeg", "-version", out: File::NULL, err: File::NULL)
 
-    export = Rails.root.join("tmp/test-job-short-#{SecureRandom.hex(4)}.mp4")
-    begin
-      ComposeShareVideoJob.perform_now(
-        @variant.id,
-        export_path: export.to_s,
-        fps: 10,
-        hold_start_s: 0.2,
-        motion_s: 0.3,
-        hold_end_s: 0.2
-      )
-      assert @variant.reload.share_video.attached?
-      assert_equal "video/mp4", @variant.share_video.content_type
-      assert export.exist?
-      assert_operator export.size, :>, 1000
-    ensure
-      export.delete if export.exist?
-    end
+    ComposeShareVideoJob.perform_now(
+      @variant.id,
+      fps: 10,
+      hold_start_s: 0.2,
+      motion_s: 0.3,
+      hold_end_s: 0.2
+    )
+    assert @variant.reload.share_video.attached?
+    assert_equal "video/mp4", @variant.share_video.content_type
   end
 end

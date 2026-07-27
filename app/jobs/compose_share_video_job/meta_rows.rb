@@ -37,4 +37,3 @@ class ComposeShareVideoJob
     end
   end
 end
-
