@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.13.0...v0.14.0) (2026-07-27)
+
+
+### Features
+
+* publish Instagram Reels alongside feed photos ([#54](https://github.com/joshmcarthur/aotearoa-again/issues/54)) ([fae11da](https://github.com/joshmcarthur/aotearoa-again/commit/fae11da139efde46bfa9e5beead892c18d28f805))
+
 ## [0.13.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.12.0...v0.13.0) (2026-07-27)
 
 
