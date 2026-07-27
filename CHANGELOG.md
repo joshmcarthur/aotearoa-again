@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.11.0...v0.12.0) (2026-07-27)
+
+
+### Features
+
+* ship pending nav and brand chip fixes ([#55](https://github.com/joshmcarthur/aotearoa-again/issues/55)) ([97e9005](https://github.com/joshmcarthur/aotearoa-again/commit/97e9005987bb242a588f44321d647bf38d410710))
+
 ## [0.11.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.10.1...v0.11.0) (2026-07-27)
 
 
