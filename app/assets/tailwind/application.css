@@ -55,12 +55,49 @@
     @apply text-[var(--color-sea)] no-underline hover:underline;
   }
 
+  .aa-nav a.aa-nav-cta {
+    @apply underline decoration-2 underline-offset-4 hover:text-[var(--color-ember)];
+  }
+
+  .aa-nav a.aa-nav-icon {
+    @apply inline-flex items-center normal-case tracking-normal hover:text-[var(--color-ember)] hover:no-underline;
+  }
+
+  .aa-social-icon-svg {
+    @apply h-[1.125rem] w-[1.125rem];
+  }
+
   .aa-footer {
-    @apply mx-auto max-w-6xl px-4 py-10 text-sm text-black/60;
+    @apply mx-auto flex max-w-6xl flex-col gap-5 px-4 py-10 text-sm text-black/60;
+  }
+
+  .aa-footer-attribution {
+    @apply max-w-2xl leading-relaxed;
+  }
+
+  .aa-footer-meta {
+    @apply flex flex-wrap items-center gap-x-5 gap-y-2;
   }
 
   .aa-footer-link {
-    @apply font-semibold text-[var(--color-sea)] underline;
+    @apply font-semibold text-[var(--color-sea)] no-underline hover:text-[var(--color-ember)];
+  }
+
+  .aa-footer-social {
+    @apply inline-flex flex-wrap items-center gap-x-5 gap-y-2;
+  }
+
+  .aa-footer a.aa-footer-icon {
+    @apply inline-flex items-center gap-2 font-semibold text-[var(--color-sea)] no-underline hover:text-[var(--color-ember)];
+    text-decoration: none;
+  }
+
+  .aa-footer a.aa-footer-icon:hover {
+    text-decoration: none;
+  }
+
+  .aa-footer .aa-social-handle {
+    text-decoration: none;
   }
 
   .aa-edition {

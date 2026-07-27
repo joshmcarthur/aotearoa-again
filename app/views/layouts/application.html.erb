@@ -28,7 +28,9 @@
           <%= link_to "Archive", editions_path %>
           <%= link_to "About", about_path %>
           <%= link_to "Feed", feed_path %>
-          <%= link_to "Subscribe", subscribe_path %>
+          <%= link_to "Subscribe", subscribe_path, class: "aa-nav-cta" %>
+          <%= social_icon_link(AppConfig.instagram_url, :instagram, "Instagram", link_class: "aa-nav-icon") %>
+          <%= social_icon_link(AppConfig.facebook_url, :facebook, "Facebook", link_class: "aa-nav-icon") %>
         </nav>
       </div>
     </header>
@@ -36,9 +38,17 @@
       <%= yield %>
     </main>
     <footer class="aa-footer">
-      <p>
+      <p class="aa-footer-attribution">
         Photographs courtesy of the Alexander Turnbull Library, via DigitalNZ. AI colourised — colours are interpretive.
-        <span aria-hidden="true"> · </span><%= link_to "About", about_path, class: "aa-footer-link" %>
+      </p>
+      <p class="aa-footer-meta">
+        <%= link_to "About", about_path, class: "aa-footer-link" %>
+        <% if AppConfig.instagram_url.present? || AppConfig.facebook_url.present? %>
+          <span class="aa-footer-social">
+            <%= social_icon_link(AppConfig.instagram_url, :instagram, "Instagram", link_class: "aa-footer-icon", show_handle: true) %>
+            <%= social_icon_link(AppConfig.facebook_url, :facebook, "Facebook", link_class: "aa-footer-icon", show_handle: true) %>
+          </span>
+        <% end %>
       </p>
     </footer>
   </body>
