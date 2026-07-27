@@ -2,7 +2,7 @@ require "test_helper"
 
 module Publishing
   class OrchestratorTest < ActiveSupport::TestCase
-    class FakeButtondown
+    class FakeEmailClient
       attr_reader :calls
 
       def initialize
@@ -15,21 +15,28 @@ module Publishing
       end
     end
 
-    class FakeMeta
-      attr_reader :instagram_calls, :facebook_calls
+    class FakeInstagramClient
+      attr_reader :calls
 
       def initialize
-        @instagram_calls = []
-        @facebook_calls = []
+        @calls = []
       end
 
-      def publish_instagram_photo(image_url:, caption:, alt_text: nil)
-        @instagram_calls << { image_url: image_url, caption: caption, alt_text: alt_text }
+      def publish_photo(image_url:, caption:, alt_text: nil)
+        @calls << { image_url: image_url, caption: caption, alt_text: alt_text }
         "ig_456"
       end
+    end
 
-      def publish_facebook_photo(image_url:, caption:)
-        @facebook_calls << { image_url: image_url, caption: caption }
+    class FakeFacebookClient
+      attr_reader :calls
+
+      def initialize
+        @calls = []
+      end
+
+      def publish_photo(image_url:, caption:)
+        @calls << { image_url: image_url, caption: caption }
         "fb_789"
       end
     end
@@ -58,50 +65,67 @@ module Publishing
     test "publishes web email instagram and facebook idempotently" do
       AppConfig.stub(:instagram_configured?, true) do
         AppConfig.stub(:facebook_configured?, true) do
-          buttondown = FakeButtondown.new
-          meta = FakeMeta.new
-          Orchestrator.new(@edition, buttondown: buttondown, meta: meta).call
+          email = FakeEmailClient.new
+          instagram = FakeInstagramClient.new
+          facebook = FakeFacebookClient.new
+          Orchestrator.new(
+            @edition,
+            email_client: email,
+            instagram_client: instagram,
+            facebook_client: facebook
+          ).call
 
           @edition.reload
           assert_equal "published", @edition.state
           assert_equal "succeeded", @edition.deliveries.find_by(channel: "web").status
-          email = @edition.deliveries.find_by(channel: "email")
-          assert_equal "succeeded", email.status
-          assert_equal "bd_123", email.external_id
+          email_delivery = @edition.deliveries.find_by(channel: "email")
+          assert_equal "succeeded", email_delivery.status
+          assert_equal "bd_123", email_delivery.external_id
           ig = @edition.deliveries.find_by(channel: "instagram")
           assert_equal "succeeded", ig.status
           assert_equal "ig_456", ig.external_id
           fb = @edition.deliveries.find_by(channel: "facebook")
           assert_equal "succeeded", fb.status
           assert_equal "fb_789", fb.external_id
-          assert_equal 1, buttondown.calls.size
-          assert_equal 1, meta.instagram_calls.size
-          assert_equal 1, meta.facebook_calls.size
-          assert_equal @source.title, buttondown.calls.first[:subject]
+          assert_equal 1, email.calls.size
+          assert_equal 1, instagram.calls.size
+          assert_equal 1, facebook.calls.size
+          assert_equal @source.title, email.calls.first[:subject]
           edition_url = Rails.application.routes.url_helpers.edition_url(@edition)
-          assert_includes buttondown.calls.first[:body], "/composite.jpg"
-          assert_includes buttondown.calls.first[:body], "[![#{@source.title}]"
-          assert_includes buttondown.calls.first[:body], "](#{edition_url})"
-          assert_includes meta.instagram_calls.first[:image_url], "/share.jpg"
-          assert_includes meta.instagram_calls.first[:caption], @source.title
-          assert_includes meta.facebook_calls.first[:image_url], "/share.jpg"
-          assert_includes meta.facebook_calls.first[:caption], @source.title
+          assert_includes email.calls.first[:body], "/composite.jpg"
+          assert_includes email.calls.first[:body], "[![#{@source.title}]"
+          assert_includes email.calls.first[:body], "](#{edition_url})"
+          assert_includes instagram.calls.first[:image_url], "/share.jpg"
+          assert_includes instagram.calls.first[:caption], @source.title
+          assert_includes facebook.calls.first[:image_url], "/share.jpg"
+          assert_includes facebook.calls.first[:caption], @source.title
 
-          Orchestrator.new(@edition, buttondown: buttondown, meta: meta).call
-          assert_equal 1, buttondown.calls.size
-          assert_equal 1, meta.instagram_calls.size
-          assert_equal 1, meta.facebook_calls.size
+          Orchestrator.new(
+            @edition,
+            email_client: email,
+            instagram_client: instagram,
+            facebook_client: facebook
+          ).call
+          assert_equal 1, email.calls.size
+          assert_equal 1, instagram.calls.size
+          assert_equal 1, facebook.calls.size
         end
       end
     end
 
     test "skips instagram and facebook when not configured" do
-      buttondown = FakeButtondown.new
-      meta = FakeMeta.new
+      email = FakeEmailClient.new
+      instagram = FakeInstagramClient.new
+      facebook = FakeFacebookClient.new
 
       AppConfig.stub(:instagram_configured?, false) do
         AppConfig.stub(:facebook_configured?, false) do
-          Orchestrator.new(@edition, buttondown: buttondown, meta: meta).call
+          Orchestrator.new(
+            @edition,
+            email_client: email,
+            instagram_client: instagram,
+            facebook_client: facebook
+          ).call
         end
       end
 
@@ -109,19 +133,25 @@ module Publishing
       assert_equal "published", @edition.state
       assert_nil @edition.deliveries.find_by(channel: "instagram")
       assert_nil @edition.deliveries.find_by(channel: "facebook")
-      assert_equal 0, meta.instagram_calls.size
-      assert_equal 0, meta.facebook_calls.size
+      assert_equal 0, instagram.calls.size
+      assert_equal 0, facebook.calls.size
       assert_equal "succeeded", @edition.deliveries.find_by(channel: "email").status
     end
 
     test "skips meta channels without commercial use" do
       @source.update!(usage_flags: %w[Modify Share])
-      buttondown = FakeButtondown.new
-      meta = FakeMeta.new
+      email = FakeEmailClient.new
+      instagram = FakeInstagramClient.new
+      facebook = FakeFacebookClient.new
 
       AppConfig.stub(:instagram_configured?, true) do
         AppConfig.stub(:facebook_configured?, true) do
-          Orchestrator.new(@edition, buttondown: buttondown, meta: meta).call
+          Orchestrator.new(
+            @edition,
+            email_client: email,
+            instagram_client: instagram,
+            facebook_client: facebook
+          ).call
         end
       end
 
@@ -129,21 +159,21 @@ module Publishing
       assert_equal "published", @edition.state
       assert_nil @edition.deliveries.find_by(channel: "instagram")
       assert_nil @edition.deliveries.find_by(channel: "facebook")
-      assert_equal 0, meta.instagram_calls.size
-      assert_equal 0, meta.facebook_calls.size
+      assert_equal 0, instagram.calls.size
+      assert_equal 0, facebook.calls.size
       assert_equal "succeeded", @edition.deliveries.find_by(channel: "email").status
     end
 
     test "fails edition when instagram delivery fails" do
       AppConfig.stub(:instagram_configured?, true) do
         AppConfig.stub(:facebook_configured?, false) do
-          buttondown = FakeButtondown.new
-          meta = Object.new
-          def meta.publish_instagram_photo(**)
-            raise MetaClient::Error, "token expired"
+          email = FakeEmailClient.new
+          instagram = Object.new
+          def instagram.publish_photo(**)
+            raise Deliveries::Instagram::Client::Error, "token expired"
           end
 
-          Orchestrator.new(@edition, buttondown: buttondown, meta: meta).call
+          Orchestrator.new(@edition, email_client: email, instagram_client: instagram).call
 
           @edition.reload
           assert_equal "failed", @edition.state
@@ -158,13 +188,13 @@ module Publishing
     test "fails edition when facebook delivery fails" do
       AppConfig.stub(:instagram_configured?, false) do
         AppConfig.stub(:facebook_configured?, true) do
-          buttondown = FakeButtondown.new
-          meta = Object.new
-          def meta.publish_facebook_photo(**)
-            raise MetaClient::Error, "pages_manage_posts missing"
+          email = FakeEmailClient.new
+          facebook = Object.new
+          def facebook.publish_photo(**)
+            raise Deliveries::Facebook::Client::Error, "pages_manage_posts missing"
           end
 
-          Orchestrator.new(@edition, buttondown: buttondown, meta: meta).call
+          Orchestrator.new(@edition, email_client: email, facebook_client: facebook).call
 
           @edition.reload
           assert_equal "failed", @edition.state
