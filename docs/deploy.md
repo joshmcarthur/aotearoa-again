@@ -9,6 +9,8 @@ Home-hosted Rails app with public ingress via Cloudflare Tunnel.
 - Solid Queue (set `SOLID_QUEUE_IN_PUMA=true` or run `bin/jobs`)
 - Active Storage on local disk (`storage/`) — back this directory up
 - Timezone: `Pacific/Auckland`
+- libvips (share stills) and **ffmpeg** (share video / shorts) — both are in the production Docker image; for bare-metal hosts install the distro packages
+- `PANGOCAIRO_BACKEND=fontconfig` so branded text uses the bundled Fraunces / Source Sans fonts (see README)
 
 ## Credentials
 
