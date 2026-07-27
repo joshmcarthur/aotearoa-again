@@ -14,6 +14,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
@@ -29,12 +30,8 @@
           <%= link_to "About", about_path %>
           <%= link_to "Feed", feed_path %>
           <%= link_to "Subscribe", subscribe_path %>
-          <% if AppConfig.instagram_url.present? %>
-            <%= link_to "Instagram", AppConfig.instagram_url, target: "_blank", rel: "noopener noreferrer" %>
-          <% end %>
-          <% if AppConfig.facebook_url.present? %>
-            <%= link_to "Facebook", AppConfig.facebook_url, target: "_blank", rel: "noopener noreferrer" %>
-          <% end %>
+          <%= social_nav_icon_link(AppConfig.instagram_url, "fa-instagram", "Instagram") %>
+          <%= social_nav_icon_link(AppConfig.facebook_url, "fa-facebook", "Facebook") %>
         </nav>
       </div>
     </header>

@@ -16,8 +16,10 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_match 'href="https://www.instagram.com/aotearoaagain"', response.body
         assert_match 'href="https://www.facebook.com/aotearoaagain"', response.body
-        assert_match ">Instagram<", response.body
-        assert_match ">Facebook<", response.body
+        assert_match 'aria-label="Instagram"', response.body
+        assert_match 'aria-label="Facebook"', response.body
+        assert_match "fa-instagram", response.body
+        assert_match "fa-facebook", response.body
       end
     end
   end
@@ -27,8 +29,10 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
       AppConfig.stub(:facebook_url, nil) do
         get about_url
         assert_response :success
-        assert_no_match ">Instagram<", response.body
-        assert_no_match ">Facebook<", response.body
+        assert_no_match 'aria-label="Instagram"', response.body
+        assert_no_match 'aria-label="Facebook"', response.body
+        assert_no_match "fa-instagram", response.body
+        assert_no_match "fa-facebook", response.body
       end
     end
   end
