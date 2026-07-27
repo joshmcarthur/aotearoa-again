@@ -35,6 +35,11 @@ class ComposeShareVideoJob
         assert_equal out, result
         assert out.exist?
         assert_operator out.size, :>, 1000
+
+        probe = ffprobe_streams(out)
+        assert_includes probe, "codec_type=video"
+        assert_includes probe, "codec_type=audio"
+        assert_includes probe, "codec_name=aac"
       ensure
         out.delete if out.exist?
       end
@@ -47,6 +52,17 @@ class ComposeShareVideoJob
       status.success?
     rescue Errno::ENOENT
       false
+    end
+
+    def ffprobe_streams(path)
+      out, _err, status = Open3.capture3(
+        "ffprobe", "-v", "error",
+        "-show_entries", "stream=codec_type,codec_name",
+        "-of", "default=noprint_wrappers=0",
+        path.to_s
+      )
+      assert status.success?, "ffprobe failed for #{path}"
+      out
     end
   end
 end
