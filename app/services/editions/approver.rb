@@ -8,7 +8,7 @@ module Editions
     def call
       raise ArgumentError, "Variant does not belong to candidate" unless @variant.candidate_id == @candidate.id
 
-      Edition.transaction do
+      edition = Edition.transaction do
         @variant.choose!
         if (edition = existing_edition)
           edition.update!(variant: @variant)
@@ -17,6 +17,8 @@ module Editions
           schedule_edition
         end
       end
+      ComposeShareVideoJob.perform_later(edition.variant_id)
+      edition
     end
 
     private

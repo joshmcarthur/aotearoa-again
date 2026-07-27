@@ -1,6 +1,8 @@
 require "test_helper"
 
 class EditionTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   setup do
     @model = Model.openrouter.image_capable.first || Model.create!(
       model_id: "test/image-model",
@@ -32,6 +34,12 @@ class EditionTest < ActiveSupport::TestCase
         assert_equal Time.zone.tomorrow, edition.publish_on
         assert_equal %w[email facebook instagram web], edition.deliveries.order(:channel).pluck(:channel)
       end
+    end
+  end
+
+  test "approver enqueues share video composition for the chosen variant" do
+    assert_enqueued_with(job: ComposeShareVideoJob, args: [ @variant.id ]) do
+      Editions::Approver.new(@candidate, variant: @variant).call
     end
   end
 
