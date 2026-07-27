@@ -16,7 +16,7 @@
     <%= link_to "Public edition", edition_path(@edition), class: "underline" %>
     <% if variant.share_link.present? %>
       · Short link:
-      <%= link_to variant.share_link.path, share_link_path(variant.share_link.code), class: "underline", target: "_blank", rel: "noopener" %>
+      <%= link_to variant.share_link.url, share_link_path(variant.share_link.code), class: "underline", target: "_blank", rel: "noopener" %>
     <% end %>
   </p>
 </div>
@@ -59,7 +59,7 @@
     <% if variant.share_link.present? %>
       <p class="mt-2 text-xs text-stone-500">
         QR target:
-        <%= link_to variant.share_link.path, share_link_path(variant.share_link.code), class: "underline", target: "_blank", rel: "noopener" %>
+        <%= link_to variant.share_link.url, share_link_path(variant.share_link.code), class: "underline", target: "_blank", rel: "noopener" %>
       </p>
     <% end %>
   </div>
