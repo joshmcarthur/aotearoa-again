@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.12.0...v0.13.0) (2026-07-27)
+
+
+### Features
+
+* mux share sting audio into composed shorts ([#57](https://github.com/joshmcarthur/aotearoa-again/issues/57)) ([e9233b2](https://github.com/joshmcarthur/aotearoa-again/commit/e9233b241db50e1cc5c8564710d684e8eadadfab))
+
 ## [0.12.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.11.0...v0.12.0) (2026-07-27)
 
 
