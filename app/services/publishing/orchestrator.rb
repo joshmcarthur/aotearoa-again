@@ -4,6 +4,7 @@ module Publishing
       Deliveries::Web,
       Deliveries::Email,
       Deliveries::Instagram,
+      Deliveries::InstagramReel,
       Deliveries::Facebook
     ].freeze
 
@@ -18,6 +19,7 @@ module Publishing
       Deliveries::Web.new(@edition).call
       Deliveries::Email.new(@edition, client: @email_client).call
       Deliveries::Instagram.new(@edition, client: @instagram_client).call
+      Deliveries::InstagramReel.new(@edition, client: @instagram_client).call
       Deliveries::Facebook.new(@edition, client: @facebook_client).call
 
       if deliveries_ready_to_publish?

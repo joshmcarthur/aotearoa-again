@@ -32,7 +32,7 @@ class EditionTest < ActiveSupport::TestCase
         edition = Editions::Approver.new(@candidate, variant: @variant).call
         assert_equal "scheduled", edition.state
         assert_equal Time.zone.tomorrow, edition.publish_on
-        assert_equal %w[email facebook instagram web], edition.deliveries.order(:channel).pluck(:channel)
+        assert_equal %w[email facebook instagram instagram_reel web], edition.deliveries.order(:channel).pluck(:channel)
       end
     end
   end

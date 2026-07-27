@@ -60,6 +60,12 @@ module Publishing
         edition_media_url(:edition_share_image_url)
       end
 
+      def share_video_url
+        return unless edition.variant.share_video.attached?
+
+        edition_media_url(:edition_share_video_url)
+      end
+
       def composite_image_url
         return unless edition.variant.archive_image.attached?
 

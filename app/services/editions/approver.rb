@@ -37,6 +37,7 @@ module Editions
       edition.deliveries.create!(channel: "email", status: "pending")
       if instagram_delivery?
         edition.deliveries.create!(channel: "instagram", status: "pending")
+        edition.deliveries.create!(channel: "instagram_reel", status: "pending")
       end
       if facebook_delivery?
         edition.deliveries.create!(channel: "facebook", status: "pending")

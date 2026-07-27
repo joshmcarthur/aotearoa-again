@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   root "editions#today"
   resources :editions, only: %i[index show], param: :publish_on
   get "editions/:publish_on/share.jpg", to: "edition_images#share", as: :edition_share_image
+  get "editions/:publish_on/share.mp4", to: "edition_images#share_video", as: :edition_share_video
   get "editions/:publish_on/composite.jpg", to: "edition_images#composite", as: :edition_composite_image
   get "/s/:code", to: "share_links#show", as: :share_link
   get "/feed.xml", to: "feeds#show", as: :feed
