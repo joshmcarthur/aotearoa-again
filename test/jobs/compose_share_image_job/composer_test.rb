@@ -1,6 +1,6 @@
 require "test_helper"
 
-module ShareImages
+class ComposeShareImageJob
   class ComposerTest < ActiveSupport::TestCase
     test "composites branded share and unbranded composite jpegs within og bounds" do
       path = Rails.root.join("test/fixtures/files/mono_plate.jpg")
@@ -76,10 +76,10 @@ module ShareImages
     test "raises when brand font file is missing" do
       path = Rails.root.join("test/fixtures/files/mono_plate.jpg")
       missing = Rails.root.join("tmp/missing-fraunces-#{SecureRandom.hex(4)}.ttf")
-      original = Composer::FONT_PATH
+      original = BrandChip::FONT_PATH
 
-      Composer.send(:remove_const, :FONT_PATH)
-      Composer.const_set(:FONT_PATH, missing)
+      BrandChip.send(:remove_const, :FONT_PATH)
+      BrandChip.const_set(:FONT_PATH, missing)
       begin
         error = assert_raises(Composer::Error) do
           Composer.new(
@@ -90,8 +90,8 @@ module ShareImages
         end
         assert_match(/brand font/i, error.message)
       ensure
-        Composer.send(:remove_const, :FONT_PATH)
-        Composer.const_set(:FONT_PATH, original)
+        BrandChip.send(:remove_const, :FONT_PATH)
+        BrandChip.const_set(:FONT_PATH, original)
       end
     end
 

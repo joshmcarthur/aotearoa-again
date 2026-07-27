@@ -12,7 +12,7 @@ class ComposeShareImageJob < ApplicationJob
 
     variant.colourised_image.blob.open do |colourised_file|
       variant.candidate.original_image.blob.open do |original_file|
-        result = ShareImages::Composer.new(
+        result = Composer.new(
           original_path: original_file.path,
           colourised_path: colourised_file.path,
           short_url: share_link.url
