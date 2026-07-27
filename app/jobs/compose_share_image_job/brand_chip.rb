@@ -18,7 +18,7 @@ class ComposeShareImageJob
       raise Composer::Error, "short URL missing" if short_url.blank?
       raise Composer::Error, "brand font missing: #{FONT_PATH}" unless FONT_PATH.exist?
 
-      qr_size = (width * 0.08).round.clamp(48, 96)
+      qr_size = 75
       padding = (width * 0.02).round.clamp(8, 24)
       text_max_w = (width * 0.42).round
 
