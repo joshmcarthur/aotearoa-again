@@ -1,4 +1,4 @@
-require "fileutils"
+require "tmpdir"
 
 class ComposeShareVideoJob < ApplicationJob
   queue_as :default
@@ -6,9 +6,8 @@ class ComposeShareVideoJob < ApplicationJob
   discard_on ActiveRecord::RecordNotFound
 
   # Renders a 9:16 share short and attaches it to the variant.
-  # Requires an Edition (for the on-screen edition label). Optional +export_path+
-  # copies the MP4 for local preview (e.g. rake shorts:demo OUT=…).
-  def perform(variant_id, export_path: nil, **opts)
+  # Requires an Edition (for the on-screen edition label).
+  def perform(variant_id, **opts)
     variant = Variant.find(variant_id)
     edition = variant.edition
     return unless edition
@@ -25,12 +24,6 @@ class ComposeShareVideoJob < ApplicationJob
           filename: "share-#{edition.publish_on.iso8601}.mp4",
           content_type: "video/mp4"
         )
-      end
-
-      if export_path.present?
-        export = Pathname(export_path)
-        export.dirname.mkpath
-        FileUtils.cp(out, export)
       end
     end
   end
