@@ -28,6 +28,8 @@
 #   app:
 #     host: aotearoa-again.example
 #     harvest_pipeline_target: 3
+#     instagram_url: https://www.instagram.com/...
+#     facebook_url: https://www.facebook.com/...
 #   smtp:
 #     address: ...
 #     port: 587
@@ -67,6 +69,10 @@ module AppConfig
   def admin_alert_email = dig(:admin, :alert_email).presence || admin_username
 
   def app_host = dig(:app, :host).presence || "localhost:3000"
+
+  def instagram_url = dig(:app, :instagram_url)
+
+  def facebook_url = dig(:app, :facebook_url)
 
   def harvest_pipeline_target = Integer(dig(:app, :harvest_pipeline_target).presence || 3)
 

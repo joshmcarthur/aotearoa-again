@@ -39,4 +39,16 @@ class AppConfigTest < ActiveSupport::TestCase
       assert_not AppConfig.instagram_configured?
     end
   end
+
+  test "reads optional social profile urls" do
+    AppConfig.stub(:dig, lambda { |*keys|
+      case keys
+      when [ :app, :instagram_url ] then "https://www.instagram.com/aotearoaagain"
+      when [ :app, :facebook_url ] then "https://www.facebook.com/aotearoaagain"
+      end
+    }) do
+      assert_equal "https://www.instagram.com/aotearoaagain", AppConfig.instagram_url
+      assert_equal "https://www.facebook.com/aotearoaagain", AppConfig.facebook_url
+    end
+  end
 end

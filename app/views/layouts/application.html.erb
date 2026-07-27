@@ -29,6 +29,12 @@
           <%= link_to "About", about_path %>
           <%= link_to "Feed", feed_path %>
           <%= link_to "Subscribe", subscribe_path %>
+          <% if AppConfig.instagram_url.present? %>
+            <%= link_to "Instagram", AppConfig.instagram_url, target: "_blank", rel: "noopener noreferrer" %>
+          <% end %>
+          <% if AppConfig.facebook_url.present? %>
+            <%= link_to "Facebook", AppConfig.facebook_url, target: "_blank", rel: "noopener noreferrer" %>
+          <% end %>
         </nav>
       </div>
     </header>
