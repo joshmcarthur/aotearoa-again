@@ -55,11 +55,15 @@
     @apply text-[var(--color-sea)] no-underline hover:underline;
   }
 
+  .aa-nav a.aa-nav-cta {
+    @apply underline decoration-2 underline-offset-4 hover:text-[var(--color-ember)];
+  }
+
   .aa-nav a.aa-nav-icon {
     @apply inline-flex items-center normal-case tracking-normal hover:text-[var(--color-ember)] hover:no-underline;
   }
 
-  .aa-nav-icon-svg {
+  .aa-social-icon-svg {
     @apply h-[1.125rem] w-[1.125rem];
   }
 
@@ -69,6 +73,14 @@
 
   .aa-footer-link {
     @apply font-semibold text-[var(--color-sea)] underline;
+  }
+
+  .aa-footer-social {
+    @apply inline-flex items-center gap-3 align-middle;
+  }
+
+  .aa-footer a.aa-footer-icon {
+    @apply inline-flex items-center text-[var(--color-sea)] no-underline hover:text-[var(--color-ember)];
   }
 
   .aa-edition {

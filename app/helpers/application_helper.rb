@@ -1,9 +1,9 @@
 module ApplicationHelper
-  def social_nav_icon_link(url, icon, label)
+  def social_icon_link(url, icon, label, link_class:)
     return if url.blank?
 
     link_to url,
-            class: "aa-nav-icon",
+            class: link_class,
             target: "_blank",
             rel: "noopener noreferrer",
             aria: { label: label } do
