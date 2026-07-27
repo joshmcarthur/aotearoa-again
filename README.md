@@ -28,6 +28,8 @@ On macOS, `bin/jobs` exports `OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` **before*
 
 Share image composition also needs `PANGOCAIRO_BACKEND=fontconfig` (exported by `bin/dev` / `bin/jobs`) so libvips honours the bundled Fraunces font file instead of falling back to Helvetica on macOS.
 
+Share video (9:16 shorts) needs **ffmpeg** on `PATH` in addition to libvips. The production Docker image and CI install it; on macOS, `brew install ffmpeg`.
+
 ## Pipeline
 
 1. `HarvestCandidatesJob` — DigitalNZ ATL images with Modify + Use commercially  
