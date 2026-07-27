@@ -15,8 +15,7 @@ class ComposeShareImageJob
 
     # Returns an RGBA image of the brand chip (text + QR), sized for +width+.
     def build(width, short_url)
-      raise Composer::Error, "share URL missing" if short_url.blank?
-      raise Composer::Error, "share URL must be absolute" unless short_url.match?(/\Ahttps?:\/\//i)
+      raise Composer::Error, "short URL missing" if short_url.blank?
       raise Composer::Error, "brand font missing: #{FONT_PATH}" unless FONT_PATH.exist?
 
       qr_size = (width * 0.08).round.clamp(48, 96)
