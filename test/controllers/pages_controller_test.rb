@@ -18,8 +18,8 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
         assert_match "aa-nav-cta", response.body
         assert_select "nav.aa-nav a[href='https://www.instagram.com/aotearoaagain'][aria-label='Instagram']"
         assert_select "nav.aa-nav a[href='https://www.facebook.com/aotearoaagain'][aria-label='Facebook']"
-        assert_select "footer.aa-footer a[href='https://www.instagram.com/aotearoaagain'][aria-label='Instagram']"
-        assert_select "footer.aa-footer a[href='https://www.facebook.com/aotearoaagain'][aria-label='Facebook']"
+        assert_select "footer.aa-footer a[href='https://www.instagram.com/aotearoaagain'][aria-label='Instagram (@aotearoaagain)']", text: /@aotearoaagain/
+        assert_select "footer.aa-footer a[href='https://www.facebook.com/aotearoaagain'][aria-label='Facebook (@aotearoaagain)']", text: /@aotearoaagain/
       end
     end
   end
