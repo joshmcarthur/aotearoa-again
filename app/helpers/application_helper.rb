@@ -1,5 +1,5 @@
 module ApplicationHelper
-  def social_nav_icon_link(url, icon_class, label)
+  def social_nav_icon_link(url, icon, label)
     return if url.blank?
 
     link_to url,
@@ -7,7 +7,7 @@ module ApplicationHelper
             target: "_blank",
             rel: "noopener noreferrer",
             aria: { label: label } do
-      tag.i class: "fa-brands #{icon_class}", aria: { hidden: true }
+      render("shared/icons/#{icon}")
     end
   end
 end

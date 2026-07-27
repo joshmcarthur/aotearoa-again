@@ -18,8 +18,8 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
         assert_match 'href="https://www.facebook.com/aotearoaagain"', response.body
         assert_match 'aria-label="Instagram"', response.body
         assert_match 'aria-label="Facebook"', response.body
-        assert_match "fa-instagram", response.body
-        assert_match "fa-facebook", response.body
+        assert_match 'viewBox="0 0 24 24"', response.body
+        assert_match "aa-nav-icon-svg", response.body
       end
     end
   end
@@ -31,8 +31,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_no_match 'aria-label="Instagram"', response.body
         assert_no_match 'aria-label="Facebook"', response.body
-        assert_no_match "fa-instagram", response.body
-        assert_no_match "fa-facebook", response.body
+        assert_no_match "aa-nav-icon-svg", response.body
       end
     end
   end

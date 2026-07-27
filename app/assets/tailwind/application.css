@@ -56,7 +56,11 @@
   }
 
   .aa-nav a.aa-nav-icon {
-    @apply text-lg leading-none normal-case tracking-normal hover:text-[var(--color-ember)] hover:no-underline;
+    @apply inline-flex items-center normal-case tracking-normal hover:text-[var(--color-ember)] hover:no-underline;
+  }
+
+  .aa-nav-icon-svg {
+    @apply h-[1.125rem] w-[1.125rem];
   }
 
   .aa-footer {
