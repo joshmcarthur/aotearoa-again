@@ -82,6 +82,7 @@ class ComposeShareVideoJob
       raise Error, "colourised image missing" unless @colourised_path.present? && File.exist?(@colourised_path)
       raise Error, "display font missing: #{TextPainter::DISPLAY_FONT_PATH}" unless TextPainter::DISPLAY_FONT_PATH.exist?
       raise Error, "body font missing: #{TextPainter::BODY_FONT_PATH}" unless TextPainter::BODY_FONT_PATH.exist?
+      raise Error, "share audio missing: #{Encoder::AUDIO_PATH}" unless Encoder::AUDIO_PATH.exist?
       raise Error, "ffmpeg not found on PATH" unless Encoder.available?
     end
 
