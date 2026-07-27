@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.10.1...v0.11.0) (2026-07-27)
+
+
+### Features
+
+* enqueue share video composition on edition approve ([#48](https://github.com/joshmcarthur/aotearoa-again/issues/48)) ([02a263c](https://github.com/joshmcarthur/aotearoa-again/commit/02a263c64547bcda6a8911dc397d129606b031e8))
+
 ## [0.10.1](https://github.com/joshmcarthur/aotearoa-again/compare/v0.10.0...v0.10.1) (2026-07-26)
 
 
