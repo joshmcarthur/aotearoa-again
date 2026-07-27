@@ -6,6 +6,7 @@ class Variant < ApplicationRecord
   has_one_attached :colourised_image
   has_one_attached :composite_image
   has_one_attached :share_image
+  has_one_attached :share_video
 
   validates :prompt, presence: true
 

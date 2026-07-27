@@ -29,7 +29,7 @@ class ComposeShareImageJob
     end
 
     test "brand font file is present" do
-      assert Composer::FONT_PATH.exist?, "expected Fraunces at #{Composer::FONT_PATH}"
+      assert BrandChip::FONT_PATH.exist?, "expected Fraunces at #{BrandChip::FONT_PATH}"
     end
 
     test "forces pangocairo fontconfig backend so fontfile is honoured" do
