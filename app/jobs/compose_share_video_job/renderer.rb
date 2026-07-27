@@ -13,11 +13,12 @@ class ComposeShareVideoJob
     MIN_TOP_BAR = 168
     MIN_BOTTOM_BAR = 260
 
+    # ~8s total: short enough for Reels/Shorts completion, long enough for the wipe + chrome.
     DEFAULTS = {
       fps: 30,
-      hold_start_s: 1.2,
-      motion_s: 4.0,
-      hold_end_s: 9.8,
+      hold_start_s: 1.0,
+      motion_s: 3.5,
+      hold_end_s: 3.5,
       caption_fade_s: 0.65,
       caption_lead_s: 0.45
     }.freeze
