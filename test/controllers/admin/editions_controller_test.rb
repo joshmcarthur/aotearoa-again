@@ -43,7 +43,7 @@ module Admin
       assert_match "Colourised", response.body
       assert_match "Share (unbranded)", response.body
       assert_match "Branded", response.body
-      assert_match @variant.share_link.path, response.body
+      assert_match @variant.share_link.url, response.body
     end
 
     test "show renders empty state when attachments are missing" do

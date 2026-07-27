@@ -1,3 +1,4 @@
+require "chunky_png"
 require "rqrcode"
 require "vips"
 
@@ -14,7 +15,8 @@ class ComposeShareImageJob
 
     # Returns an RGBA image of the brand chip (text + QR), sized for +width+.
     def build(width, short_url)
-      raise Composer::Error, "short URL missing" if short_url.blank?
+      raise Composer::Error, "share URL missing" if short_url.blank?
+      raise Composer::Error, "share URL must be absolute" unless short_url.match?(/\Ahttps?:\/\//i)
       raise Composer::Error, "brand font missing: #{FONT_PATH}" unless FONT_PATH.exist?
 
       qr_size = (width * 0.08).round.clamp(48, 96)
@@ -82,22 +84,22 @@ class ComposeShareImageJob
         .bandjoin(alpha)
     end
 
-    def qr_rgba(short_url, size)
-      png = RQRCode::QRCode.new(short_url).as_png(
-        bit_depth: 1,
-        border_modules: 1,
-        color: "black",
-        fill: "white",
-        module_px_size: 6,
+    def qr_rgba(share_url, size)
+      png = RQRCode::QRCode.new(share_url).as_png(
+        border_modules: 0,
+        color: "white",
+        fill: ChunkyPNG::Color::TRANSPARENT,
         size: size
       )
       qr = Vips::Image.new_from_buffer(png.to_s, "")
-      qr = qr.colourspace(:srgb) if qr.bands < 3
-      qr
-        .extract_band(0, n: 3)
-        .thumbnail_image(size, height: size, size: :force)
-        .copy(interpretation: :srgb)
-        .bandjoin(255)
+      unless qr.interpretation == :srgb && qr.bands >= 3
+        qr = qr.colourspace(:srgb)
+      end
+      qr = qr.bandjoin(255) if qr.bands == 3
+      if qr.width != size || qr.height != size
+        qr = qr.thumbnail_image(size, height: size, size: :force)
+      end
+      qr.copy(interpretation: :srgb)
     end
   end
 end
