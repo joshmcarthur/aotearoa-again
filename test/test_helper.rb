@@ -56,5 +56,15 @@ module ActiveSupport
         content_type: "image/jpeg"
       )
     end
+
+    def attach_fixture_video(record, name: :share_video)
+      path = Rails.root.join("test/fixtures/files/mono_plate.jpg")
+      record.public_send(name).attach(
+        io: File.open(path),
+        filename: "share.mp4",
+        content_type: "video/mp4",
+        identify: false
+      )
+    end
   end
 end

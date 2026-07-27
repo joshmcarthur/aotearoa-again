@@ -1,14 +1,18 @@
 class EditionImagesController < ApplicationController
-  # Stable public JPEGs for published artifacts (email, Instagram, Atom, OG).
+  # Stable public media for published artifacts (email, Instagram, Atom, OG).
   # Signed blob URLs expire and break mail clients and Meta fetchers.
   # Allowed for scheduled editions too — Orchestrator delivers before publish!.
 
   def share
-    serve_image(find_edition, :distribution_image, "share.jpg")
+    serve_attachment(find_edition.variant.distribution_image, "share.jpg", "image/jpeg")
+  end
+
+  def share_video
+    serve_attachment(find_edition.variant.share_video, "share.mp4", "video/mp4")
   end
 
   def composite
-    serve_image(find_edition, :archive_image, "composite.jpg")
+    serve_attachment(find_edition.variant.archive_image, "composite.jpg", "image/jpeg")
   end
 
   private
@@ -22,13 +26,12 @@ class EditionImagesController < ApplicationController
     edition
   end
 
-  def serve_image(edition, image_method, filename)
-    image = edition.variant.public_send(image_method)
-    raise ActiveRecord::RecordNotFound unless image.attached?
+  def serve_attachment(attachment, filename, default_type)
+    raise ActiveRecord::RecordNotFound unless attachment.attached?
 
     expires_in 1.day, public: true
-    send_data image.download,
-      type: image.content_type.presence || "image/jpeg",
+    send_data attachment.download,
+      type: attachment.content_type.presence || default_type,
       disposition: "inline",
       filename: filename
   end

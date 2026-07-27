@@ -7,7 +7,8 @@ Meta credentials are **optional**. Instagram and Facebook are gated independentl
 
 | Channel | Required credentials | Extra gate |
 |---|---|---|
-| Instagram | `page_access_token` + `instagram_user_id` | DigitalNZ **Use commercially** |
+| Instagram photo | `page_access_token` + `instagram_user_id` | DigitalNZ **Use commercially** |
+| Instagram Reel | same as Instagram photo | DigitalNZ **Use commercially** |
 | Facebook Page | `page_access_token` + `page_id` | DigitalNZ **Use commercially** |
 
 When a channel is not configured (or the item is not commercial-use), Approver skips that delivery and Orchestrator skips publishing for it (web + email still publish).
@@ -23,9 +24,16 @@ app:
   host: your.public.hostname      # no https:// — must be reachable by Meta
 ```
 
-Meta fetches `https://YOUR_HOST/editions/YYYY-MM-DD/share.jpg` at publish time. **localhost will not work** unless you expose the app with a public HTTPS tunnel and set `app.host` to that hostname.
+At publish time Meta fetches:
 
-Both channels post the same branded share image. Captions include attribution, the AI colourisation notice, and the public edition URL.
+- `https://YOUR_HOST/editions/YYYY-MM-DD/share.jpg` — feed photo (Instagram + Facebook) and Reel cover
+- `https://YOUR_HOST/editions/YYYY-MM-DD/share.mp4` — Instagram Reel video
+
+**localhost will not work** unless you expose the app with a public HTTPS tunnel and set `app.host` to that hostname.
+
+Instagram publishes **both** a feed photo and a Reel (`share_to_feed=false` so the Reel stays in the Reels tab and does not double-post the feed). Facebook stays photo-only. Captions include attribution, the AI colourisation notice, and the public edition URL.
+
+Reel publishing creates a `media_type=REELS` container, polls `status_code` until `FINISHED`, then publishes. If the share video is missing or Meta rejects the Reel, that delivery is marked failed and admin is emailed, but the edition still publishes (photo / email / web are required; Reel is optional).
 
 ---
 

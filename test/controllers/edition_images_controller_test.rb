@@ -96,4 +96,35 @@ class EditionImagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal "image/jpeg", response.media_type
   end
+
+  test "share video serves mp4 for published editions" do
+    attach_fixture_video(@variant)
+
+    get edition_share_video_url(@edition)
+    assert_response :success
+    assert_equal "video/mp4", response.media_type
+    assert response.body.bytesize.positive?
+  end
+
+  test "share video serves scheduled editions for publish-time delivery" do
+    attach_fixture_video(@variant)
+    @edition.update!(state: "scheduled", published_at: nil)
+
+    get edition_share_video_url(@edition)
+    assert_response :success
+    assert_equal "video/mp4", response.media_type
+  end
+
+  test "share video is not found for failed editions" do
+    attach_fixture_video(@variant)
+    @edition.update!(state: "failed", published_at: nil)
+
+    get edition_share_video_url(@edition)
+    assert_response :not_found
+  end
+
+  test "share video is not found when attachment missing" do
+    get edition_share_video_url(@edition)
+    assert_response :not_found
+  end
 end
