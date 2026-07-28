@@ -14,6 +14,39 @@ module Editions
       assert_equal Copy::AI_NOTICE, copy.ai_notice
     end
 
+    test "ai_notice includes model generation and review dates when edition provided" do
+      source = create_source_item
+      model = Model.openrouter.image_capable.first || Model.create!(
+        model_id: "test/transparency-model",
+        name: "Gemini Flash",
+        provider: "openrouter",
+        modalities: { "input" => [ "image" ], "output" => [ "image" ] }
+      )
+      candidate = source.candidates.create!(status: "ready")
+      attach_fixture_image(candidate)
+      variant = candidate.variants.create!(
+        model: model,
+        prompt: "colourise",
+        chosen: true,
+        created_at: Time.zone.local(2026, 7, 10, 14, 30)
+      )
+      attach_fixture_image(variant, name: :colourised_image)
+      edition = Edition.create!(
+        variant: variant,
+        publish_on: Date.new(2026, 7, 15),
+        state: "published",
+        created_at: Time.zone.local(2026, 7, 12, 9, 0)
+      )
+
+      copy = Copy.new(source, edition: edition)
+      notice = copy.ai_notice
+
+      assert_includes notice, Copy::AI_NOTICE
+      assert_includes notice, "Model: Gemini Flash."
+      assert_includes notice, "Generated #{I18n.l(Date.new(2026, 7, 10), format: :long)}."
+      assert_includes notice, "Reviewed #{I18n.l(Date.new(2026, 7, 12), format: :long)}."
+    end
+
     test "falls back when description blank" do
       source = create_source_item(description: nil, display_date: "1901", placename: "Dunedin")
       copy = Copy.new(source)
@@ -23,7 +56,22 @@ module Editions
 
     test "email instagram and facebook share the same narrative body" do
       source = create_source_item
-      copy = Copy.new(source)
+      model = Model.openrouter.image_capable.first || Model.create!(
+        model_id: "test/social-model",
+        name: "Test Image",
+        provider: "openrouter",
+        modalities: { "input" => [ "image" ], "output" => [ "image" ] }
+      )
+      candidate = source.candidates.create!(status: "ready")
+      attach_fixture_image(candidate)
+      variant = candidate.variants.create!(model: model, prompt: "colourise", chosen: true)
+      attach_fixture_image(variant, name: :colourised_image)
+      edition = Edition.create!(
+        variant: variant,
+        publish_on: Time.zone.today,
+        state: "published"
+      )
+      copy = Copy.new(source, edition: edition)
       edition_url = "https://example.com/editions/2026-07-25"
       body = copy.body_text
 
@@ -43,6 +91,7 @@ module Editions
       assert_includes email, "[View this plate](#{edition_url})"
       assert_includes ig, source.title
       assert_includes ig, Copy::AI_NOTICE
+      assert_includes ig, "Model: Test Image."
       assert_includes ig, edition_url
       assert_includes fb, source.title
       assert_includes fb, Copy::AI_NOTICE

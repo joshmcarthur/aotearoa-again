@@ -3,8 +3,10 @@ module Editions
     AI_NOTICE = "AI colourised — colours are interpretive.".freeze
     INSTAGRAM_CAPTION_LIMIT = 2200
 
-    def initialize(source_item)
+    def initialize(source_item, edition: nil, variant: nil)
       @source_item = source_item
+      @edition = edition
+      @variant = variant || edition&.variant
     end
 
     def title
@@ -35,7 +37,15 @@ module Editions
     end
 
     def ai_notice
-      AI_NOTICE
+      parts = [ AI_NOTICE ]
+      return parts.join if @variant.nil?
+
+      parts << "Model: #{@variant.model.name}."
+      parts << "Generated #{I18n.l(@variant.created_at.to_date, format: :long)}."
+      if @edition
+        parts << "Reviewed #{I18n.l(@edition.created_at.to_date, format: :long)}."
+      end
+      parts.join(" ")
     end
 
     def rss_summary
