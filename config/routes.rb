@@ -22,8 +22,7 @@ Rails.application.routes.draw do
     end
     resources :editions, only: %i[index show] do
       member do
-        post :regenerate_share_video
-        post :regenerate_variant
+        post :regenerate
       end
     end
     resources :models, only: %i[index] do

@@ -54,20 +54,14 @@ module Admin
       assert_select "video source[type=?]", "video/mp4"
     end
 
-    test "regenerate share video enqueues job" do
-      assert_enqueued_with(job: ComposeShareVideoJob, args: [ @variant.id ]) do
-        post regenerate_share_video_admin_edition_url(@edition), headers: basic_auth
+    test "regenerate enqueues share image and video jobs" do
+      assert_enqueued_with(job: ComposeShareImageJob, args: [ @variant.id ]) do
+        assert_enqueued_with(job: ComposeShareVideoJob, args: [ @variant.id ]) do
+          post regenerate_admin_edition_url(@edition), headers: basic_auth
+        end
       end
       assert_redirected_to admin_edition_path(@edition)
-      assert_equal "Share video queued", flash[:notice]
-    end
-
-    test "regenerate variant enqueues job" do
-      assert_enqueued_with(job: RegenerateVariantJob, args: [ @variant.id ]) do
-        post regenerate_variant_admin_edition_url(@edition), headers: basic_auth
-      end
-      assert_redirected_to admin_edition_path(@edition)
-      assert_equal "Variant colourisation queued", flash[:notice]
+      assert_equal "Share assets queued", flash[:notice]
     end
 
     test "show renders empty state when attachments are missing" do
