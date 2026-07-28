@@ -21,11 +21,14 @@ class EditionsControllerTest < ActionDispatch::IntegrationTest
     )
   end
 
-  test "today shows published edition" do
+  test "today shows published edition with AI transparency details" do
     get root_url
     assert_response :success
     assert_match "Published plate", response.body
     assert_match "AI colourised", response.body
+    assert_match "Model: #{@model.name}", response.body
+    assert_match "Generated", response.body
+    assert_match "Reviewed", response.body
     assert_match "Alexander Turnbull Library", response.body
   end
 

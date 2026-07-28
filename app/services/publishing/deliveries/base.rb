@@ -43,7 +43,7 @@ module Publishing
       end
 
       def copy
-        @copy ||= Editions::Copy.new(edition.source_item)
+        @copy ||= Editions::Copy.new(edition.source_item, edition: edition)
       end
 
       def public_edition_url
