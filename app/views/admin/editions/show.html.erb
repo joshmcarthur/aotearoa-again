@@ -64,3 +64,25 @@
     <% end %>
   </div>
 </div>
+
+<div class="mt-6 rounded border border-stone-300 bg-white p-3">
+  <h2 class="mb-2 text-sm font-semibold uppercase tracking-wide">Share video</h2>
+  <% if variant.share_video.attached? %>
+    <video controls class="mx-auto max-h-[70vh] w-full max-w-sm" preload="metadata">
+      <source src="<%= url_for(variant.share_video) %>" type="<%= variant.share_video.content_type %>">
+    </video>
+    <% if @edition.state.in?(%w[scheduled published]) %>
+      <p class="mt-2 text-xs text-stone-500">
+        Public URL:
+        <%= link_to edition_share_video_path(@edition), edition_share_video_path(@edition), class: "underline", target: "_blank", rel: "noopener" %>
+      </p>
+    <% end %>
+  <% else %>
+    <p class="text-sm text-stone-500">Not available yet</p>
+  <% end %>
+</div>
+
+<div class="mt-8 border-t border-stone-300 pt-6">
+  <%= button_to "Regenerate", regenerate_admin_edition_path(@edition), class: "rounded bg-stone-900 px-3 py-2 text-sm text-white" %>
+  <p class="mt-2 text-xs text-stone-500">Re-composes share images and video from the current colourised image.</p>
+</div>
