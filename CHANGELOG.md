@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.14.0...v0.15.0) (2026-07-28)
+
+
+### Features
+
+* Add share video review and variant regeneration to edition admin ([#60](https://github.com/joshmcarthur/aotearoa-again/issues/60)) ([30ed939](https://github.com/joshmcarthur/aotearoa-again/commit/30ed939a20c36392dbbca9e4946e9219c230e8a1))
+
 ## [0.14.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.13.0...v0.14.0) (2026-07-27)
 
 
