@@ -20,7 +20,12 @@ Rails.application.routes.draw do
         post :regenerate
       end
     end
-    resources :editions, only: %i[index show]
+    resources :editions, only: %i[index show] do
+      member do
+        post :regenerate_share_video
+        post :regenerate_variant
+      end
+    end
     resources :models, only: %i[index] do
       member do
         patch :toggle_preferred

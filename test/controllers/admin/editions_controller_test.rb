@@ -46,6 +46,30 @@ module Admin
       assert_match @variant.share_link.path, response.body
     end
 
+    test "show renders share video when attached" do
+      attach_fixture_video(@variant)
+      get admin_edition_url(@edition), headers: basic_auth
+      assert_response :success
+      assert_match "Share video", response.body
+      assert_select "video source[type=?]", "video/mp4"
+    end
+
+    test "regenerate share video enqueues job" do
+      assert_enqueued_with(job: ComposeShareVideoJob, args: [ @variant.id ]) do
+        post regenerate_share_video_admin_edition_url(@edition), headers: basic_auth
+      end
+      assert_redirected_to admin_edition_path(@edition)
+      assert_equal "Share video queued", flash[:notice]
+    end
+
+    test "regenerate variant enqueues job" do
+      assert_enqueued_with(job: RegenerateVariantJob, args: [ @variant.id ]) do
+        post regenerate_variant_admin_edition_url(@edition), headers: basic_auth
+      end
+      assert_redirected_to admin_edition_path(@edition)
+      assert_equal "Variant colourisation queued", flash[:notice]
+    end
+
     test "show renders empty state when attachments are missing" do
       bare_source = create_source_item(title: "Bare edition")
       bare_candidate = bare_source.candidates.create!(status: "ready")
@@ -58,7 +82,7 @@ module Admin
 
       get admin_edition_url(bare_edition), headers: basic_auth
       assert_response :success
-      assert_equal 4, response.body.scan("Not available yet").size
+      assert_equal 5, response.body.scan("Not available yet").size
     end
 
     private
