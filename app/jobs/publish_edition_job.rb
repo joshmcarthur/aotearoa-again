@@ -5,6 +5,6 @@ class PublishEditionJob < ApplicationJob
     edition = Edition.scheduled.find_by(publish_on: date)
     return unless edition
 
-    Publishing::Orchestrator.new(edition).call
+    edition.deliveries.each(&:enqueue!)
   end
 end
