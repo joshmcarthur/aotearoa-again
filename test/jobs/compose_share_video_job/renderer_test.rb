@@ -24,7 +24,7 @@ class ComposeShareVideoJob
             MetaRows::Row.new(text: "Alexander Turnbull Library", primary: true),
             MetaRows::Row.new(text: "natlib.govt.nz/records/123 · via DigitalNZ", primary: true),
             MetaRows::Row.new(text: "Attribution 4.0 International (CC BY 4.0)", primary: false),
-            MetaRows::Row.new(text: Editions::Copy::AI_NOTICE, primary: false)
+            MetaRows::Row.new(text: Edition::Copy::AI_NOTICE, primary: false)
           ],
           fps: 10,
           hold_start_s: 0.2,

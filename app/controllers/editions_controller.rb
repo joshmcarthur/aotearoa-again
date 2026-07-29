@@ -2,7 +2,7 @@ class EditionsController < ApplicationController
   def today
     @edition = Edition.published.find_by(publish_on: Time.zone.today)
     if @edition
-      @copy = Editions::Copy.new(@edition.source_item, edition: @edition)
+      @copy = @edition.copy
       set_adjacent_editions
       render :show
     elsif (@latest_edition = Edition.published.order(publish_on: :desc).first)
@@ -22,7 +22,7 @@ class EditionsController < ApplicationController
       render :not_published, status: :not_found and return
     end
 
-    @copy = Editions::Copy.new(@edition.source_item, edition: @edition)
+    @copy = @edition.copy
     set_adjacent_editions
   end
 

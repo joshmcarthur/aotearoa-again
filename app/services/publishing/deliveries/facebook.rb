@@ -20,7 +20,7 @@ module Publishing
 
         post_id = client.publish_photo(
           image_url: image_url,
-          caption: copy.facebook_caption(edition_url: public_edition_url)
+          caption: copy.facebook_caption
         )
         delivery.succeed!(external_id: post_id.to_s)
       rescue Client::Error => e

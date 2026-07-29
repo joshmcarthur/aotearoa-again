@@ -20,7 +20,7 @@ module Publishing
 
         media_id = client.publish_photo(
           image_url: image_url,
-          caption: copy.instagram_caption(edition_url: public_edition_url),
+          caption: copy.instagram_caption,
           alt_text: copy.alt_text
         )
         delivery.succeed!(external_id: media_id.to_s)

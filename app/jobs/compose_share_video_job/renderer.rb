@@ -29,7 +29,7 @@ class ComposeShareVideoJob
       raise Error, "edition #{edition.publish_on} missing colourised image" unless variant.colourised_image.attached?
       raise Error, "edition #{edition.publish_on} missing original image" unless candidate.original_image.attached?
 
-      copy = Editions::Copy.new(edition.source_item, edition: edition)
+      copy = edition.copy
 
       variant.colourised_image.blob.open do |colourised_file|
         candidate.original_image.blob.open do |original_file|
