@@ -35,22 +35,12 @@ module Editions
       )
       edition.deliveries.create!(channel: "web", status: "pending")
       edition.deliveries.create!(channel: "email", status: "pending")
-      if instagram_delivery?
-        edition.deliveries.create!(channel: "instagram", status: "pending")
-        edition.deliveries.create!(channel: "instagram_reel", status: "pending")
-      end
-      if facebook_delivery?
-        edition.deliveries.create!(channel: "facebook", status: "pending")
+      %w[instagram instagram_reel facebook].each do |channel|
+        next unless edition.deliveries.build(channel: channel).applicable?
+
+        edition.deliveries.create!(channel: channel, status: "pending")
       end
       edition
-    end
-
-    def instagram_delivery?
-      AppConfig.instagram_configured? && @candidate.source_item.commercial_use?
-    end
-
-    def facebook_delivery?
-      AppConfig.facebook_configured? && @candidate.source_item.commercial_use?
     end
   end
 end
