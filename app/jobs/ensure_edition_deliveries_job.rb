@@ -1,12 +1,8 @@
 class EnsureEditionDeliveriesJob < ApplicationJob
   queue_as :default
 
-  def perform(edition_id = nil)
-    if edition_id
-      ensure_for(Edition.find(edition_id))
-    else
-      Edition.scheduled.find_each { |edition| ensure_for(edition) }
-    end
+  def perform(edition_ids: Edition.scheduled)
+    Edition.where(id: edition_ids).find_each { |edition| ensure_for(edition) }
   end
 
   private

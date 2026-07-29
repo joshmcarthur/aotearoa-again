@@ -18,7 +18,7 @@ class EnsureEditionDeliveriesJobTest < ActiveJob::TestCase
   test "creates all channels as pending when meta is configured" do
     AppConfig.stub(:instagram_configured?, true) do
       AppConfig.stub(:facebook_configured?, true) do
-        EnsureEditionDeliveriesJob.perform_now(@edition.id)
+        EnsureEditionDeliveriesJob.perform_now(edition_ids: [ @edition.id ])
       end
     end
 
@@ -35,7 +35,7 @@ class EnsureEditionDeliveriesJobTest < ActiveJob::TestCase
   test "creates inapplicable meta channels as skipped" do
     AppConfig.stub(:instagram_configured?, false) do
       AppConfig.stub(:facebook_configured?, false) do
-        EnsureEditionDeliveriesJob.perform_now(@edition.id)
+        EnsureEditionDeliveriesJob.perform_now(edition_ids: [ @edition.id ])
       end
     end
 
@@ -53,7 +53,7 @@ class EnsureEditionDeliveriesJobTest < ActiveJob::TestCase
 
     AppConfig.stub(:instagram_configured?, true) do
       AppConfig.stub(:facebook_configured?, true) do
-        EnsureEditionDeliveriesJob.perform_now(@edition.id)
+        EnsureEditionDeliveriesJob.perform_now(edition_ids: [ @edition.id ])
       end
     end
 

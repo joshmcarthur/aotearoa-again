@@ -17,7 +17,7 @@ module Editions
           schedule_edition
         end
       end
-      EnsureEditionDeliveriesJob.perform_now(edition.id)
+      EnsureEditionDeliveriesJob.perform_now(edition_ids: [ edition.id ])
       ComposeShareVideoJob.perform_later(edition.variant_id)
       edition
     end
