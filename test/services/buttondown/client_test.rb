@@ -1,9 +1,7 @@
 require "test_helper"
 
-module Publishing
-  module Deliveries
-    class Email
-      class ClientTest < ActiveSupport::TestCase
+module Buttondown
+  class ClientTest < ActiveSupport::TestCase
         setup do
           @api_key = "test-buttondown-key"
           @client = Client.new(api_key: @api_key)
@@ -69,7 +67,5 @@ module Publishing
           end
           assert_match(/Buttondown request failed/, error.message)
         end
-      end
-    end
   end
 end

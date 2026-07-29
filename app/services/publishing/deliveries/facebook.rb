@@ -23,14 +23,14 @@ module Publishing
           caption: copy.facebook_caption
         )
         delivery.succeed!(external_id: post_id.to_s)
-      rescue Client::Error => e
+      rescue ::Facebook::Client::Error => e
         delivery.fail!(e.message)
       end
 
       private
 
       def client
-        @client ||= Client.new
+        @client ||= ::Facebook::Client.new
       end
     end
   end

@@ -1,9 +1,7 @@
 require "test_helper"
 
-module Publishing
-  module Deliveries
-    class Facebook
-      class ClientTest < ActiveSupport::TestCase
+module Facebook
+  class ClientTest < ActiveSupport::TestCase
         FakeResponse = Data.define(:body)
 
         class FakeHttp
@@ -64,7 +62,5 @@ module Publishing
           end
           assert_match(/Facebook not configured/, error.message)
         end
-      end
-    end
   end
 end
