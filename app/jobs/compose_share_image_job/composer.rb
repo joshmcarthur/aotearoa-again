@@ -83,7 +83,6 @@ class ComposeShareImageJob
       resized.crop(left, top, crop_w, crop_h)
     end
 
-    # Kept for tests that probe brand_text via send.
     def brand_text(max_width, max_height)
       BrandChip.brand_text(max_width, max_height)
     end
