@@ -23,6 +23,7 @@ class DeliveryJob < ApplicationJob
     delivery.with_lock do
       delivery.reload
       return if already_succeeded?(delivery)
+      return if delivery.status == "skipped"
 
       unless delivery.applicable?
         skip_delivery!(delivery)
@@ -53,9 +54,9 @@ class DeliveryJob < ApplicationJob
   end
 
   def skip_delivery!(delivery)
-    return if delivery.status == "succeeded"
+    return if delivery.status.in?(%w[succeeded skipped])
 
-    delivery.destroy!
+    delivery.update!(status: "skipped")
   end
 
   def succeed_unless_done!(delivery, external_id: nil)

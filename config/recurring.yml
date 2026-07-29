@@ -4,6 +4,11 @@ production:
     queue: default
     schedule: at 1am every day
 
+  ensure_edition_deliveries:
+    class: EnsureEditionDeliveriesJob
+    queue: default
+    schedule: at 6am every day
+
   publish_edition:
     class: PublishEditionJob
     queue: default
@@ -28,6 +33,11 @@ development:
     class: HarvestCandidatesJob
     queue: default
     schedule: at 1am every day
+
+  ensure_edition_deliveries:
+    class: EnsureEditionDeliveriesJob
+    queue: default
+    schedule: at 6am every day
 
   publish_edition:
     class: PublishEditionJob
