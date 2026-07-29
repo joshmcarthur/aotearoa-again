@@ -108,4 +108,42 @@ class EditionTest < ActiveSupport::TestCase
     assert_equal published, current.next_published
     assert_nil published.next_published
   end
+
+  test "public and media urls use default_url_options" do
+    edition = Edition.create!(variant: @variant, publish_on: Time.zone.today, state: "scheduled")
+    attach_fixture_image(@variant, name: :share_image)
+    attach_fixture_image(@variant, name: :composite_image)
+    attach_fixture_video(@variant)
+
+    assert_includes edition.public_url, edition.publish_on.iso8601
+    assert_includes edition.share_image_url, "/share.jpg"
+    assert_includes edition.share_video_url, "/share.mp4"
+    assert_includes edition.composite_image_url, "/composite.jpg"
+  end
+
+  test "share_video_url is nil without share video" do
+    edition = Edition.create!(variant: @variant, publish_on: Time.zone.today, state: "scheduled")
+
+    assert_nil edition.share_video_url
+    # distribution_image / archive_image fall back to colourised_image
+    assert_includes edition.share_image_url, "/share.jpg"
+    assert_includes edition.composite_image_url, "/composite.jpg"
+  end
+
+  test "deliveries_terminal? requires all deliveries succeeded or failed" do
+    edition = Edition.create!(variant: @variant, publish_on: Time.zone.today, state: "scheduled")
+    edition.deliveries.create!(channel: "web", status: "succeeded")
+    edition.deliveries.create!(channel: "email", status: "pending")
+
+    assert_not edition.deliveries_terminal?
+
+    edition.deliveries.find_by(channel: "email").update!(status: "failed")
+    assert edition.deliveries_terminal?
+  end
+
+  test "delegates distribution_image and archive_image to variant" do
+    edition = Edition.create!(variant: @variant, publish_on: Time.zone.today, state: "scheduled")
+    assert_equal @variant.distribution_image, edition.distribution_image
+    assert_equal @variant.archive_image, edition.archive_image
+  end
 end

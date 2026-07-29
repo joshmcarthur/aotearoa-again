@@ -10,6 +10,19 @@ class Delivery < ApplicationRecord
 
   scope :failed, -> { where(status: "failed") }
 
+  def applicable?
+    case channel
+    when "web", "email"
+      true
+    when "instagram", "instagram_reel"
+      AppConfig.instagram_configured? && edition.source_item.commercial_use?
+    when "facebook"
+      AppConfig.facebook_configured? && edition.source_item.commercial_use?
+    else
+      false
+    end
+  end
+
   def succeed!(external_id: nil)
     update!(
       status: "succeeded",
