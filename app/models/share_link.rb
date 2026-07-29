@@ -10,11 +10,7 @@ class ShareLink < ApplicationRecord
   end
 
   def url
-    Rails.application.routes.url_helpers.share_link_url(
-      code,
-      host: AppConfig.app_host,
-      protocol: AppConfig.protocol
-    )
+    Rails.application.routes.url_helpers.share_link_url(code)
   end
 
   private

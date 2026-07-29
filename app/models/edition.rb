@@ -1,4 +1,6 @@
 class Edition < ApplicationRecord
+  include Rails.application.routes.url_helpers
+
   STATES = %w[scheduled published failed].freeze
 
   belongs_to :variant
@@ -13,6 +15,8 @@ class Edition < ApplicationRecord
   scope :published, -> { where(state: "published") }
   scope :upcoming, -> { scheduled.where("publish_on >= ?", Time.zone.today).order(:publish_on) }
   scope :past, -> { published.where("publish_on < ?", Time.zone.today).order(publish_on: :desc) }
+
+  delegate :distribution_image, :share_video, :archive_image, to: :variant
 
   def self.for_date(date)
     find_by(publish_on: date)
@@ -51,5 +55,31 @@ class Edition < ApplicationRecord
 
   def next_published
     self.class.published.where("publish_on < ?", publish_on).order(publish_on: :desc).first
+  end
+
+  def public_url
+    edition_url(self)
+  end
+
+  def share_image_url
+    return unless distribution_image.attached?
+
+    edition_share_image_url(self)
+  end
+
+  def share_video_url
+    return unless share_video.attached?
+
+    edition_share_video_url(self)
+  end
+
+  def composite_image_url
+    return unless archive_image.attached?
+
+    edition_composite_image_url(self)
+  end
+
+  def deliveries_terminal?
+    deliveries.reload.all? { |d| d.status.in?(%w[succeeded failed]) }
   end
 end
