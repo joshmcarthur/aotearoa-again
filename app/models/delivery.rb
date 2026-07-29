@@ -1,6 +1,13 @@
 class Delivery < ApplicationRecord
   CHANNELS = %w[web email instagram instagram_reel facebook].freeze
   STATUSES = %w[pending succeeded failed].freeze
+  JOBS = {
+    "web" => DeliverWebJob,
+    "email" => DeliverEmailJob,
+    "instagram" => DeliverInstagramJob,
+    "instagram_reel" => DeliverInstagramReelJob,
+    "facebook" => DeliverFacebookJob
+  }.freeze
 
   belongs_to :edition
 
@@ -9,6 +16,14 @@ class Delivery < ApplicationRecord
   validates :channel, uniqueness: { scope: :edition_id }
 
   scope :failed, -> { where(status: "failed") }
+
+  def job_class
+    JOBS.fetch(channel)
+  end
+
+  def enqueue!
+    job_class.perform_later(edition_id)
+  end
 
   def applicable?
     case channel

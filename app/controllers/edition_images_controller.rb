@@ -1,7 +1,7 @@
 class EditionImagesController < ApplicationController
   # Stable public media for published artifacts (email, Instagram, Atom, OG).
   # Signed blob URLs expire and break mail clients and Meta fetchers.
-  # Allowed for scheduled editions too — Orchestrator delivers before publish!.
+  # Allowed for scheduled editions too — channel jobs deliver before publish!.
 
   def share
     serve_attachment(find_edition.variant.distribution_image, "share.jpg", "image/jpeg")
