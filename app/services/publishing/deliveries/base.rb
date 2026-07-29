@@ -43,50 +43,31 @@ module Publishing
       end
 
       def copy
-        @copy ||= Editions::Copy.new(edition.source_item, edition: edition)
+        edition.copy
       end
 
       def public_edition_url
-        Rails.application.routes.url_helpers.edition_url(
-          edition,
-          host: AppConfig.app_host,
-          protocol: AppConfig.protocol
-        )
+        edition.public_url
       end
 
       def share_image_url
-        return unless edition.variant.distribution_image.attached?
-
-        edition_media_url(:edition_share_image_url)
+        edition.share_image_url
       end
 
       def share_video_url
-        return unless edition.variant.share_video.attached?
-
-        edition_media_url(:edition_share_video_url)
+        edition.share_video_url
       end
 
       def composite_image_url
-        return unless edition.variant.archive_image.attached?
-
-        edition_media_url(:edition_composite_image_url)
-      end
-
-      def edition_media_url(helper_name)
-        Rails.application.routes.url_helpers.public_send(
-          helper_name,
-          edition,
-          host: AppConfig.app_host,
-          protocol: AppConfig.protocol
-        )
+        edition.composite_image_url
       end
 
       def instagram_gated?
-        AppConfig.instagram_configured? && edition.source_item.commercial_use?
+        Delivery.new(edition: edition, channel: "instagram").applicable?
       end
 
       def facebook_gated?
-        AppConfig.facebook_configured? && edition.source_item.commercial_use?
+        Delivery.new(edition: edition, channel: "facebook").applicable?
       end
     end
   end

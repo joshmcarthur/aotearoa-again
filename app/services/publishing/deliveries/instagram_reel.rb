@@ -22,7 +22,7 @@ module Publishing
 
         media_id = client.publish_reel(
           video_url: video_url,
-          caption: copy.instagram_caption(edition_url: public_edition_url),
+          caption: copy.instagram_caption,
           cover_url: share_image_url,
           share_to_feed: false
         )

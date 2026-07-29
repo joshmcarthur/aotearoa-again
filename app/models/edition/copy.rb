@@ -1,12 +1,12 @@
-module Editions
+class Edition
   class Copy
     AI_NOTICE = "AI colourised — colours are interpretive.".freeze
     INSTAGRAM_CAPTION_LIMIT = 2200
 
-    def initialize(source_item, edition: nil, variant: nil)
-      @source_item = source_item
+    def initialize(edition)
       @edition = edition
-      @variant = variant || edition&.variant
+      @source_item = edition.source_item
+      @variant = edition.variant
     end
 
     def title
@@ -42,9 +42,7 @@ module Editions
 
       parts << "Model: #{@variant.model.name}."
       parts << "Generated #{I18n.l(@variant.created_at.to_date, format: :long)}."
-      if @edition
-        parts << "Reviewed #{I18n.l(@edition.created_at.to_date, format: :long)}."
-      end
+      parts << "Reviewed #{I18n.l(@edition.created_at.to_date, format: :long)}."
       parts.join(" ")
     end
 
@@ -65,7 +63,8 @@ module Editions
       parts.join("\n")
     end
 
-    def email_markdown(edition_url:, image_url: nil)
+    def email_markdown(image_url: nil)
+      edition_url = @edition.public_url
       parts = []
       parts << "# #{title}"
       parts << ""
@@ -82,13 +81,13 @@ module Editions
     end
 
     # Same narrative as email, plain text for Instagram (≤ 2,200 chars).
-    def instagram_caption(edition_url:)
-      social_caption(edition_url: edition_url).truncate(INSTAGRAM_CAPTION_LIMIT)
+    def instagram_caption
+      social_caption.truncate(INSTAGRAM_CAPTION_LIMIT)
     end
 
     # Same narrative as Instagram; Facebook allows a much longer message.
-    def facebook_caption(edition_url:)
-      social_caption(edition_url: edition_url)
+    def facebook_caption
+      social_caption
     end
 
     def alt_text
@@ -97,7 +96,7 @@ module Editions
 
     private
 
-    def social_caption(edition_url:)
+    def social_caption
       [
         title,
         "",
@@ -105,7 +104,7 @@ module Editions
         "",
         ai_notice,
         "",
-        edition_url.to_s
+        @edition.public_url.to_s
       ].join("\n")
     end
 

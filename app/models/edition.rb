@@ -82,4 +82,8 @@ class Edition < ApplicationRecord
   def deliveries_terminal?
     deliveries.reload.all? { |d| d.status.in?(%w[succeeded failed]) }
   end
+
+  def copy
+    @copy ||= Copy.new(self)
+  end
 end

@@ -4,7 +4,7 @@ atom_feed(language: "en-NZ", root_url: root_url, url: feed_url) do |feed|
   feed.subtitle("Daily photographs from the Alexander Turnbull Library, seen again in colour.")
 
   @editions.each do |edition|
-    copy = Editions::Copy.new(edition.source_item, edition: edition)
+    copy = edition.copy
     feed.entry(edition, url: edition_url(edition), id: edition_url(edition), published: edition.publish_on.to_time, updated: edition.updated_at) do |entry|
       entry.title(copy.title)
       entry.summary(copy.rss_summary, type: "text")
