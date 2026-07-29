@@ -183,7 +183,7 @@ module Publishing
           email = FakeEmailClient.new
           instagram = Object.new
           def instagram.publish_photo(**)
-            raise Deliveries::Instagram::Client::Error, "token expired"
+            raise ::Instagram::Client::Error, "token expired"
           end
           def instagram.publish_reel(**)
             "ig_reel_unused"
@@ -206,7 +206,7 @@ module Publishing
           email = FakeEmailClient.new
           facebook = Object.new
           def facebook.publish_photo(**)
-            raise Deliveries::Facebook::Client::Error, "pages_manage_posts missing"
+            raise ::Facebook::Client::Error, "pages_manage_posts missing"
           end
 
           Orchestrator.new(@edition, email_client: email, facebook_client: facebook).call
@@ -252,7 +252,7 @@ module Publishing
             "ig_456"
           end
           def instagram.publish_reel(**)
-            raise Deliveries::Instagram::Client::Error, "reel rejected"
+            raise ::Instagram::Client::Error, "reel rejected"
           end
 
           assert_enqueued_emails 1 do

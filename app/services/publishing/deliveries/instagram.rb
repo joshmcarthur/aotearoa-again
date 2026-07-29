@@ -24,14 +24,14 @@ module Publishing
           alt_text: copy.alt_text
         )
         delivery.succeed!(external_id: media_id.to_s)
-      rescue Client::Error => e
+      rescue ::Instagram::Client::Error => e
         delivery.fail!(e.message)
       end
 
       private
 
       def client
-        @client ||= Client.new
+        @client ||= ::Instagram::Client.new
       end
     end
   end

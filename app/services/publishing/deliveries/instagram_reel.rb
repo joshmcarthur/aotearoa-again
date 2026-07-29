@@ -27,14 +27,14 @@ module Publishing
           share_to_feed: false
         )
         delivery.succeed!(external_id: media_id.to_s)
-      rescue Instagram::Client::Error => e
+      rescue ::Instagram::Client::Error => e
         soft_fail!(delivery, e.message)
       end
 
       private
 
       def client
-        @client ||= Instagram::Client.new
+        @client ||= ::Instagram::Client.new
       end
 
       def soft_fail!(delivery, message)

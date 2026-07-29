@@ -1,9 +1,7 @@
 require "test_helper"
 
-module Publishing
-  module Deliveries
-    class Instagram
-      class ClientTest < ActiveSupport::TestCase
+module Instagram
+  class ClientTest < ActiveSupport::TestCase
         FakeResponse = Data.define(:body)
 
         class FakeHttp
@@ -158,7 +156,5 @@ module Publishing
           end
           assert_match(/Instagram not configured/, error.message)
         end
-      end
-    end
   end
 end

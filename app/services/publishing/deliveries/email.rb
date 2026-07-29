@@ -18,14 +18,14 @@ module Publishing
           body: copy.email_markdown(image_url: image_url)
         )
         delivery.succeed!(external_id: payload["id"].to_s)
-      rescue Client::Error => e
+      rescue ::Buttondown::Client::Error => e
         delivery.fail!(e.message)
       end
 
       private
 
       def client
-        @client ||= Client.new
+        @client ||= ::Buttondown::Client.new
       end
     end
   end
