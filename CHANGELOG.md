@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.16.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.15.0...v0.16.0) (2026-07-29)
+
+
+### Features
+
+* replace share corner chip with attribution bar ([#69](https://github.com/joshmcarthur/aotearoa-again/issues/69)) ([399c05e](https://github.com/joshmcarthur/aotearoa-again/commit/399c05e4259d37894fbe94ceaff5ab0bb8f20d96))
+* split edition publishing into per-channel delivery jobs ([#66](https://github.com/joshmcarthur/aotearoa-again/issues/66)) ([cefddad](https://github.com/joshmcarthur/aotearoa-again/commit/cefddadd38457c768696d27827aa1f447b240234))
+
 ## [0.15.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.14.0...v0.15.0) (2026-07-28)
 
 
