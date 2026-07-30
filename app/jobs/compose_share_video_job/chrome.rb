@@ -14,7 +14,8 @@ class ComposeShareVideoJob
     META_PRIMARY_FONT_SIZE = 32
     META_SECONDARY_FONT_SIZE = 26
     META_LINE_HEIGHT = 1.85
-    PADDING_X = 40
+    PADDING_X = SafeAreas::PADDING_X
+    PADDING_RIGHT = SafeAreas::PADDING_RIGHT
 
     def initialize(width:, height:, top_bar_h:, bottom_bar_h:, title:, edition_label:, meta_rows:)
       @width = width
@@ -53,7 +54,7 @@ class ComposeShareVideoJob
     end
 
     def composite_top_bar(overlay)
-      max_w = @width - PADDING_X * 2
+      max_w = @width - PADDING_X - PADDING_RIGHT
       brand = @painter.paint(
         ComposeShareImageJob::BrandChip::BRAND,
         width: max_w,
@@ -85,14 +86,15 @@ class ComposeShareVideoJob
 
     def composite_bottom_caption(overlay)
       y = @height - @bottom_bar_h + 24
-      max_w = @width - PADDING_X * 2
+      max_w = @width - PADDING_X - PADDING_RIGHT
+      caption_limit = SafeAreas.caption_bottom_limit(frame_height: @height)
       secondary_line_box = (META_SECONDARY_FONT_SIZE * META_LINE_HEIGHT).round
 
-      overlay, y = composite_title(overlay, y, max_w, secondary_line_box)
-      composite_meta_rows(overlay, y, max_w)
+      overlay, y = composite_title(overlay, y, max_w, secondary_line_box, caption_limit)
+      composite_meta_rows(overlay, y, max_w, caption_limit)
     end
 
-    def composite_title(overlay, y, max_w, secondary_line_box)
+    def composite_title(overlay, y, max_w, secondary_line_box, caption_limit)
       return [ overlay, y ] if @title.blank?
 
       title_line_box = (TITLE_FONT_SIZE * TITLE_LINE_HEIGHT).round
@@ -109,14 +111,14 @@ class ComposeShareVideoJob
       [ overlay, next_y ]
     end
 
-    def composite_meta_rows(overlay, y, max_w)
+    def composite_meta_rows(overlay, y, max_w, caption_limit)
       primary_line_box = (META_PRIMARY_FONT_SIZE * META_LINE_HEIGHT).round
       secondary_line_box = (META_SECONDARY_FONT_SIZE * META_LINE_HEIGHT).round
 
       @meta_rows.each do |row|
         size = row.primary ? META_PRIMARY_FONT_SIZE : META_SECONDARY_FONT_SIZE
         line_box = row.primary ? primary_line_box : secondary_line_box
-        break if y + line_box > @height - 12
+        break if y + line_box > caption_limit - 12
 
         text = @painter.paint(
           row.text,
