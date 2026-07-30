@@ -25,6 +25,16 @@ class PublishEditionJobTest < ActiveJob::TestCase
     end
   end
 
+  test "does not enqueue skipped deliveries" do
+    @edition.deliveries.create!(channel: "instagram", status: "skipped")
+
+    assert_no_enqueued_jobs only: DeliverInstagramJob do
+      assert_enqueued_with(job: DeliverWebJob, args: [ @edition.id ]) do
+        PublishEditionJob.perform_now(Time.zone.today)
+      end
+    end
+  end
+
   test "no-ops when no scheduled edition for date" do
     assert_no_enqueued_jobs only: [ DeliverWebJob, DeliverEmailJob ] do
       PublishEditionJob.perform_now(Time.zone.tomorrow)

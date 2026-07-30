@@ -80,7 +80,7 @@ class Edition < ApplicationRecord
   end
 
   def deliveries_terminal?
-    deliveries.reload.all? { |d| d.status.in?(%w[succeeded failed]) }
+    deliveries.reload.all? { |d| d.status.in?(%w[succeeded failed skipped]) }
   end
 
   def copy

@@ -17,6 +17,7 @@ module Editions
           schedule_edition
         end
       end
+      EnsureEditionDeliveriesJob.perform_now(edition_ids: [ edition.id ])
       ComposeShareVideoJob.perform_later(edition.variant_id)
       edition
     end
@@ -28,19 +29,11 @@ module Editions
     end
 
     def schedule_edition
-      edition = Edition.create!(
+      Edition.create!(
         variant: @variant,
         publish_on: Edition.next_free_publish_on,
         state: "scheduled"
       )
-      edition.deliveries.create!(channel: "web", status: "pending")
-      edition.deliveries.create!(channel: "email", status: "pending")
-      %w[instagram instagram_reel facebook].each do |channel|
-        next unless edition.deliveries.build(channel: channel).applicable?
-
-        edition.deliveries.create!(channel: channel, status: "pending")
-      end
-      edition
     end
   end
 end
