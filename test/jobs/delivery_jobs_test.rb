@@ -141,8 +141,8 @@ class DeliveryJobsTest < ActiveJob::TestCase
 
     @edition.reload
     assert_equal "published", @edition.state
-    assert_nil @edition.deliveries.find_by(channel: "instagram")
-    assert_nil @edition.deliveries.find_by(channel: "facebook")
+    assert_equal "skipped", @edition.deliveries.find_by(channel: "instagram").status
+    assert_equal "skipped", @edition.deliveries.find_by(channel: "facebook").status
   end
 
   test "publishes edition when a channel fails after retries and alerts admin" do
