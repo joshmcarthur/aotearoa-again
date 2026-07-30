@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.17.1](https://github.com/joshmcarthur/aotearoa-again/compare/v0.17.0...v0.17.1) (2026-07-30)
+
+
+### Bug Fixes
+
+* fail closed when admin password is missing ([#81](https://github.com/joshmcarthur/aotearoa-again/issues/81)) ([1d53523](https://github.com/joshmcarthur/aotearoa-again/commit/1d53523a52793762a181926c385b0c0be934e9fd))
+
 ## [0.17.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.16.0...v0.17.0) (2026-07-30)
 
 
