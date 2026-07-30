@@ -15,10 +15,10 @@ Rails 8 app ("Aotearoa, Again"): harvests ATL images via DigitalNZ, AI-colourise
 
 ### Credentials gotcha
 - Only `config/credentials/test.key` is committed (tests decrypt automatically). `development.key`/`production.key` are NOT present.
-- The app still boots in development without the dev key: `AppConfig.dig` rescues decryption errors, so admin defaults to `admin` / `changeme` and host to `localhost:3000`. Credential-backed features (OpenRouter colourise, Buttondown/Meta publish) won't work without real keys, but browsing, admin review, and scheduling do.
+- The app still boots in development without the dev key: `AppConfig.dig` rescues decryption errors, so host defaults to `localhost:3000`. Without a decryptable `admin.password`, `/admin` fails closed (`KeyError`). Credential-backed features (OpenRouter colourise, Buttondown/Meta publish) won't work without real keys, but browsing and scheduling do.
 
 ### Run / lint / test (see `README.md`, `Procfile.dev`, `config/ci.rb`)
-- Dev server: `bin/dev` (foreman: Puma on :3000 + `tailwindcss:watch`). Admin is at `/admin` (HTTP Basic `admin`/`changeme`).
+- Dev server: `bin/dev` (foreman: Puma on :3000 + `tailwindcss:watch`). Admin is at `/admin` (HTTP Basic from credentials: `admin.username` / `admin.password`).
 - Background pipeline worker: `bin/jobs` (Solid Queue). NOT started by `Procfile.dev`; jobs use the `:solid_queue` adapter in dev, so enqueued jobs only run when `bin/jobs` is running.
 - Lint: `bin/rubocop`. Tests: `bin/rails db:test:prepare test`. System tests: `bin/rails test:system`. Full local CI pipeline: `bin/ci`.
 

@@ -64,7 +64,7 @@ module AppConfig
 
   def admin_username = dig(:admin, :username).presence || "admin"
 
-  def admin_password = dig(:admin, :password).presence || "changeme"
+  def admin_password = required(:admin, :password)
 
   def admin_alert_email = dig(:admin, :alert_email).presence || admin_username
 
