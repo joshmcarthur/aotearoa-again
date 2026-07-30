@@ -51,4 +51,22 @@ class AppConfigTest < ActiveSupport::TestCase
       assert_equal "https://www.facebook.com/aotearoaagain", AppConfig.facebook_url
     end
   end
+
+  test "admin_password returns configured value" do
+    AppConfig.stub(:dig, lambda { |*keys|
+      case keys
+      when [ :admin, :password ] then "secret-admin-password"
+      end
+    }) do
+      assert_equal "secret-admin-password", AppConfig.admin_password
+    end
+  end
+
+  test "admin_password raises when missing" do
+    AppConfig.stub(:dig, ->(*) { nil }) do
+      error = assert_raises(KeyError) { AppConfig.admin_password }
+      assert_match(/admin\.password/, error.message)
+      assert_match(/credentials:edit/, error.message)
+    end
+  end
 end
