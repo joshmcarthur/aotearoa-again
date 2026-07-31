@@ -52,8 +52,11 @@ Reel publishing creates a `media_type=REELS` container, polls `status_code` unti
    - **Facebook Login** (or Facebook Login for Business)
    - **Instagram** (Graph API / Facebook Login path)
 3. **App settings → Basic**: copy **App ID** and **App Secret**.
-4. Stay in **Development** mode. Under **Roles**, add yourself as Admin/Developer/Tester.
-5. App Review is **not** required for posting only to accounts/Pages that have a role on this app.
+4. Under **Roles**, add yourself as Admin/Developer/Tester while you set tokens up.
+5. Switch the app to **Live** mode before expecting public visibility.
+   - In Development mode, Graph API posts succeed and look “Public” to Page admins, but logged-out visitors (and anyone without an app role) cannot see them — permalinks show “This content isn't available”.
+   - Live mode needs a Privacy Policy URL in App settings → Basic. App Review is **not** required when you only post to Pages/IG accounts you admin; Live alone is enough for those posts to be publicly visible.
+6. Confirm Live mode in the App Dashboard (toggle top of the app). Existing Development-mode posts usually become visible after going Live; if not, re-publish one edition to verify.
 
 ---
 
@@ -211,3 +214,4 @@ Expired tokens surface as Instagram/Facebook delivery failures → `AdminMailer.
 | Permission errors | Wrong scopes (need `pages_manage_posts` for Facebook), or user not a role on the Dev-mode app |
 | Wrong Instagram account | Used Page id instead of `instagram_business_account.id` |
 | Facebook posts fail, IG works | Missing `meta.page_id` or `pages_manage_posts` |
+| Posts exist for admins but blank/unavailable when logged out | Meta app still in **Development** mode — switch to **Live** (needs Privacy Policy URL) |
