@@ -65,7 +65,7 @@ SOLID_QUEUE_IN_PUMA=true bin/rails server -b 127.0.0.1 -p 3000
 
 Or run the queue separately: `bin/jobs`.
 
-Recurring schedules are in `config/recurring.yml` (harvest 01:00, publish 07:00, runway alert 08:00 Auckland).
+Recurring schedules are in `config/recurring.yml` (harvest 01:00, ensure edition deliveries 06:00, publish 07:00, runway alert 08:00 Auckland).
 
 ## Cloudflare Tunnel
 
@@ -85,7 +85,7 @@ If DigitalNZ/ATL request removal:
 
 Harvest is limited to NatLib's Meta-upload-eligible ATL subset (DigitalNZ **Use commercially** + **Modify**). See [natlib-social-media.md](natlib-social-media.md) for caption, people/tikanga, and takedown rules.
 
-Optional Instagram and Facebook Page deliveries via the Meta Graph API. Credentials are optional — when a channel’s credentials are blank, or when the source item lacks DigitalNZ **Use commercially** (`SourceItem#commercial_use?`), Approver skips that delivery and Orchestrator skips the channel (web + email still publish).
+Optional Instagram and Facebook Page deliveries via the Meta Graph API. Credentials are optional — when a channel’s credentials are blank, or when the source item lacks DigitalNZ **Use commercially** (`SourceItem#commercial_use?`), `EnsureEditionDeliveriesJob` marks that delivery `skipped` (web + email still publish).
 
 ### Meta app setup (own account)
 
@@ -93,7 +93,7 @@ Step-by-step: **[meta-setup.md](meta-setup.md)**.
 
 Summary: Professional IG + linked Facebook Page → Meta app (Facebook Login path) → long-lived Page token → store `meta.page_access_token` plus `meta.instagram_user_id` and/or `meta.page_id`. App Review not required for your own account/Page. Tokens last ~60 days; refresh before expiry. Failed Meta deliveries alert via `AdminMailer.delivery_failed`.
 
-`PublishEditionJob` posts the branded `share_image` to Instagram (two-step container flow) and/or the Facebook Page (`/{page-id}/photos`). Captions include the public edition URL. Email, Instagram, Facebook, Atom enclosures, and `og:image` all use `/editions/:publish_on/share.jpg` (Meta and mail clients cannot use expired signed blob URLs).
+`PublishEditionJob` enqueues per-channel delivery jobs (`DeliverWebJob`, `DeliverEmailJob`, `DeliverInstagramJob`, `DeliverInstagramReelJob`, `DeliverFacebookJob`). Meta jobs post the branded `share_image` to Instagram (two-step container flow) and/or the Facebook Page (`/{page-id}/photos`). When all deliveries reach a terminal state, `FinalizeEditionPublishJob` publishes the edition. Captions include the public edition URL. Email, Instagram, Facebook, Atom enclosures, and `og:image` all use `/editions/:publish_on/share.jpg` (Meta and mail clients cannot use expired signed blob URLs).
 
 ## Container releases
 

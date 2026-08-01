@@ -3,7 +3,7 @@
 # Default to port 3000 if not specified
 export PORT="${PORT:-3000}"
 
-# Honour ShareImages::Composer fontfile (Fraunces). macOS CoreText ignores it.
+# Honour ComposeShareImageJob fontfile (Fraunces). macOS CoreText ignores it.
 export PANGOCAIRO_BACKEND="${PANGOCAIRO_BACKEND:-fontconfig}"
 
 # macOS + forked Solid Queue/Puma workers: avoid UIFont/CoreText fork crashes

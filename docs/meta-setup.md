@@ -11,7 +11,7 @@ Meta credentials are **optional**. Instagram and Facebook are gated independentl
 | Instagram Reel | same as Instagram photo | DigitalNZ **Use commercially** |
 | Facebook Page | `page_access_token` + `page_id` | DigitalNZ **Use commercially** |
 
-When a channel is not configured (or the item is not commercial-use), Approver skips that delivery and Orchestrator skips publishing for it (web + email still publish).
+When a channel is not configured (or the item is not commercial-use), `EnsureEditionDeliveriesJob` marks that delivery `skipped` (web + email still publish).
 
 Credentials shape:
 
@@ -186,13 +186,14 @@ curl -sS -X POST "https://graph.facebook.com/v21.0/PAGE_ID/photos" \
 ```bash
 bin/rails runner '
   edition = Edition.find_by!(publish_on: Date.parse("YYYY-MM-DD"))
-  Publishing::Orchestrator.new(edition).call
+  edition.deliveries.where(status: "pending").each { |d| d.job_class.perform_now(edition.id) }
+  FinalizeEditionPublishJob.perform_now(edition.id)
   puts edition.reload.state
   edition.deliveries.order(:channel).each { |d| puts "#{d.channel}: #{d.status} #{d.external_id} #{d.error_message}" }
 '
 ```
 
-Or wait for `PublishEditionJob` (07:00 NZ in `config/recurring.yml`).
+With `bin/jobs` running, `PublishEditionJob.perform_now(edition.publish_on)` enqueues the same delivery jobs asynchronously (07:00 NZ in `config/recurring.yml`).
 
 ---
 
