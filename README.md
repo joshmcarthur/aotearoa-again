@@ -35,7 +35,7 @@ Share video (9:16 shorts) needs **ffmpeg** on `PATH` in addition to libvips. The
 1. `HarvestCandidatesJob` — DigitalNZ ATL images with Modify + Use commercially  
 2. `ColouriseCandidateJob` — RubyLLM.paint via preferred `Model` rows  
 3. Admin approve → schedule `Edition`  
-4. `PublishEditionJob` (07:00 NZ) — web + Buttondown + Instagram + Facebook Page  
+4. `PublishEditionJob` (07:00 NZ) enqueues per-channel delivery jobs (web, Buttondown, Instagram, Facebook)  
 
 See [docs/deploy.md](docs/deploy.md) for home hosting + Cloudflare Tunnel.  
 See [docs/natlib-social-media.md](docs/natlib-social-media.md) for NatLib social media rules.  

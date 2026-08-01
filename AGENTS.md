@@ -6,7 +6,7 @@ Rails 8 app ("Aotearoa, Again"): harvests ATL images via DigitalNZ, AI-colourise
 
 ### Environment (already provisioned in the VM snapshot)
 - Ruby 3.4.9 is installed via `rbenv` under `~/.rbenv` (interactive shells get it from `~/.bashrc`). Non-interactive commands can call binaries through the shims, e.g. `~/.rbenv/shims/bundle`, or run `eval "$(rbenv init - bash)"` first.
-- System packages `libvips`, `libsqlite3-dev`, and gem build tools are installed. `libvips` is required — image rendering, the before/after slider, and `ShareImages::Composer` all depend on `ruby-vips`.
+- System packages `libvips`, `libsqlite3-dev`, and gem build tools are installed. `libvips` is required — image rendering, the before/after slider, and `ComposeShareImageJob::Composer` all depend on `ruby-vips`.
 - The update script runs `bundle install` on startup. Nothing else is automated.
 
 ### First-run steps (not in the update script)

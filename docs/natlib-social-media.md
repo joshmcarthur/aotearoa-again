@@ -31,7 +31,7 @@ For images including people:
 - Avoid obscuring, blurring, or cropping through people, especially faces
 - Seek community advice if unsure about tikanga
 
-Admin review is the gate for dignity concerns. Instagram uses the same branded share image as the website/email (diagonal blend + corner chip); pause approval if the blend cuts through faces or otherwise feels inappropriate.
+Admin review is the gate for dignity concerns. Instagram uses the same branded share image as the website/email (diagonal blend + attribution bar); pause approval if the blend cuts through faces or otherwise feels inappropriate.
 
 ## Other platforms
 
