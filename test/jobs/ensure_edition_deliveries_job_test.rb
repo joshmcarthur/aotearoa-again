@@ -18,7 +18,9 @@ class EnsureEditionDeliveriesJobTest < ActiveJob::TestCase
   test "creates all channels as pending when meta is configured" do
     AppConfig.stub(:instagram_configured?, true) do
       AppConfig.stub(:facebook_configured?, true) do
-        EnsureEditionDeliveriesJob.perform_now(edition_ids: [ @edition.id ])
+        AppConfig.stub(:youtube_configured?, true) do
+          EnsureEditionDeliveriesJob.perform_now(edition_ids: [ @edition.id ])
+        end
       end
     end
 
@@ -28,14 +30,17 @@ class EnsureEditionDeliveriesJobTest < ActiveJob::TestCase
       [ "facebook", "pending" ],
       [ "instagram", "pending" ],
       [ "instagram_reel", "pending" ],
-      [ "web", "pending" ]
+      [ "web", "pending" ],
+      [ "youtube_short", "pending" ]
     ], statuses
   end
 
   test "creates inapplicable meta channels as skipped" do
     AppConfig.stub(:instagram_configured?, false) do
       AppConfig.stub(:facebook_configured?, false) do
-        EnsureEditionDeliveriesJob.perform_now(edition_ids: [ @edition.id ])
+        AppConfig.stub(:youtube_configured?, false) do
+          EnsureEditionDeliveriesJob.perform_now(edition_ids: [ @edition.id ])
+        end
       end
     end
 
@@ -45,6 +50,7 @@ class EnsureEditionDeliveriesJobTest < ActiveJob::TestCase
     assert_equal "skipped", by_channel.fetch("instagram").status
     assert_equal "skipped", by_channel.fetch("instagram_reel").status
     assert_equal "skipped", by_channel.fetch("facebook").status
+    assert_equal "skipped", by_channel.fetch("youtube_short").status
   end
 
   test "does not change existing delivery statuses" do
@@ -53,7 +59,9 @@ class EnsureEditionDeliveriesJobTest < ActiveJob::TestCase
 
     AppConfig.stub(:instagram_configured?, true) do
       AppConfig.stub(:facebook_configured?, true) do
-        EnsureEditionDeliveriesJob.perform_now(edition_ids: [ @edition.id ])
+        AppConfig.stub(:youtube_configured?, true) do
+          EnsureEditionDeliveriesJob.perform_now(edition_ids: [ @edition.id ])
+        end
       end
     end
 
@@ -63,6 +71,7 @@ class EnsureEditionDeliveriesJobTest < ActiveJob::TestCase
     assert_equal "pending", by_channel.fetch("email").status
     assert_equal "pending", by_channel.fetch("instagram_reel").status
     assert_equal "pending", by_channel.fetch("facebook").status
+    assert_equal "pending", by_channel.fetch("youtube_short").status
   end
 
   test "batch mode ensures all scheduled editions" do
@@ -72,7 +81,9 @@ class EnsureEditionDeliveriesJobTest < ActiveJob::TestCase
 
     AppConfig.stub(:instagram_configured?, false) do
       AppConfig.stub(:facebook_configured?, false) do
-        EnsureEditionDeliveriesJob.perform_now
+        AppConfig.stub(:youtube_configured?, false) do
+          EnsureEditionDeliveriesJob.perform_now
+        end
       end
     end
 
