@@ -21,6 +21,8 @@ At publish time the app uploads the composed **9:16 share video** (`variant.shar
 
 The title includes `#Shorts`; the description carries attribution, the AI colourisation notice, and the public edition URL (same narrative as Instagram/Facebook).
 
+Upload metadata defaults live on `AppConfig.youtube_upload_defaults` (not credentials): category **Education**, `containsSyntheticMedia: true`, recording date = edition `publish_on` at NZ midnight, and best-effort `locationDescription: "New Zealand"`. Comment moderation is a channel Studio setting — see §6.
+
 If the share video is missing or YouTube rejects the upload, that delivery is marked failed and admin is emailed, but the edition still publishes (Shorts delivery is optional, like the Instagram Reel).
 
 ---
@@ -109,7 +111,21 @@ Confirm the returned channel is the one you expect. Uploads go to this channel.
 
 ---
 
-## 6. Rails credentials
+## 6. Channel comment defaults (Studio)
+
+Comment availability and moderation strictness are **channel defaults** in YouTube Studio. The Data API cannot set “comments on + moderation strict” per upload, so configure this once on the channel that owns the refresh token.
+
+1. Open [YouTube Studio](https://studio.youtube.com/) while signed in as the channel owner (switch channel if you use a dedicated Shorts channel).
+2. **Settings → Community moderation → Content controls** ([help article](https://support.google.com/youtube/answer/16622701)).
+3. Under **Comments on new videos and posts**:
+   - Turn comments **On**
+   - Set comment moderation to **Strict** (holds a broader range of potentially inappropriate comments for review; alternatives are None, Basic, or Hold all)
+
+New uploads — including API Shorts — inherit these defaults. Held comments appear under Studio’s **Comments → Held** for approve/remove.
+
+---
+
+## 7. Rails credentials
 
 ```bash
 bin/rails credentials:edit --environment development
@@ -128,7 +144,7 @@ Restart server and `bin/jobs` after saving.
 
 ---
 
-## 7. Share video present
+## 8. Share video present
 
 Before publishing:
 
@@ -137,24 +153,29 @@ Before publishing:
 
 ---
 
-## 8. Dry-run upload with curl (optional)
+## 9. Dry-run upload with curl (optional)
 
 Initiate a resumable upload:
 
 ```bash
 curl -sS -D - -o /dev/null -X POST \
-  "https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status" \
+  "https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status,recordingDetails" \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json; charset=UTF-8" \
   -d '{
     "snippet": {
       "title": "Setup test — Aotearoa, Again #Shorts",
       "description": "OAuth setup test.",
-      "categoryId": "19"
+      "categoryId": "27"
     },
     "status": {
       "privacyStatus": "unlisted",
-      "selfDeclaredMadeForKids": false
+      "selfDeclaredMadeForKids": false,
+      "containsSyntheticMedia": true
+    },
+    "recordingDetails": {
+      "recordingDate": "2026-08-02T00:00:00+12:00",
+      "locationDescription": "New Zealand"
     }
   }'
 ```
@@ -172,7 +193,7 @@ Use `privacyStatus: "unlisted"` for dry-runs; the app publishes as **public**.
 
 ---
 
-## 9. Publish from the app
+## 10. Publish from the app
 
 ```bash
 bin/rails runner '
@@ -199,7 +220,7 @@ bin/rails runner '
 
 ---
 
-## 10. Token refresh
+## 11. Token refresh
 
 The app exchanges the refresh token for a short-lived access token on each upload. Refresh tokens are long-lived but can be revoked:
 
