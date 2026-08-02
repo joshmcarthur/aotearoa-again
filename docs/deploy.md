@@ -42,6 +42,9 @@ Files:
 | `meta.page_access_token` | Optional — Page access token; Meta deliveries skipped if blank |
 | `meta.page_id` | Optional — Facebook Page id (enables Facebook Page posting) |
 | `meta.instagram_user_id` | Optional — Instagram professional account id (enables Instagram) |
+| `youtube.client_id` | Optional — Google OAuth client id (enables YouTube Shorts) |
+| `youtube.client_secret` | Optional — Google OAuth client secret |
+| `youtube.refresh_token` | Optional — offline OAuth refresh token for the target YouTube channel |
 | `admin.username` / `admin.password` | HTTP Basic for `/admin` |
 | `admin.alert_email` | Runway / delivery alerts |
 | `app.host` | Public hostname (no protocol), e.g. `aotearoa-again.example` |
@@ -93,7 +96,17 @@ Step-by-step: **[meta-setup.md](meta-setup.md)**.
 
 Summary: Professional IG + linked Facebook Page → Meta app (Facebook Login path) → long-lived Page token → store `meta.page_access_token` plus `meta.instagram_user_id` and/or `meta.page_id`. App Review not required for your own account/Page. Tokens last ~60 days; refresh before expiry. Failed Meta deliveries alert via `AdminMailer.delivery_failed`.
 
-`PublishEditionJob` enqueues per-channel delivery jobs (`DeliverWebJob`, `DeliverEmailJob`, `DeliverInstagramJob`, `DeliverInstagramReelJob`, `DeliverFacebookJob`). Meta jobs post the branded `share_image` to Instagram (two-step container flow) and/or the Facebook Page (`/{page-id}/photos`). When all deliveries reach a terminal state, `FinalizeEditionPublishJob` publishes the edition. Captions include the public edition URL. Email, Instagram, Facebook, Atom enclosures, and `og:image` all use `/editions/:publish_on/share.jpg` (Meta and mail clients cannot use expired signed blob URLs).
+`PublishEditionJob` enqueues per-channel delivery jobs (`DeliverWebJob`, `DeliverEmailJob`, `DeliverInstagramJob`, `DeliverInstagramReelJob`, `DeliverFacebookJob`, `DeliverYoutubeShortJob`). Meta jobs post the branded `share_image` to Instagram (two-step container flow) and/or the Facebook Page (`/{page-id}/photos`). When all deliveries reach a terminal state, `FinalizeEditionPublishJob` publishes the edition. Captions include the public edition URL. Email, Instagram, Facebook, Atom enclosures, and `og:image` all use `/editions/:publish_on/share.jpg` (Meta and mail clients cannot use expired signed blob URLs).
+
+## YouTube Shorts
+
+Optional YouTube Shorts delivery via the YouTube Data API v3. Credentials are optional — when `youtube.*` is blank, or when the source item lacks DigitalNZ **Use commercially** (`SourceItem#commercial_use?`), `EnsureEditionDeliveriesJob` marks that delivery `skipped` (web + email still publish).
+
+### YouTube setup (own channel)
+
+Step-by-step: **[youtube-setup.md](youtube-setup.md)**.
+
+Summary: Google Cloud project → enable YouTube Data API v3 → OAuth consent + `youtube.upload` scope → one-time refresh token → store `youtube.client_id`, `youtube.client_secret`, and `youtube.refresh_token`. The app uploads the composed 9:16 `share.mp4` (same asset as the Instagram Reel). Failed YouTube deliveries alert via `AdminMailer.delivery_failed`.
 
 ## Container releases
 
