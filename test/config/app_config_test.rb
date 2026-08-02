@@ -51,4 +51,32 @@ class AppConfigTest < ActiveSupport::TestCase
       assert_equal "https://www.facebook.com/aotearoaagain", AppConfig.facebook_url
     end
   end
+
+  test "admin_password returns configured value" do
+    AppConfig.stub(:dig, lambda { |*keys|
+      case keys
+      when [ :admin, :password ] then "secret-admin-password"
+      end
+    }) do
+      assert_equal "secret-admin-password", AppConfig.admin_password
+    end
+  end
+
+  test "admin_password raises when missing" do
+    AppConfig.stub(:dig, ->(*) { nil }) do
+      error = assert_raises(KeyError) { AppConfig.admin_password }
+      assert_match(/admin\.password/, error.message)
+      assert_match(/credentials:edit/, error.message)
+    end
+  end
+
+  test "youtube_upload_defaults disclose synthetic media under Education in NZ" do
+    defaults = AppConfig.youtube_upload_defaults
+
+    assert_equal "27", defaults.dig(:snippet, :categoryId)
+    assert_equal "public", defaults.dig(:status, :privacyStatus)
+    assert_equal false, defaults.dig(:status, :selfDeclaredMadeForKids)
+    assert_equal true, defaults.dig(:status, :containsSyntheticMedia)
+    assert_equal "New Zealand", defaults.dig(:recordingDetails, :locationDescription)
+  end
 end
