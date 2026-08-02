@@ -8,10 +8,8 @@ class ComposeShareVideoJob
   class Renderer
     class Error < StandardError; end
 
-    WIDTH = 1080
-    HEIGHT = 1920
-    MIN_TOP_BAR = 168
-    MIN_BOTTOM_BAR = 260
+    WIDTH = SafeAreas::FRAME_WIDTH
+    HEIGHT = SafeAreas::FRAME_HEIGHT
 
     # ~8s total: short enough for Reels/Shorts completion, long enough for the wipe + chrome.
     DEFAULTS = {
@@ -91,15 +89,16 @@ class ComposeShareVideoJob
       @plates = Plates.new(
         original_path: @original_path,
         colourised_path: @colourised_path,
-        frame_width: WIDTH
+        frame_width: SafeAreas.stage_max_width
       ).prepare!
 
-      stage = @plates.fit_stage(HEIGHT - MIN_TOP_BAR - MIN_BOTTOM_BAR)
+      stage = @plates.fit_stage(SafeAreas.stage_max_height)
       @layout = Letterbox.new(
         frame_width: WIDTH,
         frame_height: HEIGHT,
-        min_top: MIN_TOP_BAR,
-        min_bottom: MIN_BOTTOM_BAR
+        min_top: SafeAreas::MIN_TOP_BAR,
+        min_bottom: SafeAreas::MIN_BOTTOM_BAR,
+        stage_inset_left: SafeAreas::STAGE_INSET_LEFT
       ).layout_for(stage)
 
       @chrome = Chrome.new(
@@ -148,18 +147,20 @@ class ComposeShareVideoJob
     end
 
     def compose_frame(layout_p, wipe_center, chrome_opacity)
+      dest_w = Timeline.lerp(WIDTH, @layout.stage_w, layout_p).round.clamp(@layout.stage_w, WIDTH)
       dest_h = Timeline.lerp(HEIGHT, @layout.stage_h, layout_p).round.clamp(@layout.stage_h, HEIGHT)
+      dest_x = Timeline.lerp(0, @layout.stage_x, layout_p).round
       dest_y = Timeline.lerp(0, @layout.top_bar_h, layout_p).round
 
       plate = ComposeShareImageJob::DiagonalBlend.apply(
-        @plates.cover_crop(@plates.bw, WIDTH, dest_h),
-        @plates.cover_crop(@plates.colour, WIDTH, dest_h),
-        WIDTH,
+        @plates.cover_crop(@plates.bw, dest_w, dest_h),
+        @plates.cover_crop(@plates.colour, dest_w, dest_h),
+        dest_w,
         dest_h,
         center: wipe_center
       )
 
-      canvas = solid(WIDTH, HEIGHT, Chrome::BAR_RGB).composite(plate, :over, x: 0, y: dest_y)
+      canvas = solid(WIDTH, HEIGHT, Chrome::BAR_RGB).composite(plate, :over, x: dest_x, y: dest_y)
       return canvas if chrome_opacity <= 0.001
 
       overlay = chrome_opacity < 0.999 ? @chrome.apply_opacity(@chrome.overlay, chrome_opacity) : @chrome.overlay

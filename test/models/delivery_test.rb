@@ -38,8 +38,11 @@ class DeliveryTest < ActiveSupport::TestCase
     @source.update!(usage_flags: %w[Modify Share])
     AppConfig.stub(:instagram_configured?, true) do
       AppConfig.stub(:facebook_configured?, true) do
-        assert_not @edition.deliveries.build(channel: "instagram").applicable?
-        assert_not @edition.deliveries.build(channel: "facebook").applicable?
+        AppConfig.stub(:youtube_configured?, true) do
+          assert_not @edition.deliveries.build(channel: "instagram").applicable?
+          assert_not @edition.deliveries.build(channel: "facebook").applicable?
+          assert_not @edition.deliveries.build(channel: "youtube_short").applicable?
+        end
       end
     end
   end
@@ -47,6 +50,25 @@ class DeliveryTest < ActiveSupport::TestCase
   test "facebook applicable when configured with commercial use" do
     AppConfig.stub(:facebook_configured?, true) do
       assert @edition.deliveries.build(channel: "facebook").applicable?
+    end
+  end
+
+  test "youtube_short applicable when configured with commercial use" do
+    AppConfig.stub(:youtube_configured?, true) do
+      assert @edition.deliveries.build(channel: "youtube_short").applicable?
+    end
+  end
+
+  test "youtube_short not applicable when not configured" do
+    AppConfig.stub(:youtube_configured?, false) do
+      assert_not @edition.deliveries.build(channel: "youtube_short").applicable?
+    end
+  end
+
+  test "youtube_short not applicable without commercial use" do
+    @source.update!(usage_flags: %w[Modify Share])
+    AppConfig.stub(:youtube_configured?, true) do
+      assert_not @edition.deliveries.build(channel: "youtube_short").applicable?
     end
   end
 end

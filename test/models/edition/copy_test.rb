@@ -77,5 +77,15 @@ class Edition
       assert_no_match(/Branded share image/, ig)
       assert_operator ig.length, :<=, Copy::INSTAGRAM_CAPTION_LIMIT
     end
+
+    test "youtube title appends Shorts hashtag and description matches social caption" do
+      copy = @edition.copy
+
+      assert_includes copy.youtube_title, @source.title
+      assert_match(/#Shorts/i, copy.youtube_title)
+      assert_includes copy.youtube_description, copy.body_text
+      assert_includes copy.youtube_description, @edition.public_url
+      assert_operator copy.youtube_description.length, :<=, Copy::YOUTUBE_DESCRIPTION_LIMIT
+    end
   end
 end

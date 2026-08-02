@@ -21,6 +21,12 @@
 #     page_access_token: ...   # Page access token from /me/accounts
 #     page_id: ...             # enables Facebook Page posting
 #     instagram_user_id: ...   # enables Instagram Content Publishing
+#   youtube:                   # optional — YouTube Shorts delivery skipped when blank
+#     client_id: ...
+#     client_secret: ...
+#     refresh_token: ...       # offline OAuth token for the target channel
+#                              # upload metadata (category, AI disclosure, location)
+#                              # lives on AppConfig.youtube_upload_defaults — not credentials
 #   admin:
 #     username: admin
 #     password: ...
@@ -40,6 +46,18 @@
 #
 module AppConfig
   module_function
+
+  YOUTUBE_UPLOAD_DEFAULTS = {
+    snippet: { categoryId: "27" }, # Education
+    status: {
+      privacyStatus: "public",
+      selfDeclaredMadeForKids: false,
+      containsSyntheticMedia: true
+    },
+    recordingDetails: {
+      locationDescription: "New Zealand"
+    }
+  }.freeze
 
   def digitalnz_api_key = dig(:digitalnz, :api_key)
 
@@ -63,9 +81,21 @@ module AppConfig
     meta_page_access_token.present? && meta_page_id.present?
   end
 
+  def youtube_client_id = dig(:youtube, :client_id)
+
+  def youtube_client_secret = dig(:youtube, :client_secret)
+
+  def youtube_refresh_token = dig(:youtube, :refresh_token)
+
+  def youtube_upload_defaults = YOUTUBE_UPLOAD_DEFAULTS
+
+  def youtube_configured?
+    youtube_client_id.present? && youtube_client_secret.present? && youtube_refresh_token.present?
+  end
+
   def admin_username = dig(:admin, :username).presence || "admin"
 
-  def admin_password = dig(:admin, :password).presence || "changeme"
+  def admin_password = required(:admin, :password)
 
   def admin_alert_email = dig(:admin, :alert_email).presence || admin_username
 

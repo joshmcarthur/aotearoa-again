@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.18.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.17.1...v0.18.0) (2026-08-02)
+
+
+### Features
+
+* add YouTube Data API client and upload defaults ([#88](https://github.com/joshmcarthur/aotearoa-again/issues/88)) ([e11474c](https://github.com/joshmcarthur/aotearoa-again/commit/e11474cab8abcb824c561884df7ec1c7331d84b1))
+* add YouTube Shorts delivery channel ([#89](https://github.com/joshmcarthur/aotearoa-again/issues/89)) ([78a212b](https://github.com/joshmcarthur/aotearoa-again/commit/78a212b64b6ad27eb9f880110f1f8eabf9185b1b))
+
+## [0.17.1](https://github.com/joshmcarthur/aotearoa-again/compare/v0.17.0...v0.17.1) (2026-07-30)
+
+
+### Bug Fixes
+
+* fail closed when admin password is missing ([#81](https://github.com/joshmcarthur/aotearoa-again/issues/81)) ([1d53523](https://github.com/joshmcarthur/aotearoa-again/commit/1d53523a52793762a181926c385b0c0be934e9fd))
+
+## [0.17.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.16.0...v0.17.0) (2026-07-30)
+
+
+### Features
+
+* ensure scheduled editions have channel deliveries ([#78](https://github.com/joshmcarthur/aotearoa-again/issues/78)) ([a111660](https://github.com/joshmcarthur/aotearoa-again/commit/a11166069281e1e8849f9922967c5d89a3930f38))
+
 ## [0.16.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.15.0...v0.16.0) (2026-07-29)
 
 
