@@ -18,7 +18,7 @@ module ApplicationHelper
     path = URI.parse(url).path.to_s.delete_prefix("/").split("/").reject(&:blank?).first
     return if path.blank?
 
-    "@#{path}"
+    path.start_with?("@") ? path : "@#{path}"
   rescue URI::InvalidURIError
     nil
   end

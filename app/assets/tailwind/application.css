@@ -67,6 +67,11 @@
     @apply h-[1.125rem] w-[1.125rem];
   }
 
+  /* YouTube mark is wider than tall — size by height so it matches the square icons. */
+  .aa-social-icon-svg.aa-social-icon-youtube {
+    @apply h-[1.125rem] w-[1.5rem];
+  }
+
   .aa-footer {
     @apply mx-auto flex max-w-6xl flex-col gap-5 px-4 py-10 text-sm text-black/60;
   }

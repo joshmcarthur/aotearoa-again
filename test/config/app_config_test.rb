@@ -45,10 +45,12 @@ class AppConfigTest < ActiveSupport::TestCase
       case keys
       when [ :app, :instagram_url ] then "https://www.instagram.com/aotearoaagain"
       when [ :app, :facebook_url ] then "https://www.facebook.com/aotearoaagain"
+      when [ :app, :youtube_url ] then "https://www.youtube.com/@aotearoaagain"
       end
     }) do
       assert_equal "https://www.instagram.com/aotearoaagain", AppConfig.instagram_url
       assert_equal "https://www.facebook.com/aotearoaagain", AppConfig.facebook_url
+      assert_equal "https://www.youtube.com/@aotearoaagain", AppConfig.youtube_url
     end
   end
 
