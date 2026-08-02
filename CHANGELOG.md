@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.19.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.18.0...v0.19.0) (2026-08-02)
+
+
+### Features
+
+* add YouTube social profile link ([#94](https://github.com/joshmcarthur/aotearoa-again/issues/94)) ([b76ee71](https://github.com/joshmcarthur/aotearoa-again/commit/b76ee7106aab658f031c0a3604b90b7058135b8f))
+
 ## [0.18.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.17.1...v0.18.0) (2026-08-02)
 
 
