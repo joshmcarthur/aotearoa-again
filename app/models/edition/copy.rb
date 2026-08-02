@@ -2,6 +2,7 @@ class Edition
   class Copy
     AI_NOTICE = "AI colourised — colours are interpretive.".freeze
     INSTAGRAM_CAPTION_LIMIT = 2200
+    YOUTUBE_DESCRIPTION_LIMIT = 5000
 
     def initialize(edition)
       @edition = edition
@@ -88,6 +89,17 @@ class Edition
     # Same narrative as Instagram; Facebook allows a much longer message.
     def facebook_caption
       social_caption
+    end
+
+    def youtube_title
+      base = title.to_s.strip
+      return "#Shorts" if base.blank?
+
+      base.match?(/#shorts/i) ? base : "#{base} #Shorts"
+    end
+
+    def youtube_description
+      social_caption.truncate(YOUTUBE_DESCRIPTION_LIMIT)
     end
 
     def alt_text

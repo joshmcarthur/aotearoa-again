@@ -1,12 +1,13 @@
 class Delivery < ApplicationRecord
-  CHANNELS = %w[web email instagram instagram_reel facebook].freeze
+  CHANNELS = %w[web email instagram instagram_reel facebook youtube_short].freeze
   STATUSES = %w[pending succeeded failed skipped].freeze
   JOBS = {
     "web" => DeliverWebJob,
     "email" => DeliverEmailJob,
     "instagram" => DeliverInstagramJob,
     "instagram_reel" => DeliverInstagramReelJob,
-    "facebook" => DeliverFacebookJob
+    "facebook" => DeliverFacebookJob,
+    "youtube_short" => DeliverYoutubeShortJob
   }.freeze
 
   belongs_to :edition
@@ -33,6 +34,8 @@ class Delivery < ApplicationRecord
       AppConfig.instagram_configured? && edition.source_item.commercial_use?
     when "facebook"
       AppConfig.facebook_configured? && edition.source_item.commercial_use?
+    when "youtube_short"
+      AppConfig.youtube_configured? && edition.source_item.commercial_use?
     else
       false
     end

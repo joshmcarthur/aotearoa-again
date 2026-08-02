@@ -2,7 +2,7 @@
 
 ## Cursor Cloud specific instructions
 
-Rails 8 app ("Aotearoa, Again"): harvests ATL images via DigitalNZ, AI-colourises them (RubyLLM/OpenRouter), human-reviews in an admin UI, and publishes daily editions to the web/Atom feed/Buttondown/Instagram/Facebook. SQLite + the Solid stack (Queue/Cache/Cable) — no external DB/Redis needed.
+Rails 8 app ("Aotearoa, Again"): harvests ATL images via DigitalNZ, AI-colourises them (RubyLLM/OpenRouter), human-reviews in an admin UI, and publishes daily editions to the web/Atom feed/Buttondown/Instagram/Facebook/YouTube Shorts. SQLite + the Solid stack (Queue/Cache/Cable) — no external DB/Redis needed.
 
 ### Environment (already provisioned in the VM snapshot)
 - Ruby 3.4.9 is installed via `rbenv` under `~/.rbenv` (interactive shells get it from `~/.bashrc`). Non-interactive commands can call binaries through the shims, e.g. `~/.rbenv/shims/bundle`, or run `eval "$(rbenv init - bash)"` first.
@@ -15,7 +15,7 @@ Rails 8 app ("Aotearoa, Again"): harvests ATL images via DigitalNZ, AI-colourise
 
 ### Credentials gotcha
 - Only `config/credentials/test.key` is committed (tests decrypt automatically). `development.key`/`production.key` are NOT present.
-- The app still boots in development without the dev key: `AppConfig.dig` rescues decryption errors, so host defaults to `localhost:3000`. Without a decryptable `admin.password`, `/admin` fails closed (`KeyError`). Credential-backed features (OpenRouter colourise, Buttondown/Meta publish) won't work without real keys, but browsing and scheduling do.
+- The app still boots in development without the dev key: `AppConfig.dig` rescues decryption errors, so host defaults to `localhost:3000`. Without a decryptable `admin.password`, `/admin` fails closed (`KeyError`). Credential-backed features (OpenRouter colourise, Buttondown/Meta/YouTube publish) won't work without real keys, but browsing and scheduling do.
 
 ### Run / lint / test (see `README.md`, `Procfile.dev`, `config/ci.rb`)
 - Dev server: `bin/dev` (foreman: Puma on :3000 + `tailwindcss:watch`). Admin is at `/admin` (HTTP Basic from credentials: `admin.username` / `admin.password`).
