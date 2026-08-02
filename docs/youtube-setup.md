@@ -32,7 +32,7 @@ If the share video is missing or YouTube rejects the upload, that delivery is ma
 1. Open [Google Cloud Console](https://console.cloud.google.com/).
 2. Create a project (or select an existing one).
 3. **APIs & Services → Library** → search **YouTube Data API v3** → **Enable**.
-4. Note the default quota: uploads cost ~1,600 units each (~6 uploads/day on the free tier). Request a quota increase in Console if you need more.
+4. Note the default **`videos.insert` quota**: a separate daily bucket of **100 uploads/day** (1 unit per call). Other Data API methods share a 10,000-unit pool; `search.list` has its own 100/day bucket. Quotas reset at **midnight Pacific Time**. Check usage under [APIs & Services → YouTube Data API v3 → Quotas](https://console.cloud.google.com/apis/api/youtube.googleapis.com/quotas). Request an increase in Console if you need more.
 
 ---
 
@@ -232,6 +232,69 @@ Re-run section 4 to obtain a new refresh token and update credentials. Failures 
 
 ---
 
+## 12. Backfill published editions
+
+Upload Shorts for older published editions (newest `publish_on` first). Each successful upload costs one `videos.insert` against the daily bucket — leave headroom for the next scheduled 07:00 NZ publish when it falls on the same Pacific quota day (default limit 100/day; a safe same-day backfill budget is ~97 if usage is still 0).
+
+Preview candidates:
+
+```bash
+bin/rails runner '
+  Edition.published.includes(:deliveries, :source_item, variant: { share_video_attachment: :blob })
+    .order(publish_on: :desc)
+    .select { |e| e.source_item.commercial_use? }
+    .reject { |e| e.deliveries.find { |d| d.channel == "youtube_short" }&.then { |d| d.status == "succeeded" && d.external_id.present? } }
+    .first(30)
+    .each { |e| puts "#{e.publish_on} share=#{e.share_video.attached?} yt=#{e.deliveries.find { |d| d.channel == "youtube_short" }&.status || "none"}" }
+'
+```
+
+Compose missing share videos and upload (set `limit` to your budget). Runs synchronously so you can stop on failure:
+
+```bash
+bin/rails runner '
+  limit = 30
+  abort "YouTube credentials missing" unless AppConfig.youtube_configured?
+
+  editions = Edition.published
+    .includes(:deliveries, :source_item, variant: { share_video_attachment: :blob })
+    .order(publish_on: :desc)
+    .select { |e| e.source_item.commercial_use? }
+    .reject { |e| e.deliveries.find { |d| d.channel == "youtube_short" }&.then { |d| d.status == "succeeded" && d.external_id.present? } }
+    .first(limit)
+
+  editions.each do |edition|
+    delivery = edition.deliveries.find_or_initialize_by(channel: "youtube_short")
+    if delivery.new_record?
+      delivery.status = delivery.applicable? ? "pending" : "skipped"
+      delivery.save!
+    elsif delivery.status.in?(%w[skipped failed]) && delivery.applicable?
+      delivery.update!(status: "pending", error_message: nil)
+    end
+    next puts("SKIP #{edition.publish_on}: #{delivery.status}") if delivery.status == "skipped"
+
+    unless edition.share_video.attached?
+      puts "COMPOSE #{edition.publish_on}"
+      ComposeShareVideoJob.perform_now(edition.variant_id)
+      edition.variant.reload
+      unless edition.share_video.attached?
+        puts "FAIL #{edition.publish_on}: share_video missing"
+        next
+      end
+    end
+
+    puts "UPLOAD #{edition.publish_on}"
+    DeliverYoutubeShortJob.perform_now(edition.id)
+    delivery.reload
+    puts "#{delivery.status} #{delivery.external_id} #{delivery.error_message}"
+  end
+'
+```
+
+Requires ffmpeg on `PATH` when composing, and decryptable `youtube.*` credentials.
+
+---
+
 ## Common failures
 
 | Symptom | Fix |
@@ -240,7 +303,7 @@ Re-run section 4 to obtain a new refresh token and update credentials. Failures 
 | `invalid_grant` on token refresh | Refresh token revoked or expired — re-authorize (section 4) |
 | `youtube_short` skipped | Credentials blank or source item lacks **Use commercially** |
 | `Share video missing` | `ComposeShareVideoJob` did not run or ffmpeg unavailable |
-| `uploadHttpRequest` / quota errors | YouTube Data API daily quota exceeded — wait or request increase |
+| `uploadHttpRequest` / quota errors | `videos.insert` daily bucket exhausted (default 100/day, resets midnight PT) — wait or request increase |
 | `insufficientPermissions` | Scope missing `youtube.upload` when authorizing |
 | Video uploads but not a Short | Video must be vertical (9:16) and ≤ 60s — app composes ~8s 9:16 shorts; title includes `#Shorts` |
 | `selfDeclaredMadeForKids` errors | API requires explicit `madeForKids` flag — app sets `selfDeclaredMadeForKids: false` |
