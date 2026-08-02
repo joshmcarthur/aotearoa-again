@@ -30,6 +30,7 @@
 #     harvest_pipeline_target: 3
 #     instagram_url: https://www.instagram.com/...
 #     facebook_url: https://www.facebook.com/...
+#     youtube_url: https://www.youtube.com/@...
 #   smtp:
 #     address: ...
 #     port: 587
@@ -73,6 +74,8 @@ module AppConfig
   def instagram_url = dig(:app, :instagram_url)
 
   def facebook_url = dig(:app, :facebook_url)
+
+  def youtube_url = dig(:app, :youtube_url)
 
   def harvest_pipeline_target = Integer(dig(:app, :harvest_pipeline_target).presence || 3)
 
