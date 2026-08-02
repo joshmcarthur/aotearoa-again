@@ -35,16 +35,16 @@ module Youtube
       end
 
       def post(url, &block)
-        @posts << { url: url }
         req = Request.new
         yield req if block
+        @posts << { url: url, params: req.params, body: req.body }
         FakeResponse.new(body: "", headers: @post_headers)
       end
 
       def put(url, &block)
-        @puts << { url: url }
         req = Request.new
         yield req if block
+        @puts << { url: url, body: req.body }
         FakeResponse.new(body: @put_response.to_json, headers: {})
       end
 
@@ -71,11 +71,13 @@ module Youtube
         oauth_http: oauth,
         upload_http: upload
       )
+      recording_date = Time.zone.parse("2026-08-02 00:00:00")
 
       video_id = client.publish_short(
         video_io: StringIO.new("fake-mp4-bytes"),
         title: "Harbour scene #Shorts",
-        description: "A colourised plate from ATL."
+        description: "A colourised plate from ATL.",
+        recording_date: recording_date
       )
 
       assert_equal "yt_video_42", video_id
@@ -85,6 +87,17 @@ module Youtube
       assert_equal 1, upload.posts.size
       init = upload.posts.first
       assert_includes init[:url], "/upload/youtube/v3/videos"
+      assert_equal "snippet,status,recordingDetails", init[:params]["part"]
+
+      metadata = JSON.parse(init[:body])
+      assert_equal "Harbour scene #Shorts", metadata.dig("snippet", "title")
+      assert_equal "A colourised plate from ATL.", metadata.dig("snippet", "description")
+      assert_equal "27", metadata.dig("snippet", "categoryId")
+      assert_equal "public", metadata.dig("status", "privacyStatus")
+      assert_equal false, metadata.dig("status", "selfDeclaredMadeForKids")
+      assert_equal true, metadata.dig("status", "containsSyntheticMedia")
+      assert_equal "New Zealand", metadata.dig("recordingDetails", "locationDescription")
+      assert_equal recording_date.iso8601, metadata.dig("recordingDetails", "recordingDate")
 
       assert_equal 1, upload.puts.size
       assert_equal "https://upload.example/resumable/abc", upload.puts.first[:url]
@@ -105,7 +118,12 @@ module Youtube
       )
 
       error = assert_raises(Client::Error) do
-        client.publish_short(video_io: StringIO.new("x"), title: "x", description: "x")
+        client.publish_short(
+          video_io: StringIO.new("x"),
+          title: "x",
+          description: "x",
+          recording_date: Time.zone.now
+        )
       end
       assert_match(/token refresh failed/, error.message)
     end
@@ -123,7 +141,12 @@ module Youtube
       )
 
       error = assert_raises(Client::Error) do
-        client.publish_short(video_io: StringIO.new("x"), title: "x", description: "x")
+        client.publish_short(
+          video_io: StringIO.new("x"),
+          title: "x",
+          description: "x",
+          recording_date: Time.zone.now
+        )
       end
       assert_match(/upload location missing/, error.message)
     end

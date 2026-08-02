@@ -25,6 +25,8 @@
 #     client_id: ...
 #     client_secret: ...
 #     refresh_token: ...       # offline OAuth token for the target channel
+#                              # upload metadata (category, AI disclosure, location)
+#                              # lives on AppConfig.youtube_upload_defaults — not credentials
 #   admin:
 #     username: admin
 #     password: ...
@@ -43,6 +45,18 @@
 #
 module AppConfig
   module_function
+
+  YOUTUBE_UPLOAD_DEFAULTS = {
+    snippet: { categoryId: "27" }, # Education
+    status: {
+      privacyStatus: "public",
+      selfDeclaredMadeForKids: false,
+      containsSyntheticMedia: true
+    },
+    recordingDetails: {
+      locationDescription: "New Zealand"
+    }
+  }.freeze
 
   def digitalnz_api_key = dig(:digitalnz, :api_key)
 
@@ -71,6 +85,8 @@ module AppConfig
   def youtube_client_secret = dig(:youtube, :client_secret)
 
   def youtube_refresh_token = dig(:youtube, :refresh_token)
+
+  def youtube_upload_defaults = YOUTUBE_UPLOAD_DEFAULTS
 
   def youtube_configured?
     youtube_client_id.present? && youtube_client_secret.present? && youtube_refresh_token.present?

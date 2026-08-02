@@ -6,7 +6,6 @@ module Youtube
     OAUTH_URL = "https://oauth2.googleapis.com".freeze
     API_URL = "https://www.googleapis.com".freeze
     UPLOAD_URL = "https://www.googleapis.com/upload/youtube/v3".freeze
-    CATEGORY_ID = "19".freeze # Travel & Events
 
     class Error < StandardError; end
 
@@ -36,12 +35,13 @@ module Youtube
     end
 
     # Resumable upload via YouTube Data API v3 videos.insert.
-    def publish_short(video_io:, title:, description:)
+    def publish_short(video_io:, title:, description:, recording_date:)
       token = access_token
       upload_location = initiate_resumable_upload(
         token: token,
         title: title,
-        description: description
+        description: description,
+        recording_date: recording_date
       )
       upload_video(upload_location, video_io, token)
     end
@@ -66,23 +66,18 @@ module Youtube
       raise Error, "YouTube token refresh failed: #{e.message}"
     end
 
-    def initiate_resumable_upload(token:, title:, description:)
+    def initiate_resumable_upload(token:, title:, description:, recording_date:)
+      metadata = AppConfig.youtube_upload_defaults.deep_merge(
+        snippet: { title: title, description: description },
+        recordingDetails: { recordingDate: recording_date.iso8601 }
+      )
+
       response = @upload_http.post("#{UPLOAD_URL}/videos") do |req|
         req.params["uploadType"] = "resumable"
-        req.params["part"] = "snippet,status"
+        req.params["part"] = "snippet,status,recordingDetails"
         req.headers["Authorization"] = "Bearer #{token}"
         req.headers["Content-Type"] = "application/json; charset=UTF-8"
-        req.body = {
-          snippet: {
-            title: title,
-            description: description,
-            categoryId: CATEGORY_ID
-          },
-          status: {
-            privacyStatus: "public",
-            selfDeclaredMadeForKids: false
-          }
-        }.to_json
+        req.body = metadata.to_json
       end
       location = response.headers["location"]
       raise Error, "YouTube resumable upload location missing" if location.blank?

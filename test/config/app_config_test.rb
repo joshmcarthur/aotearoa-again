@@ -69,4 +69,14 @@ class AppConfigTest < ActiveSupport::TestCase
       assert_match(/credentials:edit/, error.message)
     end
   end
+
+  test "youtube_upload_defaults disclose synthetic media under Education in NZ" do
+    defaults = AppConfig.youtube_upload_defaults
+
+    assert_equal "27", defaults.dig(:snippet, :categoryId)
+    assert_equal "public", defaults.dig(:status, :privacyStatus)
+    assert_equal false, defaults.dig(:status, :selfDeclaredMadeForKids)
+    assert_equal true, defaults.dig(:status, :containsSyntheticMedia)
+    assert_equal "New Zealand", defaults.dig(:recordingDetails, :locationDescription)
+  end
 end

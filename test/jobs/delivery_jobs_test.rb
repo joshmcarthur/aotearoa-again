@@ -70,8 +70,13 @@ class DeliveryJobsTest < ActiveJob::TestCase
       @calls = []
     end
 
-    def publish_short(video_io:, title:, description:)
-      @calls << { video_bytes: video_io.read, title: title, description: description }
+    def publish_short(video_io:, title:, description:, recording_date:)
+      @calls << {
+        video_bytes: video_io.read,
+        title: title,
+        description: description,
+        recording_date: recording_date
+      }
       "yt_short_321"
     end
   end
@@ -140,6 +145,7 @@ class DeliveryJobsTest < ActiveJob::TestCase
     assert_equal false, instagram.reel_calls.first[:share_to_feed]
     assert_includes youtube.calls.first[:title], "#Shorts"
     assert_includes youtube.calls.first[:description], @source.title
+    assert_equal @edition.publish_on.in_time_zone.beginning_of_day, youtube.calls.first[:recording_date]
 
     AppConfig.stub(:instagram_configured?, true) do
       AppConfig.stub(:facebook_configured?, true) do
