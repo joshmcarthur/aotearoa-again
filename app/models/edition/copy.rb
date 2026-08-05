@@ -3,6 +3,7 @@ class Edition
     AI_NOTICE = "AI colourised — colours are interpretive.".freeze
     INSTAGRAM_CAPTION_LIMIT = 2200
     YOUTUBE_DESCRIPTION_LIMIT = 5000
+    BLUESKY_TEXT_LIMIT = 300
 
     def initialize(edition)
       @edition = edition
@@ -100,6 +101,10 @@ class Edition
 
     def youtube_description
       social_caption.truncate(YOUTUBE_DESCRIPTION_LIMIT)
+    end
+
+    def bluesky_post_text
+      [ title, @edition.public_url.to_s ].join("\n\n").truncate(BLUESKY_TEXT_LIMIT)
     end
 
     def alt_text

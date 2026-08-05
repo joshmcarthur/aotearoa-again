@@ -1,12 +1,13 @@
 class Delivery < ApplicationRecord
-  CHANNELS = %w[email instagram instagram_reel facebook youtube_short].freeze
+  CHANNELS = %w[email instagram instagram_reel facebook youtube_short bluesky].freeze
   STATUSES = %w[pending succeeded failed skipped].freeze
   JOBS = {
     "email" => DeliverEmailJob,
     "instagram" => DeliverInstagramJob,
     "instagram_reel" => DeliverInstagramReelJob,
     "facebook" => DeliverFacebookJob,
-    "youtube_short" => DeliverYoutubeShortJob
+    "youtube_short" => DeliverYoutubeShortJob,
+    "bluesky" => DeliverBlueskyJob
   }.freeze
 
   belongs_to :edition
@@ -35,6 +36,8 @@ class Delivery < ApplicationRecord
       AppConfig.facebook_configured? && edition.source_item.commercial_use?
     when "youtube_short"
       AppConfig.youtube_configured? && edition.source_item.commercial_use?
+    when "bluesky"
+      AppConfig.bluesky_configured? && edition.source_item.commercial_use?
     else
       false
     end
@@ -58,5 +61,13 @@ class Delivery < ApplicationRecord
     )
 
     NotifyDeliveryFailureJob.perform_later(id) if edition.state == "published"
+  end
+
+  def metadata_get(key)
+    metadata.fetch(key.to_s, nil)
+  end
+
+  def merge_metadata!(attrs)
+    update!(metadata: metadata.merge(attrs.stringify_keys))
   end
 end

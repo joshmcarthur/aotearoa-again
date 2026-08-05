@@ -27,6 +27,12 @@
 #     refresh_token: ...       # offline OAuth token for the target channel
 #                              # upload metadata (category, AI disclosure, location)
 #                              # lives on AppConfig.youtube_upload_defaults — not credentials
+#   bluesky:                   # optional — Bluesky delivery skipped when blank
+#     handle: aotearoa-again.example
+#     app_password: xxxx-xxxx-xxxx-xxxx
+#     pds_host: bsky.social    # optional
+#     publication_uri: at://did:plc:.../site.standard.publication/...
+#     publication_cid: bafyrei...
 #   admin:
 #     username: admin
 #     password: ...
@@ -37,6 +43,7 @@
 #     instagram_url: https://www.instagram.com/...
 #     facebook_url: https://www.facebook.com/...
 #     youtube_url: https://www.youtube.com/@...
+#     bluesky_url: https://bsky.app/profile/aotearoa-again.example
 #   smtp:
 #     address: ...
 #     port: 587
@@ -93,6 +100,23 @@ module AppConfig
     youtube_client_id.present? && youtube_client_secret.present? && youtube_refresh_token.present?
   end
 
+  def bluesky_handle = dig(:bluesky, :handle)
+
+  def bluesky_app_password = dig(:bluesky, :app_password)
+
+  def bluesky_pds_host = dig(:bluesky, :pds_host)
+
+  def bluesky_publication_uri = dig(:bluesky, :publication_uri)
+
+  def bluesky_publication_cid = dig(:bluesky, :publication_cid)
+
+  def bluesky_configured?
+    bluesky_handle.present? &&
+      bluesky_app_password.present? &&
+      bluesky_publication_uri.present? &&
+      bluesky_publication_cid.present?
+  end
+
   def admin_username = dig(:admin, :username).presence || "admin"
 
   def admin_password = required(:admin, :password)
@@ -106,6 +130,8 @@ module AppConfig
   def facebook_url = dig(:app, :facebook_url)
 
   def youtube_url = dig(:app, :youtube_url)
+
+  def bluesky_url = dig(:app, :bluesky_url)
 
   def harvest_pipeline_target = Integer(dig(:app, :harvest_pipeline_target).presence || 3)
 
