@@ -2,6 +2,8 @@ require "test_helper"
 
 module Publishing
   class FinalizeEditionTest < ActiveSupport::TestCase
+    include ActiveJob::TestHelper
+
     setup do
       @model = Model.openrouter.image_capable.first || Model.create!(
         model_id: "test/finalize-edition-model",
