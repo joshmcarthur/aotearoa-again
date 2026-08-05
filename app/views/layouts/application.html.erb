@@ -8,6 +8,9 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= yield :head %>
+    <% if AppConfig.bluesky_publication_uri.present? %>
+      <link rel="site.standard.publication" href="<%= AppConfig.bluesky_publication_uri %>">
+    <% end %>
     <link rel="alternate" type="application/atom+xml" title="Aotearoa, Again" href="<%= feed_path %>">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="icon" href="/icon.png" type="image/png">
@@ -32,6 +35,7 @@
           <%= social_icon_link(AppConfig.instagram_url, :instagram, "Instagram", link_class: "aa-nav-icon") %>
           <%= social_icon_link(AppConfig.facebook_url, :facebook, "Facebook", link_class: "aa-nav-icon") %>
           <%= social_icon_link(AppConfig.youtube_url, :youtube, "YouTube", link_class: "aa-nav-icon") %>
+          <%= social_icon_link(AppConfig.bluesky_url, :bluesky, "Bluesky", link_class: "aa-nav-icon") %>
         </nav>
       </div>
     </header>
@@ -44,11 +48,12 @@
       </p>
       <p class="aa-footer-meta">
         <%= link_to "About", about_path, class: "aa-footer-link" %>
-        <% if AppConfig.instagram_url.present? || AppConfig.facebook_url.present? || AppConfig.youtube_url.present? %>
+        <% if AppConfig.instagram_url.present? || AppConfig.facebook_url.present? || AppConfig.youtube_url.present? || AppConfig.bluesky_url.present? %>
           <span class="aa-footer-social">
             <%= social_icon_link(AppConfig.instagram_url, :instagram, "Instagram", link_class: "aa-footer-icon", show_handle: true) %>
             <%= social_icon_link(AppConfig.facebook_url, :facebook, "Facebook", link_class: "aa-footer-icon", show_handle: true) %>
             <%= social_icon_link(AppConfig.youtube_url, :youtube, "YouTube", link_class: "aa-footer-icon", show_handle: true) %>
+            <%= social_icon_link(AppConfig.bluesky_url, :bluesky, "Bluesky", link_class: "aa-footer-icon", show_handle: true) %>
           </span>
         <% end %>
       </p>

@@ -2,14 +2,14 @@
 
 Daily photographs from the Alexander Turnbull Library, seen again in colour.
 
-A small Rails app that harvests reusable ATL images via DigitalNZ (Modify + Use commercially — NatLib Meta-upload-eligible subset), AI-colourises them with RubyLLM (OpenRouter), human-reviews into a ~30-day runway, and publishes to the web, Atom feed, Buttondown, Instagram, Facebook Page, and YouTube Shorts.
+A small Rails app that harvests reusable ATL images via DigitalNZ (Modify + Use commercially — NatLib Meta-upload-eligible subset), AI-colourises them with RubyLLM (OpenRouter), human-reviews into a ~30-day runway, and publishes to the web, Atom feed, Buttondown, Instagram, Facebook Page, YouTube Shorts, and Bluesky.
 
 ## Setup
 
 ```bash
 bin/setup
 bin/rails credentials:edit --environment development
-# fill openrouter / buttondown / meta / youtube / admin / app (digitalnz key optional)
+# fill openrouter / buttondown / meta / youtube / bluesky / admin / app (digitalnz key optional)
 bin/rails ruby_llm:load_models
 bin/rails db:seed
 bin/dev
@@ -35,9 +35,10 @@ Share video (9:16 shorts) needs **ffmpeg** on `PATH` in addition to libvips. The
 1. `HarvestCandidatesJob` — DigitalNZ ATL images with Modify + Use commercially  
 2. `ColouriseCandidateJob` — RubyLLM.paint via preferred `Model` rows  
 3. Admin approve → schedule `Edition`  
-4. `PublishEditionJob` (07:00 NZ) publishes the edition, then enqueues per-channel delivery jobs (Buttondown, Instagram, Facebook, YouTube Shorts)  
+4. `PublishEditionJob` (07:00 NZ) publishes the edition, then enqueues per-channel delivery jobs (Buttondown, Instagram, Facebook, YouTube Shorts, Bluesky)  
 
 See [docs/deploy.md](docs/deploy.md) for home hosting + Cloudflare Tunnel.  
 See [docs/natlib-social-media.md](docs/natlib-social-media.md) for NatLib social media rules.  
 See [docs/meta-setup.md](docs/meta-setup.md) for Meta Graph API setup (Instagram + Facebook Page).  
-See [docs/youtube-setup.md](docs/youtube-setup.md) for YouTube Data API setup (Shorts).
+See [docs/youtube-setup.md](docs/youtube-setup.md) for YouTube Data API setup (Shorts).  
+See [docs/bluesky-setup.md](docs/bluesky-setup.md) for Bluesky + Standard.site setup.

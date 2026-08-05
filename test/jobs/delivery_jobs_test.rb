@@ -8,7 +8,8 @@ class DeliveryJobsTest < ActiveJob::TestCase
     DeliverInstagramJob,
     DeliverInstagramReelJob,
     DeliverFacebookJob,
-    DeliverYoutubeShortJob
+    DeliverYoutubeShortJob,
+    DeliverBlueskyJob
   ].freeze
   RUN_JOBS = (DELIVERY_JOBS + [ NotifyDeliveryFailureJob ]).freeze
 
@@ -80,6 +81,25 @@ class DeliveryJobsTest < ActiveJob::TestCase
     end
   end
 
+  class FakeBlueskyClient
+    def upload_blob(*)
+      {
+        "$type" => "blob",
+        "ref" => { "$link" => "bafybluesky" },
+        "mimeType" => "image/jpeg",
+        "size" => 1
+      }
+    end
+
+    def create_record(collection:, record:)
+      { uri: "at://did:plc:test/#{collection}/bsky1", cid: "bafy#{collection}" }
+    end
+
+    def publish_edition_post(**)
+      { uri: "at://did:plc:test/app.bsky.feed.post/bsky1", cid: "bafypost" }
+    end
+  end
+
   setup do
     @model = Model.openrouter.image_capable.first || Model.create!(
       model_id: "test/image-model",
@@ -96,23 +116,33 @@ class DeliveryJobsTest < ActiveJob::TestCase
     attach_fixture_image(@variant, name: :share_image)
     attach_fixture_video(@variant)
     @edition = Edition.create!(variant: @variant, publish_on: Time.zone.today, state: "published")
-    %w[email instagram instagram_reel facebook youtube_short].each do |channel|
+    %w[email instagram instagram_reel facebook youtube_short bluesky].each do |channel|
       @edition.deliveries.create!(channel: channel, status: "pending")
     end
   end
 
-  def stub_clients(email:, instagram:, facebook: FakeFacebookClient.new, youtube: FakeYoutubeClient.new, &)
+  def stub_clients(email:, instagram:, facebook: FakeFacebookClient.new, youtube: FakeYoutubeClient.new, bluesky: FakeBlueskyClient.new, &)
     Buttondown::Client.stub(:new, email) do
       Instagram::Client.stub(:new, instagram) do
         Facebook::Client.stub(:new, facebook) do
-          Youtube::Client.stub(:new, youtube, &)
+          Youtube::Client.stub(:new, youtube) do
+            with_bluesky_stubs(bluesky, &)
+          end
         end
       end
     end
   end
 
-  def deliver_all(email:, instagram:, facebook: FakeFacebookClient.new, youtube: FakeYoutubeClient.new)
-    stub_clients(email:, instagram:, facebook:, youtube:) do
+  def with_bluesky_stubs(client)
+    AppConfig.stub(:bluesky_publication_uri, "at://did:plc:test/site.standard.publication/pub1") do
+      AppConfig.stub(:bluesky_publication_cid, "bafypub") do
+        Bluesky::Client.stub(:new, client) { yield }
+      end
+    end
+  end
+
+  def deliver_all(email:, instagram:, facebook: FakeFacebookClient.new, youtube: FakeYoutubeClient.new, bluesky: FakeBlueskyClient.new)
+    stub_clients(email:, instagram:, facebook:, youtube:, bluesky:) do
       perform_enqueued_jobs only: RUN_JOBS do
         @edition.deliveries.each(&:enqueue!)
       end
@@ -128,7 +158,9 @@ class DeliveryJobsTest < ActiveJob::TestCase
     AppConfig.stub(:instagram_configured?, true) do
       AppConfig.stub(:facebook_configured?, true) do
         AppConfig.stub(:youtube_configured?, true) do
-          deliver_all(email:, instagram:, facebook:, youtube:)
+          AppConfig.stub(:bluesky_configured?, true) do
+            deliver_all(email:, instagram:, facebook:, youtube:)
+          end
         end
       end
     end
@@ -140,6 +172,8 @@ class DeliveryJobsTest < ActiveJob::TestCase
     assert_equal "ig_reel_999", @edition.deliveries.find_by(channel: "instagram_reel").external_id
     assert_equal "fb_789", @edition.deliveries.find_by(channel: "facebook").external_id
     assert_equal "yt_short_321", @edition.deliveries.find_by(channel: "youtube_short").external_id
+    assert_equal "at://did:plc:test/app.bsky.feed.post/bsky1", @edition.deliveries.find_by(channel: "bluesky").external_id
+    assert_equal "at://did:plc:test/site.standard.document/bsky1", @edition.deliveries.find_by(channel: "bluesky").metadata_get("standard_site_document_uri")
     assert_includes instagram.reel_calls.first[:video_url], "/share.mp4"
     assert_equal false, instagram.reel_calls.first[:share_to_feed]
     assert_includes youtube.calls.first[:title], "#Shorts"
@@ -149,22 +183,26 @@ class DeliveryJobsTest < ActiveJob::TestCase
     AppConfig.stub(:instagram_configured?, true) do
       AppConfig.stub(:facebook_configured?, true) do
         AppConfig.stub(:youtube_configured?, true) do
-          stub_clients(email:, instagram:, facebook:, youtube:) do
-            DeliverEmailJob.perform_now(@edition.id)
-            DeliverInstagramJob.perform_now(@edition.id)
-            DeliverInstagramReelJob.perform_now(@edition.id)
-            DeliverFacebookJob.perform_now(@edition.id)
-            DeliverYoutubeShortJob.perform_now(@edition.id)
+          AppConfig.stub(:bluesky_configured?, true) do
+            stub_clients(email:, instagram:, facebook:, youtube:) do
+              DeliverEmailJob.perform_now(@edition.id)
+              DeliverInstagramJob.perform_now(@edition.id)
+              DeliverInstagramReelJob.perform_now(@edition.id)
+              DeliverFacebookJob.perform_now(@edition.id)
+              DeliverYoutubeShortJob.perform_now(@edition.id)
+              DeliverBlueskyJob.perform_now(@edition.id)
+            end
           end
         end
       end
     end
-    assert_equal [ 1, 1, 1, 1, 1 ], [
+    assert_equal [ 1, 1, 1, 1, 1, 1 ], [
       email.calls.size,
       instagram.photo_calls.size,
       instagram.reel_calls.size,
       facebook.calls.size,
-      youtube.calls.size
+      youtube.calls.size,
+      1
     ]
   end
 
@@ -172,7 +210,9 @@ class DeliveryJobsTest < ActiveJob::TestCase
     AppConfig.stub(:instagram_configured?, false) do
       AppConfig.stub(:facebook_configured?, false) do
         AppConfig.stub(:youtube_configured?, false) do
-          deliver_all(email: FakeEmailClient.new, instagram: FakeInstagramClient.new)
+          AppConfig.stub(:bluesky_configured?, false) do
+            deliver_all(email: FakeEmailClient.new, instagram: FakeInstagramClient.new)
+          end
         end
       end
     end
@@ -182,6 +222,7 @@ class DeliveryJobsTest < ActiveJob::TestCase
     assert_equal "skipped", @edition.deliveries.find_by(channel: "instagram").status
     assert_equal "skipped", @edition.deliveries.find_by(channel: "facebook").status
     assert_equal "skipped", @edition.deliveries.find_by(channel: "youtube_short").status
+    assert_equal "skipped", @edition.deliveries.find_by(channel: "bluesky").status
   end
 
   test "alerts admin when a channel fails after retries" do
