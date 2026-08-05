@@ -17,12 +17,14 @@ class PublishEditionJobTest < ActiveJob::TestCase
     @edition.deliveries.create!(channel: "email", status: "pending")
   end
 
-  test "enqueues the channel job for each delivery" do
+  test "publishes edition and enqueues the channel job for each delivery" do
     assert_enqueued_with(job: DeliverWebJob, args: [ @edition.id ]) do
       assert_enqueued_with(job: DeliverEmailJob, args: [ @edition.id ]) do
         PublishEditionJob.perform_now(Time.zone.today)
       end
     end
+
+    assert_equal "published", @edition.reload.state
   end
 
   test "does not enqueue skipped deliveries" do
@@ -33,6 +35,8 @@ class PublishEditionJobTest < ActiveJob::TestCase
         PublishEditionJob.perform_now(Time.zone.today)
       end
     end
+
+    assert_equal "published", @edition.reload.state
   end
 
   test "no-ops when no scheduled edition for date" do

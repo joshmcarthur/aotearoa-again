@@ -198,6 +198,7 @@ Use `privacyStatus: "unlisted"` for dry-runs; the app publishes as **public**.
 ```bash
 bin/rails runner '
   edition = Edition.find_by!(publish_on: Date.parse("YYYY-MM-DD"))
+  edition.publish! unless edition.state == "published"
   edition.deliveries.where(status: "pending").each { |d| d.job_class.perform_now(edition.id) }
   FinalizeEditionPublishJob.perform_now(edition.id)
   puts edition.reload.state

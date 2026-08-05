@@ -14,16 +14,7 @@ class FinalizeEditionPublishJobTest < ActiveJob::TestCase
     @candidate = @source.candidates.create!(status: "ready")
     @variant = @candidate.variants.create!(model: @model, prompt: "colourise", chosen: true)
     attach_fixture_image(@variant, name: :colourised_image)
-    @edition = Edition.create!(variant: @variant, publish_on: Time.zone.today, state: "scheduled")
-  end
-
-  test "publishes when all deliveries are terminal" do
-    @edition.deliveries.create!(channel: "web", status: "succeeded")
-    @edition.deliveries.create!(channel: "email", status: "succeeded")
-
-    FinalizeEditionPublishJob.perform_now(@edition.id)
-
-    assert_equal "published", @edition.reload.state
+    @edition = Edition.create!(variant: @variant, publish_on: Time.zone.today, state: "published")
   end
 
   test "alerts admin when any delivery failed" do
@@ -33,25 +24,32 @@ class FinalizeEditionPublishJobTest < ActiveJob::TestCase
     assert_enqueued_emails 1 do
       FinalizeEditionPublishJob.perform_now(@edition.id)
     end
+  end
 
-    assert_equal "published", @edition.reload.state
+  test "does not alert when all deliveries succeeded" do
+    @edition.deliveries.create!(channel: "web", status: "succeeded")
+    @edition.deliveries.create!(channel: "email", status: "succeeded")
+
+    assert_no_enqueued_emails do
+      FinalizeEditionPublishJob.perform_now(@edition.id)
+    end
   end
 
   test "no-ops when deliveries are still pending" do
     @edition.deliveries.create!(channel: "web", status: "succeeded")
     @edition.deliveries.create!(channel: "email", status: "pending")
 
-    FinalizeEditionPublishJob.perform_now(@edition.id)
-
-    assert_equal "scheduled", @edition.reload.state
+    assert_no_enqueued_emails do
+      FinalizeEditionPublishJob.perform_now(@edition.id)
+    end
   end
 
-  test "no-ops when already published" do
-    @edition.publish!
-    @edition.deliveries.create!(channel: "web", status: "succeeded")
+  test "no-ops when edition is not published" do
+    @edition.update!(state: "scheduled")
+    @edition.deliveries.create!(channel: "web", status: "failed", error_message: "boom")
 
-    FinalizeEditionPublishJob.perform_now(@edition.id)
-
-    assert_equal "published", @edition.reload.state
+    assert_no_enqueued_emails do
+      FinalizeEditionPublishJob.perform_now(@edition.id)
+    end
   end
 end

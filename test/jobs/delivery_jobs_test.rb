@@ -96,7 +96,7 @@ class DeliveryJobsTest < ActiveJob::TestCase
     attach_fixture_image(@variant, name: :composite_image)
     attach_fixture_image(@variant, name: :share_image)
     attach_fixture_video(@variant)
-    @edition = Edition.create!(variant: @variant, publish_on: Time.zone.today, state: "scheduled")
+    @edition = Edition.create!(variant: @variant, publish_on: Time.zone.today, state: "published")
     %w[web email instagram instagram_reel facebook youtube_short].each do |channel|
       @edition.deliveries.create!(channel: channel, status: "pending")
     end
@@ -120,7 +120,7 @@ class DeliveryJobsTest < ActiveJob::TestCase
     end
   end
 
-  test "delivers each channel idempotently and finalizes publish" do
+  test "delivers each channel idempotently and alerts when deliveries finish" do
     email = FakeEmailClient.new
     instagram = FakeInstagramClient.new
     facebook = FakeFacebookClient.new
