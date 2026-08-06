@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.20.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.19.0...v0.20.0) (2026-08-06)
+
+
+### Features
+
+* add Bluesky delivery with Standard.site lexicon ([#100](https://github.com/joshmcarthur/aotearoa-again/issues/100)) ([0a2efb2](https://github.com/joshmcarthur/aotearoa-again/commit/0a2efb2fc89660efda33c904d24c6efc926249e0))
+
 ## [0.19.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.18.0...v0.19.0) (2026-08-02)
 
 
