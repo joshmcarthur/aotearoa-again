@@ -19,13 +19,16 @@ class EnsureEditionDeliveriesJobTest < ActiveJob::TestCase
     AppConfig.stub(:instagram_configured?, true) do
       AppConfig.stub(:facebook_configured?, true) do
         AppConfig.stub(:youtube_configured?, true) do
-          EnsureEditionDeliveriesJob.perform_now(edition_ids: [ @edition.id ])
+          AppConfig.stub(:bluesky_configured?, true) do
+            EnsureEditionDeliveriesJob.perform_now(edition_ids: [ @edition.id ])
+          end
         end
       end
     end
 
     statuses = @edition.deliveries.order(:channel).pluck(:channel, :status)
     assert_equal [
+      [ "bluesky", "pending" ],
       [ "email", "pending" ],
       [ "facebook", "pending" ],
       [ "instagram", "pending" ],
@@ -38,13 +41,16 @@ class EnsureEditionDeliveriesJobTest < ActiveJob::TestCase
     AppConfig.stub(:instagram_configured?, false) do
       AppConfig.stub(:facebook_configured?, false) do
         AppConfig.stub(:youtube_configured?, false) do
-          EnsureEditionDeliveriesJob.perform_now(edition_ids: [ @edition.id ])
+          AppConfig.stub(:bluesky_configured?, false) do
+            EnsureEditionDeliveriesJob.perform_now(edition_ids: [ @edition.id ])
+          end
         end
       end
     end
 
     by_channel = @edition.deliveries.index_by(&:channel)
     assert_equal "pending", by_channel.fetch("email").status
+    assert_equal "skipped", by_channel.fetch("bluesky").status
     assert_equal "skipped", by_channel.fetch("instagram").status
     assert_equal "skipped", by_channel.fetch("instagram_reel").status
     assert_equal "skipped", by_channel.fetch("facebook").status
@@ -58,7 +64,9 @@ class EnsureEditionDeliveriesJobTest < ActiveJob::TestCase
     AppConfig.stub(:instagram_configured?, true) do
       AppConfig.stub(:facebook_configured?, true) do
         AppConfig.stub(:youtube_configured?, true) do
-          EnsureEditionDeliveriesJob.perform_now(edition_ids: [ @edition.id ])
+          AppConfig.stub(:bluesky_configured?, true) do
+            EnsureEditionDeliveriesJob.perform_now(edition_ids: [ @edition.id ])
+          end
         end
       end
     end
@@ -69,6 +77,7 @@ class EnsureEditionDeliveriesJobTest < ActiveJob::TestCase
     assert_equal "pending", by_channel.fetch("instagram_reel").status
     assert_equal "pending", by_channel.fetch("facebook").status
     assert_equal "pending", by_channel.fetch("youtube_short").status
+    assert_equal "pending", by_channel.fetch("bluesky").status
   end
 
   test "batch mode ensures all scheduled editions" do
@@ -79,7 +88,9 @@ class EnsureEditionDeliveriesJobTest < ActiveJob::TestCase
     AppConfig.stub(:instagram_configured?, false) do
       AppConfig.stub(:facebook_configured?, false) do
         AppConfig.stub(:youtube_configured?, false) do
-          EnsureEditionDeliveriesJob.perform_now
+          AppConfig.stub(:bluesky_configured?, false) do
+            EnsureEditionDeliveriesJob.perform_now
+          end
         end
       end
     end

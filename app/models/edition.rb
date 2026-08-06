@@ -83,6 +83,10 @@ class Edition < ApplicationRecord
     deliveries.reload.all? { |d| d.status.in?(%w[succeeded failed skipped]) }
   end
 
+  def bluesky_delivery
+    deliveries.find_by(channel: "bluesky")
+  end
+
   def copy
     @copy ||= Copy.new(self)
   end

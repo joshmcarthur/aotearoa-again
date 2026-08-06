@@ -96,7 +96,11 @@ Step-by-step: **[meta-setup.md](meta-setup.md)**.
 
 Summary: Professional IG + linked Facebook Page → Meta app (Facebook Login path) → long-lived Page token → store `meta.page_access_token` plus `meta.instagram_user_id` and/or `meta.page_id`. App Review not required for your own account/Page. Tokens last ~60 days; refresh before expiry. Failed Meta deliveries alert via `AdminMailer.delivery_failed`.
 
-`PublishEditionJob` publishes the edition, then enqueues per-channel delivery jobs (`DeliverEmailJob`, `DeliverInstagramJob`, `DeliverInstagramReelJob`, `DeliverFacebookJob`, `DeliverYoutubeShortJob`). Meta jobs post the branded `share_image` to Instagram (two-step container flow) and/or the Facebook Page (`/{page-id}/photos`). Each failed delivery enqueues `NotifyDeliveryFailureJob` (deduplicated per delivery via Solid Queue concurrency controls). Captions include the public edition URL. Email, Instagram, Facebook, Atom enclosures, and `og:image` all use `/editions/:publish_on/share.jpg` (Meta and mail clients cannot use expired signed blob URLs).
+`PublishEditionJob` publishes the edition, then enqueues per-channel delivery jobs (`DeliverEmailJob`, `DeliverInstagramJob`, `DeliverInstagramReelJob`, `DeliverFacebookJob`, `DeliverYoutubeShortJob`, `DeliverBlueskyJob`). Meta and Bluesky jobs post the branded `share_image` (Meta via public URL fetch; Bluesky via blob upload + Standard.site document record). Each failed delivery enqueues `NotifyDeliveryFailureJob` (deduplicated per delivery via Solid Queue concurrency controls). Captions include the public edition URL. Email, Instagram, Facebook, Atom enclosures, and `og:image` all use `/editions/:publish_on/share.jpg` (Meta and mail clients cannot use expired signed blob URLs).
+
+## Bluesky + Standard.site
+
+Optional Bluesky delivery via AT Protocol XRPC (Faraday client — no extra gem). Credentials optional; skipped when incomplete or without commercial use. One-off `bin/rails bluesky:bootstrap_publication` creates the `site.standard.publication` record; each edition gets a `site.standard.document` record at delivery time (refs in `deliveries.metadata`). See **[bluesky-setup.md](bluesky-setup.md)**.
 
 ## YouTube Shorts
 

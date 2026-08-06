@@ -10,6 +10,12 @@
   <% if @edition.variant.distribution_image.attached? %>
     <meta property="og:image" content="<%= edition_share_image_url(@edition) %>">
   <% end %>
+  <% if (document_uri = @edition.bluesky_delivery&.metadata_get("standard_site_document_uri")).present? %>
+    <link rel="site.standard.document" href="<%= document_uri %>">
+  <% end %>
+  <% if AppConfig.bluesky_publication_uri.present? %>
+    <link rel="site.standard.publication" href="<%= AppConfig.bluesky_publication_uri %>">
+  <% end %>
 <% end %>
 
 <article class="aa-edition">

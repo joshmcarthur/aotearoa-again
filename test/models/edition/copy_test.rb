@@ -87,5 +87,13 @@ class Edition
       assert_includes copy.youtube_description, @edition.public_url
       assert_operator copy.youtube_description.length, :<=, Copy::YOUTUBE_DESCRIPTION_LIMIT
     end
+
+    test "bluesky post text is short and includes edition url" do
+      copy = @edition.copy
+
+      assert_includes copy.bluesky_post_text, @source.title
+      assert_includes copy.bluesky_post_text, @edition.public_url
+      assert_operator copy.bluesky_post_text.length, :<=, Copy::BLUESKY_TEXT_LIMIT
+    end
   end
 end

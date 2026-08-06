@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   get "/feed.xml", to: "feeds#show", as: :feed
   get "/about", to: "pages#about", as: :about
   get "/subscribe", to: "pages#subscribe", as: :subscribe
+  get "/.well-known/site.standard.publication", to: "well_known#site_standard_publication"
 
   namespace :admin do
     root to: "candidates#index"

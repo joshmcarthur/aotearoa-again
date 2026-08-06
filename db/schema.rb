@@ -64,6 +64,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_06_100000) do
     t.integer "edition_id", null: false
     t.text "error_message"
     t.string "external_id"
+    t.json "metadata", default: {}, null: false
     t.string "status", default: "pending", null: false
     t.datetime "updated_at", null: false
     t.index ["edition_id", "channel"], name: "index_deliveries_on_edition_id_and_channel", unique: true

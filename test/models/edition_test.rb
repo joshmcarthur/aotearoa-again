@@ -30,11 +30,13 @@ class EditionTest < ActiveSupport::TestCase
     AppConfig.stub(:instagram_configured?, true) do
       AppConfig.stub(:facebook_configured?, true) do
         AppConfig.stub(:youtube_configured?, true) do
-          edition = Editions::Approver.new(@candidate, variant: @variant).call
-          assert_equal "scheduled", edition.state
-          assert_equal Time.zone.tomorrow, edition.publish_on
-          assert_equal %w[email facebook instagram instagram_reel youtube_short], edition.deliveries.order(:channel).pluck(:channel)
-          assert_equal %w[pending pending pending pending pending], edition.deliveries.order(:channel).pluck(:status)
+          AppConfig.stub(:bluesky_configured?, true) do
+            edition = Editions::Approver.new(@candidate, variant: @variant).call
+            assert_equal "scheduled", edition.state
+            assert_equal Time.zone.tomorrow, edition.publish_on
+            assert_equal %w[bluesky email facebook instagram instagram_reel youtube_short], edition.deliveries.order(:channel).pluck(:channel)
+            assert_equal %w[pending pending pending pending pending pending], edition.deliveries.order(:channel).pluck(:status)
+          end
         end
       end
     end
@@ -50,14 +52,17 @@ class EditionTest < ActiveSupport::TestCase
     AppConfig.stub(:instagram_configured?, false) do
       AppConfig.stub(:facebook_configured?, false) do
         AppConfig.stub(:youtube_configured?, false) do
-          edition = Editions::Approver.new(@candidate, variant: @variant).call
-          by_channel = edition.deliveries.index_by(&:channel)
-          assert_equal %w[email facebook instagram instagram_reel youtube_short], edition.deliveries.order(:channel).pluck(:channel)
-          assert_equal "pending", by_channel.fetch("email").status
-          assert_equal "skipped", by_channel.fetch("instagram").status
-          assert_equal "skipped", by_channel.fetch("instagram_reel").status
-          assert_equal "skipped", by_channel.fetch("facebook").status
-          assert_equal "skipped", by_channel.fetch("youtube_short").status
+          AppConfig.stub(:bluesky_configured?, false) do
+            edition = Editions::Approver.new(@candidate, variant: @variant).call
+            by_channel = edition.deliveries.index_by(&:channel)
+            assert_equal %w[bluesky email facebook instagram instagram_reel youtube_short], edition.deliveries.order(:channel).pluck(:channel)
+            assert_equal "pending", by_channel.fetch("email").status
+            assert_equal "skipped", by_channel.fetch("bluesky").status
+            assert_equal "skipped", by_channel.fetch("instagram").status
+            assert_equal "skipped", by_channel.fetch("instagram_reel").status
+            assert_equal "skipped", by_channel.fetch("facebook").status
+            assert_equal "skipped", by_channel.fetch("youtube_short").status
+          end
         end
       end
     end
@@ -68,13 +73,16 @@ class EditionTest < ActiveSupport::TestCase
     AppConfig.stub(:instagram_configured?, true) do
       AppConfig.stub(:facebook_configured?, true) do
         AppConfig.stub(:youtube_configured?, true) do
-          edition = Editions::Approver.new(@candidate, variant: @variant).call
-          by_channel = edition.deliveries.index_by(&:channel)
-          assert_equal "pending", by_channel.fetch("email").status
-          assert_equal "skipped", by_channel.fetch("instagram").status
-          assert_equal "skipped", by_channel.fetch("instagram_reel").status
-          assert_equal "skipped", by_channel.fetch("facebook").status
-          assert_equal "skipped", by_channel.fetch("youtube_short").status
+          AppConfig.stub(:bluesky_configured?, true) do
+            edition = Editions::Approver.new(@candidate, variant: @variant).call
+            by_channel = edition.deliveries.index_by(&:channel)
+            assert_equal "pending", by_channel.fetch("email").status
+            assert_equal "skipped", by_channel.fetch("bluesky").status
+            assert_equal "skipped", by_channel.fetch("instagram").status
+            assert_equal "skipped", by_channel.fetch("instagram_reel").status
+            assert_equal "skipped", by_channel.fetch("facebook").status
+            assert_equal "skipped", by_channel.fetch("youtube_short").status
+          end
         end
       end
     end

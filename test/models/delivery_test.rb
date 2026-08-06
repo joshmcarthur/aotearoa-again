@@ -70,4 +70,24 @@ class DeliveryTest < ActiveSupport::TestCase
       assert_not @edition.deliveries.build(channel: "youtube_short").applicable?
     end
   end
+
+  test "bluesky applicable when configured with commercial use" do
+    AppConfig.stub(:bluesky_configured?, true) do
+      assert @edition.deliveries.build(channel: "bluesky").applicable?
+    end
+  end
+
+  test "bluesky not applicable when not configured" do
+    AppConfig.stub(:bluesky_configured?, false) do
+      assert_not @edition.deliveries.build(channel: "bluesky").applicable?
+    end
+  end
+
+  test "merge_metadata! stores channel-specific keys" do
+    delivery = @edition.deliveries.create!(channel: "bluesky", status: "pending")
+    delivery.merge_metadata!(standard_site_document_uri: "at://doc", standard_site_document_cid: "bafy")
+
+    assert_equal "at://doc", delivery.metadata_get("standard_site_document_uri")
+    assert_equal "bafy", delivery.metadata_get("standard_site_document_cid")
+  end
 end
