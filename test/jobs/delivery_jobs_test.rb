@@ -11,7 +11,6 @@ class DeliveryJobsTest < ActiveJob::TestCase
     DeliverYoutubeShortJob,
     DeliverBlueskyJob
   ].freeze
-  RUN_JOBS = (DELIVERY_JOBS + [ NotifyDeliveryFailureJob ]).freeze
 
   class FakeEmailClient
     attr_reader :calls
@@ -143,7 +142,7 @@ class DeliveryJobsTest < ActiveJob::TestCase
 
   def deliver_all(email:, instagram:, facebook: FakeFacebookClient.new, youtube: FakeYoutubeClient.new, bluesky: FakeBlueskyClient.new)
     stub_clients(email:, instagram:, facebook:, youtube:, bluesky:) do
-      perform_enqueued_jobs only: RUN_JOBS do
+      perform_enqueued_jobs only: DELIVERY_JOBS do
         @edition.deliveries.each(&:enqueue!)
       end
     end
