@@ -33,8 +33,8 @@ class EditionTest < ActiveSupport::TestCase
           edition = Editions::Approver.new(@candidate, variant: @variant).call
           assert_equal "scheduled", edition.state
           assert_equal Time.zone.tomorrow, edition.publish_on
-          assert_equal %w[email facebook instagram instagram_reel web youtube_short], edition.deliveries.order(:channel).pluck(:channel)
-          assert_equal %w[pending pending pending pending pending pending], edition.deliveries.order(:channel).pluck(:status)
+          assert_equal %w[email facebook instagram instagram_reel youtube_short], edition.deliveries.order(:channel).pluck(:channel)
+          assert_equal %w[pending pending pending pending pending], edition.deliveries.order(:channel).pluck(:status)
         end
       end
     end
@@ -52,8 +52,7 @@ class EditionTest < ActiveSupport::TestCase
         AppConfig.stub(:youtube_configured?, false) do
           edition = Editions::Approver.new(@candidate, variant: @variant).call
           by_channel = edition.deliveries.index_by(&:channel)
-          assert_equal %w[email facebook instagram instagram_reel web youtube_short], edition.deliveries.order(:channel).pluck(:channel)
-          assert_equal "pending", by_channel.fetch("web").status
+          assert_equal %w[email facebook instagram instagram_reel youtube_short], edition.deliveries.order(:channel).pluck(:channel)
           assert_equal "pending", by_channel.fetch("email").status
           assert_equal "skipped", by_channel.fetch("instagram").status
           assert_equal "skipped", by_channel.fetch("instagram_reel").status
@@ -71,7 +70,6 @@ class EditionTest < ActiveSupport::TestCase
         AppConfig.stub(:youtube_configured?, true) do
           edition = Editions::Approver.new(@candidate, variant: @variant).call
           by_channel = edition.deliveries.index_by(&:channel)
-          assert_equal "pending", by_channel.fetch("web").status
           assert_equal "pending", by_channel.fetch("email").status
           assert_equal "skipped", by_channel.fetch("instagram").status
           assert_equal "skipped", by_channel.fetch("instagram_reel").status
@@ -152,15 +150,15 @@ class EditionTest < ActiveSupport::TestCase
 
   test "deliveries_terminal? requires all deliveries succeeded, failed, or skipped" do
     edition = Edition.create!(variant: @variant, publish_on: Time.zone.today, state: "scheduled")
-    edition.deliveries.create!(channel: "web", status: "succeeded")
-    edition.deliveries.create!(channel: "email", status: "pending")
+    edition.deliveries.create!(channel: "email", status: "succeeded")
+    edition.deliveries.create!(channel: "instagram", status: "pending")
 
     assert_not edition.deliveries_terminal?
 
-    edition.deliveries.find_by(channel: "email").update!(status: "failed")
+    edition.deliveries.find_by(channel: "instagram").update!(status: "failed")
     assert edition.deliveries_terminal?
 
-    edition.deliveries.create!(channel: "instagram", status: "skipped")
+    edition.deliveries.find_by(channel: "instagram").update!(status: "skipped")
     assert edition.deliveries_terminal?
   end
 

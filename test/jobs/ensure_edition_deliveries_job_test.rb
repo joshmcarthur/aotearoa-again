@@ -30,7 +30,6 @@ class EnsureEditionDeliveriesJobTest < ActiveJob::TestCase
       [ "facebook", "pending" ],
       [ "instagram", "pending" ],
       [ "instagram_reel", "pending" ],
-      [ "web", "pending" ],
       [ "youtube_short", "pending" ]
     ], statuses
   end
@@ -45,7 +44,6 @@ class EnsureEditionDeliveriesJobTest < ActiveJob::TestCase
     end
 
     by_channel = @edition.deliveries.index_by(&:channel)
-    assert_equal "pending", by_channel.fetch("web").status
     assert_equal "pending", by_channel.fetch("email").status
     assert_equal "skipped", by_channel.fetch("instagram").status
     assert_equal "skipped", by_channel.fetch("instagram_reel").status
@@ -54,7 +52,7 @@ class EnsureEditionDeliveriesJobTest < ActiveJob::TestCase
   end
 
   test "does not change existing delivery statuses" do
-    @edition.deliveries.create!(channel: "web", status: "pending")
+    @edition.deliveries.create!(channel: "email", status: "pending")
     @edition.deliveries.create!(channel: "instagram", status: "skipped")
 
     AppConfig.stub(:instagram_configured?, true) do
@@ -66,9 +64,8 @@ class EnsureEditionDeliveriesJobTest < ActiveJob::TestCase
     end
 
     by_channel = @edition.deliveries.reload.index_by(&:channel)
-    assert_equal "pending", by_channel.fetch("web").status
-    assert_equal "skipped", by_channel.fetch("instagram").status
     assert_equal "pending", by_channel.fetch("email").status
+    assert_equal "skipped", by_channel.fetch("instagram").status
     assert_equal "pending", by_channel.fetch("instagram_reel").status
     assert_equal "pending", by_channel.fetch("facebook").status
     assert_equal "pending", by_channel.fetch("youtube_short").status

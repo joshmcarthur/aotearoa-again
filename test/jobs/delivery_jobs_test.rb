@@ -4,13 +4,11 @@ class DeliveryJobsTest < ActiveJob::TestCase
   include ActionMailer::TestHelper
 
   DELIVERY_JOBS = [
-    DeliverWebJob,
     DeliverEmailJob,
     DeliverInstagramJob,
     DeliverInstagramReelJob,
     DeliverFacebookJob,
-    DeliverYoutubeShortJob,
-    FinalizeEditionPublishJob
+    DeliverYoutubeShortJob
   ].freeze
 
   class FakeEmailClient
@@ -96,8 +94,8 @@ class DeliveryJobsTest < ActiveJob::TestCase
     attach_fixture_image(@variant, name: :composite_image)
     attach_fixture_image(@variant, name: :share_image)
     attach_fixture_video(@variant)
-    @edition = Edition.create!(variant: @variant, publish_on: Time.zone.today, state: "scheduled")
-    %w[web email instagram instagram_reel facebook youtube_short].each do |channel|
+    @edition = Edition.create!(variant: @variant, publish_on: Time.zone.today, state: "published")
+    %w[email instagram instagram_reel facebook youtube_short].each do |channel|
       @edition.deliveries.create!(channel: channel, status: "pending")
     end
   end
@@ -120,7 +118,7 @@ class DeliveryJobsTest < ActiveJob::TestCase
     end
   end
 
-  test "delivers each channel idempotently and finalizes publish" do
+  test "delivers each channel idempotently and alerts when deliveries finish" do
     email = FakeEmailClient.new
     instagram = FakeInstagramClient.new
     facebook = FakeFacebookClient.new
@@ -185,15 +183,16 @@ class DeliveryJobsTest < ActiveJob::TestCase
     assert_equal "skipped", @edition.deliveries.find_by(channel: "youtube_short").status
   end
 
-  test "publishes edition when a channel fails after retries and alerts admin" do
+  test "alerts admin when a channel fails after retries" do
     failing = Object.new
     def failing.publish_photo(**) = raise(Instagram::Client::Error, "token expired")
     def failing.publish_reel(**) = "unused"
 
     AppConfig.stub(:instagram_configured?, true) do
       AppConfig.stub(:facebook_configured?, false) do
-        assert_enqueued_emails 1 do
+        assert_emails 1 do
           deliver_all(email: FakeEmailClient.new, instagram: failing)
+          perform_enqueued_jobs only: NotifyDeliveryFailureJob
         end
       end
     end

@@ -88,7 +88,7 @@ If DigitalNZ/ATL request removal:
 
 Harvest is limited to NatLib's Meta-upload-eligible ATL subset (DigitalNZ **Use commercially** + **Modify**). See [natlib-social-media.md](natlib-social-media.md) for caption, people/tikanga, and takedown rules.
 
-Optional Instagram and Facebook Page deliveries via the Meta Graph API. Credentials are optional — when a channel’s credentials are blank, or when the source item lacks DigitalNZ **Use commercially** (`SourceItem#commercial_use?`), `EnsureEditionDeliveriesJob` marks that delivery `skipped` (web + email still publish).
+Optional Instagram and Facebook Page deliveries via the Meta Graph API. Credentials are optional — when a channel’s credentials are blank, or when the source item lacks DigitalNZ **Use commercially** (`SourceItem#commercial_use?`), `EnsureEditionDeliveriesJob` marks that delivery `skipped` (email still delivers).
 
 ### Meta app setup (own account)
 
@@ -96,11 +96,11 @@ Step-by-step: **[meta-setup.md](meta-setup.md)**.
 
 Summary: Professional IG + linked Facebook Page → Meta app (Facebook Login path) → long-lived Page token → store `meta.page_access_token` plus `meta.instagram_user_id` and/or `meta.page_id`. App Review not required for your own account/Page. Tokens last ~60 days; refresh before expiry. Failed Meta deliveries alert via `AdminMailer.delivery_failed`.
 
-`PublishEditionJob` enqueues per-channel delivery jobs (`DeliverWebJob`, `DeliverEmailJob`, `DeliverInstagramJob`, `DeliverInstagramReelJob`, `DeliverFacebookJob`, `DeliverYoutubeShortJob`). Meta jobs post the branded `share_image` to Instagram (two-step container flow) and/or the Facebook Page (`/{page-id}/photos`). When all deliveries reach a terminal state, `FinalizeEditionPublishJob` publishes the edition. Captions include the public edition URL. Email, Instagram, Facebook, Atom enclosures, and `og:image` all use `/editions/:publish_on/share.jpg` (Meta and mail clients cannot use expired signed blob URLs).
+`PublishEditionJob` publishes the edition, then enqueues per-channel delivery jobs (`DeliverEmailJob`, `DeliverInstagramJob`, `DeliverInstagramReelJob`, `DeliverFacebookJob`, `DeliverYoutubeShortJob`). Meta jobs post the branded `share_image` to Instagram (two-step container flow) and/or the Facebook Page (`/{page-id}/photos`). Each failed delivery enqueues `NotifyDeliveryFailureJob` (deduplicated per delivery via Solid Queue concurrency controls). Captions include the public edition URL. Email, Instagram, Facebook, Atom enclosures, and `og:image` all use `/editions/:publish_on/share.jpg` (Meta and mail clients cannot use expired signed blob URLs).
 
 ## YouTube Shorts
 
-Optional YouTube Shorts delivery via the YouTube Data API v3. Credentials are optional — when `youtube.*` is blank, or when the source item lacks DigitalNZ **Use commercially** (`SourceItem#commercial_use?`), `EnsureEditionDeliveriesJob` marks that delivery `skipped` (web + email still publish).
+Optional YouTube Shorts delivery via the YouTube Data API v3. Credentials are optional — when `youtube.*` is blank, or when the source item lacks DigitalNZ **Use commercially** (`SourceItem#commercial_use?`), `EnsureEditionDeliveriesJob` marks that delivery `skipped` (email still delivers).
 
 ### YouTube setup (own channel)
 

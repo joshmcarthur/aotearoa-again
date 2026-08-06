@@ -6,8 +6,9 @@ class AdminMailer < ApplicationMailer
     mail(subject: "[Aotearoa, Again] Approved runway low (#{days} days)")
   end
 
-  def delivery_failed(edition)
-    @edition = edition
-    mail(subject: "[Aotearoa, Again] Delivery failed for #{edition.publish_on}")
+  def delivery_failed(delivery)
+    @delivery = delivery
+    @edition = delivery.edition
+    mail(subject: "[Aotearoa, Again] #{delivery.channel} delivery failed for #{@edition.publish_on}")
   end
 end

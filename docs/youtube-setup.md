@@ -2,7 +2,7 @@
 
 This app posts **YouTube Shorts** via the [YouTube Data API v3](https://developers.google.com/youtube/v3) (`videos.insert` with resumable upload).
 
-YouTube credentials are **optional**. When blank (or when the source item lacks DigitalNZ **Use commercially**), `EnsureEditionDeliveriesJob` marks the `youtube_short` delivery `skipped` (web + email still publish).
+YouTube credentials are **optional**. When blank (or when the source item lacks DigitalNZ **Use commercially**), `EnsureEditionDeliveriesJob` marks the `youtube_short` delivery `skipped` (email still delivers).
 
 | Channel | Required credentials | Extra gate |
 |---|---|---|
@@ -198,8 +198,8 @@ Use `privacyStatus: "unlisted"` for dry-runs; the app publishes as **public**.
 ```bash
 bin/rails runner '
   edition = Edition.find_by!(publish_on: Date.parse("YYYY-MM-DD"))
+  edition.publish! unless edition.state == "published"
   edition.deliveries.where(status: "pending").each { |d| d.job_class.perform_now(edition.id) }
-  FinalizeEditionPublishJob.perform_now(edition.id)
   puts edition.reload.state
   edition.deliveries.order(:channel).each { |d| puts "#{d.channel}: #{d.status} #{d.external_id} #{d.error_message}" }
 '
