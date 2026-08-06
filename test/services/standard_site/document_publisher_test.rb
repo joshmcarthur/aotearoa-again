@@ -44,6 +44,7 @@ module StandardSite
     end
 
     test "creates document record and stores refs in delivery metadata" do
+      ref = nil
       AppConfig.stub(:bluesky_publication_uri, "at://did:plc:test/site.standard.publication/pub1") do
         ref = DocumentPublisher.call(@edition, @delivery, client: @client)
       end

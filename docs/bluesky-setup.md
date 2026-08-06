@@ -1,6 +1,6 @@
 # Bluesky + Standard.site setup
 
-Optional Bluesky delivery posts each edition with a Standard.site-enhanced link card. Credentials are optional — when `bluesky.*` is incomplete, `EnsureEditionDeliveriesJob` marks that delivery `skipped` (web + email still run).
+Optional Bluesky delivery posts each edition with a Standard.site-enhanced link card. Credentials are optional — when `bluesky.*` is incomplete, `EnsureEditionDeliveriesJob` marks that delivery `skipped` (email still delivers).
 
 NatLib rules match Meta: Bluesky delivery requires DigitalNZ **Use commercially** (`SourceItem#commercial_use?`) because the share image is uploaded as an AT Protocol blob.
 
