@@ -1,8 +1,7 @@
 class Delivery < ApplicationRecord
-  CHANNELS = %w[web email instagram instagram_reel facebook youtube_short].freeze
+  CHANNELS = %w[email instagram instagram_reel facebook youtube_short].freeze
   STATUSES = %w[pending succeeded failed skipped].freeze
   JOBS = {
-    "web" => DeliverWebJob,
     "email" => DeliverEmailJob,
     "instagram" => DeliverInstagramJob,
     "instagram_reel" => DeliverInstagramReelJob,
@@ -28,7 +27,7 @@ class Delivery < ApplicationRecord
 
   def applicable?
     case channel
-    when "web", "email"
+    when "email"
       true
     when "instagram", "instagram_reel"
       AppConfig.instagram_configured? && edition.source_item.commercial_use?

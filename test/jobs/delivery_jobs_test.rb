@@ -4,13 +4,11 @@ class DeliveryJobsTest < ActiveJob::TestCase
   include ActionMailer::TestHelper
 
   DELIVERY_JOBS = [
-    DeliverWebJob,
     DeliverEmailJob,
     DeliverInstagramJob,
     DeliverInstagramReelJob,
     DeliverFacebookJob,
-    DeliverYoutubeShortJob,
-    FinalizeEditionPublishJob
+    DeliverYoutubeShortJob
   ].freeze
 
   class FakeEmailClient
@@ -97,7 +95,7 @@ class DeliveryJobsTest < ActiveJob::TestCase
     attach_fixture_image(@variant, name: :share_image)
     attach_fixture_video(@variant)
     @edition = Edition.create!(variant: @variant, publish_on: Time.zone.today, state: "published")
-    %w[web email instagram instagram_reel facebook youtube_short].each do |channel|
+    %w[email instagram instagram_reel facebook youtube_short].each do |channel|
       @edition.deliveries.create!(channel: channel, status: "pending")
     end
   end

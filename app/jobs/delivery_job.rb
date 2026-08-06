@@ -12,7 +12,7 @@ class DeliveryJob < ApplicationJob
     retry_on(*errors, wait: :polynomially_longer, attempts: 5) do |job, error|
       edition_id = job.arguments.first
       Delivery.find_by!(edition_id: edition_id, channel: job.class.channel).fail!(error.message)
-      Publishing::FinalizeEdition.enqueue_if_ready(edition_id)
+      Publishing::NotifyDeliveryFailures.call(edition_id)
     end
   end
 
@@ -33,7 +33,7 @@ class DeliveryJob < ApplicationJob
 
     deliver(edition, delivery)
   ensure
-    Publishing::FinalizeEdition.enqueue_if_ready(edition_id)
+    Publishing::NotifyDeliveryFailures.call(edition_id)
   end
 
   private

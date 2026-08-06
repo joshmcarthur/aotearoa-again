@@ -15,8 +15,7 @@ class DeliveryTest < ActiveSupport::TestCase
     @edition = Edition.create!(variant: @variant, publish_on: Time.zone.today, state: "scheduled")
   end
 
-  test "web and email are always applicable" do
-    assert @edition.deliveries.build(channel: "web").applicable?
+  test "email is always applicable" do
     assert @edition.deliveries.build(channel: "email").applicable?
   end
 

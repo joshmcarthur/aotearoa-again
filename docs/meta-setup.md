@@ -11,7 +11,7 @@ Meta credentials are **optional**. Instagram and Facebook are gated independentl
 | Instagram Reel | same as Instagram photo | DigitalNZ **Use commercially** |
 | Facebook Page | `page_access_token` + `page_id` | DigitalNZ **Use commercially** |
 
-When a channel is not configured (or the item is not commercial-use), `EnsureEditionDeliveriesJob` marks that delivery `skipped` (web + email still publish).
+When a channel is not configured (or the item is not commercial-use), `EnsureEditionDeliveriesJob` marks that delivery `skipped` (email still delivers).
 
 Credentials shape:
 
@@ -188,7 +188,6 @@ bin/rails runner '
   edition = Edition.find_by!(publish_on: Date.parse("YYYY-MM-DD"))
   edition.publish! unless edition.state == "published"
   edition.deliveries.where(status: "pending").each { |d| d.job_class.perform_now(edition.id) }
-  FinalizeEditionPublishJob.perform_now(edition.id)
   puts edition.reload.state
   edition.deliveries.order(:channel).each { |d| puts "#{d.channel}: #{d.status} #{d.external_id} #{d.error_message}" }
 '
