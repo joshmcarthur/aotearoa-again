@@ -10,6 +10,7 @@ class DeliveryJobsTest < ActiveJob::TestCase
     DeliverFacebookJob,
     DeliverYoutubeShortJob
   ].freeze
+  RUN_JOBS = (DELIVERY_JOBS + [ NotifyDeliveryFailureJob ]).freeze
 
   class FakeEmailClient
     attr_reader :calls
@@ -112,7 +113,7 @@ class DeliveryJobsTest < ActiveJob::TestCase
 
   def deliver_all(email:, instagram:, facebook: FakeFacebookClient.new, youtube: FakeYoutubeClient.new)
     stub_clients(email:, instagram:, facebook:, youtube:) do
-      perform_enqueued_jobs only: DELIVERY_JOBS do
+      perform_enqueued_jobs only: RUN_JOBS do
         @edition.deliveries.each(&:enqueue!)
       end
     end
@@ -183,14 +184,14 @@ class DeliveryJobsTest < ActiveJob::TestCase
     assert_equal "skipped", @edition.deliveries.find_by(channel: "youtube_short").status
   end
 
-  test "publishes edition when a channel fails after retries and alerts admin" do
+  test "alerts admin when a channel fails after retries" do
     failing = Object.new
     def failing.publish_photo(**) = raise(Instagram::Client::Error, "token expired")
     def failing.publish_reel(**) = "unused"
 
     AppConfig.stub(:instagram_configured?, true) do
       AppConfig.stub(:facebook_configured?, false) do
-        assert_enqueued_emails 1 do
+        assert_emails 1 do
           deliver_all(email: FakeEmailClient.new, instagram: failing)
         end
       end

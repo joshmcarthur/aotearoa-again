@@ -56,5 +56,7 @@ class Delivery < ApplicationRecord
       error_message: message,
       attempts: attempts + 1
     )
+
+    NotifyDeliveryFailureJob.perform_later(id) if edition.state == "published"
   end
 end

@@ -73,7 +73,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_06_100000) do
   create_table "editions", force: :cascade do |t|
     t.text "admin_note"
     t.datetime "created_at", null: false
-    t.datetime "delivery_alert_sent_at"
     t.date "publish_on", null: false
     t.datetime "published_at"
     t.string "state", default: "scheduled", null: false
