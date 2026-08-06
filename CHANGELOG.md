@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.20.3](https://github.com/joshmcarthur/aotearoa-again/compare/v0.20.2...v0.20.3) (2026-08-06)
+
+
+### Bug Fixes
+
+* Bluesky footer icon and handle ([#107](https://github.com/joshmcarthur/aotearoa-again/issues/107)) ([2084cce](https://github.com/joshmcarthur/aotearoa-again/commit/2084cce780cd7bf321fdd02e265a286d7a49d67d))
+
 ## [0.20.2](https://github.com/joshmcarthur/aotearoa-again/compare/v0.20.1...v0.20.2) (2026-08-06)
 
 
