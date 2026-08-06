@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.20.1](https://github.com/joshmcarthur/aotearoa-again/compare/v0.20.0...v0.20.1) (2026-08-06)
+
+
+### Miscellaneous Chores
+
+* update production Bluesky credentials ([#102](https://github.com/joshmcarthur/aotearoa-again/issues/102)) ([20803ec](https://github.com/joshmcarthur/aotearoa-again/commit/20803ece74edbf990ebf24fb6347a96c3355f137))
+
 ## [0.20.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.19.0...v0.20.0) (2026-08-06)
 
 
