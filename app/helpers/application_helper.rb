@@ -15,7 +15,11 @@ module ApplicationHelper
   end
 
   def social_handle_from_url(url)
-    path = URI.parse(url).path.to_s.delete_prefix("/").split("/").reject(&:blank?).first
+    uri = URI.parse(url)
+    segments = uri.path.to_s.delete_prefix("/").split("/").reject(&:blank?)
+    # Bluesky profile URLs are /profile/<handle>, not /<handle>.
+    segments = segments.drop(1) if segments.first == "profile" && uri.host&.include?("bsky.app")
+    path = segments.first
     return if path.blank?
 
     path.start_with?("@") ? path : "@#{path}"
@@ -23,3 +27,4 @@ module ApplicationHelper
     nil
   end
 end
+
