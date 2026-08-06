@@ -15,4 +15,3 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_nil social_handle_from_url("not a url")
   end
 end
-
