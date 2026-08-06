@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.20.2](https://github.com/joshmcarthur/aotearoa-again/compare/v0.20.1...v0.20.2) (2026-08-06)
+
+
+### Bug Fixes
+
+* rename RemoveWebDeliveries migration to match class ([#105](https://github.com/joshmcarthur/aotearoa-again/issues/105)) ([2c4610c](https://github.com/joshmcarthur/aotearoa-again/commit/2c4610c147f6adaa9831fc8becbe0638fc5d3501))
+
 ## [0.20.1](https://github.com/joshmcarthur/aotearoa-again/compare/v0.20.0...v0.20.1) (2026-08-06)
 
 
