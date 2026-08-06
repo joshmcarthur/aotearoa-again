@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.20.4](https://github.com/joshmcarthur/aotearoa-again/compare/v0.20.3...v0.20.4) (2026-08-07)
+
+
+### Bug Fixes
+
+* correct production app host and Bluesky publication refs ([#109](https://github.com/joshmcarthur/aotearoa-again/issues/109)) ([e7ec6f3](https://github.com/joshmcarthur/aotearoa-again/commit/e7ec6f3fc5f11c69fb0c34032aaf370cb7e32dad))
+
 ## [0.20.3](https://github.com/joshmcarthur/aotearoa-again/compare/v0.20.2...v0.20.3) (2026-08-06)
 
 
