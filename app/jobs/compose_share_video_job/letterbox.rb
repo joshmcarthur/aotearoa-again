@@ -3,8 +3,7 @@ class ComposeShareVideoJob
   class Letterbox
     Layout = Data.define(:stage_w, :stage_h, :stage_x, :top_bar_h, :bottom_bar_h)
 
-    def initialize(frame_width:, frame_height:, min_top:, min_bottom:, stage_inset_left: 0)
-      @frame_width = frame_width
+    def initialize(frame_height:, min_top:, min_bottom:, stage_inset_left: 0)
       @frame_height = frame_height
       @min_top = min_top
       @min_bottom = min_bottom

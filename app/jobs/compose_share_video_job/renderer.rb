@@ -1,26 +1,25 @@
 require "tmpdir"
 require "vips"
 
-ENV["PANGOCAIRO_BACKEND"] ||= "fontconfig"
-
 class ComposeShareVideoJob
-  # 9:16 short: full-bleed B&W → compare wipe → colour hold → letterbox + caption.
+  # 9:16 short: full-bleed B&W → letterbox + metadata → compare wipe on the card.
   class Renderer
     class Error < StandardError; end
 
     WIDTH = SafeAreas::FRAME_WIDTH
     HEIGHT = SafeAreas::FRAME_HEIGHT
+    BACKDROP_BLUR = 28
+    BACKDROP_DARKEN = 0.57
 
     # ~8s total: short enough for Reels/Shorts completion, long enough for wipe + chrome.
     DEFAULTS = {
       fps: 30,
-      hold_bw_s: 0.6,
-      wipe_s: 1.8,
-      hold_colour_s: 2.2,
+      hold_bw_s: 0.8,
       letterbox_s: 1.2,
-      hold_end_s: 2.2,
+      wipe_s: 2.0,
+      hold_end_s: 4.0,
       caption_fade_s: 0.65,
-      caption_lead_s: 0.45
+      caption_lead_s: 0.65
     }.freeze
 
     def self.from_edition(edition, out_path:, **opts)
@@ -76,6 +75,11 @@ class ComposeShareVideoJob
       raise Error, e.message
     end
 
+    def preview_frame(layout_p:, wipe_p:, chrome_opacity:)
+      prepare_stage!
+      compose_frame(layout_p, wipe_p, chrome_opacity)
+    end
+
     private
 
     def validate!
@@ -96,7 +100,6 @@ class ComposeShareVideoJob
 
       stage = @plates.fit_stage(SafeAreas.stage_max_height)
       @layout = Letterbox.new(
-        frame_width: WIDTH,
         frame_height: HEIGHT,
         min_top: SafeAreas::MIN_TOP_BAR,
         min_bottom: SafeAreas::MIN_BOTTOM_BAR,
@@ -112,6 +115,11 @@ class ComposeShareVideoJob
         edition_label: @edition_label,
         meta_rows: @meta_rows
       )
+
+      @bleed_bw = @plates.cover_crop(@plates.bw, WIDTH, HEIGHT).copy_memory
+      @bleed_colour = @plates.cover_crop(@plates.colour, WIDTH, HEIGHT).copy_memory
+      @blurred_bw = @bleed_bw.gaussblur(BACKDROP_BLUR).copy_memory
+      @blurred_colour = @bleed_colour.gaussblur(BACKDROP_BLUR).copy_memory
     end
 
     def write_frames(frame_dir)
@@ -129,39 +137,76 @@ class ComposeShareVideoJob
     end
 
     def compose_frame(layout_p, wipe_p, chrome_opacity)
-      dest_w = Timeline.lerp(WIDTH, @layout.stage_w, layout_p).round.clamp(@layout.stage_w, WIDTH)
-      dest_h = Timeline.lerp(HEIGHT, @layout.stage_h, layout_p).round.clamp(@layout.stage_h, HEIGHT)
-      dest_x = Timeline.lerp(0, @layout.stage_x, layout_p).round
-      dest_y = Timeline.lerp(0, @layout.top_bar_h, layout_p).round
+      if layout_p > 0.001
+        dest_w = Timeline.lerp(WIDTH, @layout.stage_w, layout_p).round.clamp(@layout.stage_w, WIDTH)
+        dest_h = Timeline.lerp(HEIGHT, @layout.stage_h, layout_p).round.clamp(@layout.stage_h, HEIGHT)
+        dest_x = Timeline.lerp(0, @layout.stage_x, layout_p).round
+        dest_y = Timeline.lerp(0, @layout.top_bar_h, layout_p).round
+        card = ComposeShareImageJob::CompareHandle.apply(
+          wiped_plate(dest_w, dest_h, wipe_p),
+          progress: wipe_p
+        )
+        canvas = letterbox_backdrop(wipe_p, layout_p).composite(card, :over, x: dest_x, y: dest_y)
+      else
+        canvas = wiped_bleed(wipe_p)
+      end
 
-      bw = @plates.cover_crop(@plates.bw, dest_w, dest_h)
-      colour = @plates.cover_crop(@plates.colour, dest_w, dest_h)
-      plate =
-        if wipe_p <= 0.001
-          bw
-        elsif wipe_p >= 0.999
-          colour
-        else
-          ComposeShareImageJob::VerticalWipe.apply(
-            bw,
-            colour,
-            dest_w,
-            dest_h,
-            position: ComposeShareImageJob::VerticalWipe.position_for(wipe_p)
-          )
-        end
-
-      canvas = solid(WIDTH, HEIGHT, Chrome::BAR_RGB).composite(plate, :over, x: dest_x, y: dest_y)
       return canvas if chrome_opacity <= 0.001
 
+      canvas = canvas.composite(@chrome.scrim(chrome_opacity), :over, x: 0, y: 0)
       overlay = chrome_opacity < 0.999 ? @chrome.apply_opacity(@chrome.overlay, chrome_opacity) : @chrome.overlay
       canvas.composite(overlay, :over, x: 0, y: 0)
     end
 
-    def solid(width, height, rgb)
-      Vips::Image.black(width, height, bands: 3)
-        .new_from_image(rgb)
-        .copy(interpretation: :srgb)
+    def letterbox_backdrop(wipe_p, layout_p)
+      sharp = mix_images(@bleed_bw, @bleed_colour, wipe_p)
+      blurred = mix_images(@blurred_bw, @blurred_colour, wipe_p)
+      darken(mix_images(sharp, blurred, layout_p), BACKDROP_DARKEN * layout_p)
+    end
+
+    def wiped_bleed(wipe_p)
+      mix_images(@bleed_bw, @bleed_colour, wipe_p)
+    end
+
+    def wiped_plate(width, height, wipe_p)
+      wipe_pair(
+        @plates.cover_crop(@plates.bw, width, height),
+        @plates.cover_crop(@plates.colour, width, height),
+        width,
+        height,
+        wipe_p
+      )
+    end
+
+    def wipe_pair(bw, colour, width, height, wipe_p)
+      if wipe_p <= 0.001
+        bw
+      elsif wipe_p >= 0.999
+        colour
+      else
+        ComposeShareImageJob::VerticalWipe.apply(
+          bw,
+          colour,
+          width,
+          height,
+          position: ComposeShareImageJob::VerticalWipe.position_for(wipe_p)
+        )
+      end
+    end
+
+    def mix_images(from, to, t)
+      t = t.to_f.clamp(0.0, 1.0)
+      return from if t <= 0.001
+      return to if t >= 0.999
+
+      ((from.cast(:float) * (1.0 - t)) + (to.cast(:float) * t)).cast(:uchar).copy(interpretation: :srgb)
+    end
+
+    def darken(image, amount)
+      amount = amount.to_f.clamp(0.0, 1.0)
+      return image if amount <= 0.001
+
+      ((image.cast(:float) * (1.0 - amount))).cast(:uchar).copy(interpretation: :srgb)
     end
   end
 end

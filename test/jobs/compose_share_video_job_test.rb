@@ -37,9 +37,8 @@ class ComposeShareVideoJobTest < ActiveJob::TestCase
       @variant.id,
       fps: 10,
       hold_bw_s: 0.05,
-      wipe_s: 0.1,
-      hold_colour_s: 0.05,
       letterbox_s: 0.1,
+      wipe_s: 0.1,
       hold_end_s: 0.1
     )
     assert @variant.reload.share_video.attached?
