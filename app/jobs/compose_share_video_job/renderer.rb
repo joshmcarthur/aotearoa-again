@@ -4,19 +4,21 @@ require "vips"
 ENV["PANGOCAIRO_BACKEND"] ||= "fontconfig"
 
 class ComposeShareVideoJob
-  # 9:16 short: full-bleed B&W detail → zoom out + soft diagonal wipe → letterbox + caption.
+  # 9:16 short: full-bleed B&W → compare wipe → colour hold → letterbox + caption.
   class Renderer
     class Error < StandardError; end
 
     WIDTH = SafeAreas::FRAME_WIDTH
     HEIGHT = SafeAreas::FRAME_HEIGHT
 
-    # ~8s total: short enough for Reels/Shorts completion, long enough for the wipe + chrome.
+    # ~8s total: short enough for Reels/Shorts completion, long enough for wipe + chrome.
     DEFAULTS = {
       fps: 30,
-      hold_start_s: 1.0,
-      motion_s: 3.5,
-      hold_end_s: 3.5,
+      hold_bw_s: 0.6,
+      wipe_s: 1.8,
+      hold_colour_s: 2.2,
+      letterbox_s: 1.2,
+      hold_end_s: 2.2,
       caption_fade_s: 0.65,
       caption_lead_s: 0.45
     }.freeze
@@ -114,51 +116,40 @@ class ComposeShareVideoJob
 
     def write_frames(frame_dir)
       fps = @opts[:fps].to_f
-      hold_start_s = @opts[:hold_start_s].to_f
-      motion_s = @opts[:motion_s].to_f
-      hold_end_s = @opts[:hold_end_s].to_f
-      caption_fade_s = @opts[:caption_fade_s].to_f
-      caption_lead_s = @opts[:caption_lead_s].to_f
-
-      t_hold_start_end = hold_start_s
-      t_motion_end = t_hold_start_end + motion_s
-      t_caption_start = [ t_motion_end - caption_lead_s, t_hold_start_end ].max
-      t_end = t_motion_end + hold_end_s
-
-      feather = ComposeShareImageJob::DiagonalBlend::FEATHER
-      center_bw = ComposeShareImageJob::DiagonalBlend.full_bw_center(feather: feather)
-      center_colour = ComposeShareImageJob::DiagonalBlend.full_colour_center(feather: feather)
+      schedule = Timeline.schedule_for(@opts)
+      t_end = schedule.end
 
       total_frames = (t_end * fps).round
       total_frames.times do |i|
-        layout_p, wipe_p, chrome_opacity = Timeline.sample_at(
-          i / fps,
-          t_hold_start_end:,
-          t_motion_end:,
-          t_caption_start:,
-          caption_fade_s:,
-          center_bw:,
-          center_colour:
-        )
+        layout_p, wipe_p, chrome_opacity = Timeline.sample_at(i / fps, schedule)
         compose_frame(layout_p, wipe_p, chrome_opacity)
           .jpegsave(frame_dir.join(format("frame_%05d.jpg", i)).to_s, Q: 88)
       end
       total_frames
     end
 
-    def compose_frame(layout_p, wipe_center, chrome_opacity)
+    def compose_frame(layout_p, wipe_p, chrome_opacity)
       dest_w = Timeline.lerp(WIDTH, @layout.stage_w, layout_p).round.clamp(@layout.stage_w, WIDTH)
       dest_h = Timeline.lerp(HEIGHT, @layout.stage_h, layout_p).round.clamp(@layout.stage_h, HEIGHT)
       dest_x = Timeline.lerp(0, @layout.stage_x, layout_p).round
       dest_y = Timeline.lerp(0, @layout.top_bar_h, layout_p).round
 
-      plate = ComposeShareImageJob::DiagonalBlend.apply(
-        @plates.cover_crop(@plates.bw, dest_w, dest_h),
-        @plates.cover_crop(@plates.colour, dest_w, dest_h),
-        dest_w,
-        dest_h,
-        center: wipe_center
-      )
+      bw = @plates.cover_crop(@plates.bw, dest_w, dest_h)
+      colour = @plates.cover_crop(@plates.colour, dest_w, dest_h)
+      plate =
+        if wipe_p <= 0.001
+          bw
+        elsif wipe_p >= 0.999
+          colour
+        else
+          ComposeShareImageJob::VerticalWipe.apply(
+            bw,
+            colour,
+            dest_w,
+            dest_h,
+            position: ComposeShareImageJob::VerticalWipe.position_for(wipe_p)
+          )
+        end
 
       canvas = solid(WIDTH, HEIGHT, Chrome::BAR_RGB).composite(plate, :over, x: dest_x, y: dest_y)
       return canvas if chrome_opacity <= 0.001

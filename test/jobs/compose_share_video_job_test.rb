@@ -36,9 +36,11 @@ class ComposeShareVideoJobTest < ActiveJob::TestCase
     ComposeShareVideoJob.perform_now(
       @variant.id,
       fps: 10,
-      hold_start_s: 0.2,
-      motion_s: 0.3,
-      hold_end_s: 0.2
+      hold_bw_s: 0.05,
+      wipe_s: 0.1,
+      hold_colour_s: 0.05,
+      letterbox_s: 0.1,
+      hold_end_s: 0.1
     )
     assert @variant.reload.share_video.attached?
     assert_equal "video/mp4", @variant.share_video.content_type

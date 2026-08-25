@@ -27,9 +27,11 @@ class ComposeShareVideoJob
             MetaRows::Row.new(text: Edition::Copy::AI_NOTICE, primary: false)
           ],
           fps: 10,
-          hold_start_s: 0.2,
-          motion_s: 0.4,
-          hold_end_s: 0.3
+          hold_bw_s: 0.1,
+          wipe_s: 0.2,
+          hold_colour_s: 0.1,
+          letterbox_s: 0.2,
+          hold_end_s: 0.2
         ).call
 
         assert_equal out, result
