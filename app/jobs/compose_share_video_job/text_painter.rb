@@ -12,10 +12,6 @@ class ComposeShareVideoJob
     BODY_FONT_PATH = Rails.root.join("app/assets/fonts/SourceSans3-Regular.ttf")
     BODY_FONT_NAME = "Source Sans 3"
 
-    def self.paint(string, width:, font_height:, height: nil, rgb: TEXT_RGB, style: :display, spacing: nil)
-      new.paint(string, width:, font_height:, height:, rgb:, style:, spacing:)
-    end
-
     def paint(string, width:, font_height:, height: nil, rgb: TEXT_RGB, style: :display, spacing: nil)
       font_name, font_path = font_for(style)
       opts = {

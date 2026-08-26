@@ -8,9 +8,11 @@ class ComposeShareVideoJob
     end
 
     test "minimum bars leave room for platform chrome" do
-      assert_operator SafeAreas::MIN_TOP_BAR, :>=, 220
+      assert_operator SafeAreas::PLATFORM_TOP_RESERVE, :>=, 250
+      assert_operator SafeAreas::MIN_TOP_BAR, :>=, SafeAreas::PLATFORM_TOP_RESERVE + 120
       assert_operator SafeAreas::MIN_BOTTOM_BAR, :>=, 360
       assert_operator SafeAreas::PLATFORM_BOTTOM_RESERVE, :>=, 120
+      assert_operator SafeAreas::PADDING_X, :>=, 56
     end
 
     test "caption bottom limit sits above platform reserve" do
@@ -23,7 +25,6 @@ class ComposeShareVideoJob
     test "layout_for keeps minimum bars and right inset" do
       stage = Data.define(:width, :height).new(width: 968, height: 720)
       layout = Letterbox.new(
-        frame_width: SafeAreas::FRAME_WIDTH,
         frame_height: SafeAreas::FRAME_HEIGHT,
         min_top: SafeAreas::MIN_TOP_BAR,
         min_bottom: SafeAreas::MIN_BOTTOM_BAR,
@@ -36,6 +37,35 @@ class ComposeShareVideoJob
       assert_operator layout.top_bar_h, :>=, SafeAreas::MIN_TOP_BAR
       assert_operator layout.bottom_bar_h, :>=, SafeAreas::MIN_BOTTOM_BAR
       assert_equal SafeAreas::FRAME_HEIGHT, layout.top_bar_h + layout.stage_h + layout.bottom_bar_h
+    end
+  end
+
+  class ChromeTest < ActiveSupport::TestCase
+    test "brand and edition sit below the Reels top overlay" do
+      overlay = Chrome.new(
+        width: SafeAreas::FRAME_WIDTH,
+        height: SafeAreas::FRAME_HEIGHT,
+        top_bar_h: SafeAreas::MIN_TOP_BAR,
+        bottom_bar_h: SafeAreas::MIN_BOTTOM_BAR,
+        title: "Title",
+        edition_label: "EDITION · JULY 19, 2026",
+        meta_rows: []
+      ).overlay
+      alpha = overlay.extract_band(3)
+
+      reserved = alpha.crop(0, 0, overlay.width, SafeAreas::PLATFORM_TOP_RESERVE)
+      assert_equal 0, reserved.max
+
+      left_gutter = alpha.crop(0, SafeAreas::PLATFORM_TOP_RESERVE, SafeAreas::PADDING_X, 120)
+      assert_equal 0, left_gutter.max
+
+      brand_band = alpha.crop(
+        SafeAreas::PADDING_X,
+        SafeAreas::PLATFORM_TOP_RESERVE,
+        480,
+        120
+      )
+      assert_operator brand_band.max, :>, 0
     end
   end
 end

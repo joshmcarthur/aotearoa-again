@@ -3,9 +3,9 @@ require "vips"
 class ComposeShareVideoJob
   # Letterbox bar typography (brand, edition label, plate title, NatLib meta).
   class Chrome
-    BAR_RGB = [ 28, 25, 20 ].freeze
     MUTED_RGB = [ 168, 162, 150 ].freeze
     EMBER_RGB = [ 184, 106, 74 ].freeze
+    SCRIM_STRENGTH = 0.32
 
     BRAND_FONT_SIZE = 51
     EDITION_DATE_FONT_SIZE = 30
@@ -38,12 +38,46 @@ class ComposeShareVideoJob
       rgb.bandjoin(alpha)
     end
 
+    def scrim(opacity)
+      @scrim_base ||= build_scrim.copy_memory
+      opacity = opacity.to_f.clamp(0.0, 1.0)
+      opacity >= 0.999 ? @scrim_base : apply_opacity(@scrim_base, opacity)
+    end
+
     private
 
     def build_overlay
       overlay = transparent_canvas
       overlay = composite_top_bar(overlay)
       composite_bottom_caption(overlay)
+    end
+
+    def build_scrim
+      overlay = transparent_canvas
+      overlay = overlay.composite(bar_scrim(@top_bar_h, from_top: true), :over, x: 0, y: 0)
+      overlay.composite(
+        bar_scrim(@bottom_bar_h, from_top: false),
+        :over,
+        x: 0,
+        y: @height - @bottom_bar_h
+      )
+    end
+
+    def bar_scrim(height, from_top:)
+      alphas = Array.new(height) do |row|
+        t = height == 1 ? 1.0 : (from_top ? row.to_f / (height - 1) : 1.0 - (row.to_f / (height - 1)))
+        (ComposeShareImageJob::BrandChip.interpolate_opacity(t) * SCRIM_STRENGTH * 255).round.clamp(0, 255)
+      end
+
+      alpha_col = Vips::Image.new_from_array(alphas.map { |a| [ a ] })
+        .cast(:uchar)
+        .copy(interpretation: :"b-w")
+      alpha = alpha_col.embed(0, 0, @width, height, extend: :copy)
+
+      Vips::Image.black(@width, height, bands: 3)
+        .new_from_image(ComposeShareImageJob::BrandChip::SCRIM_RGB)
+        .copy(interpretation: :srgb)
+        .bandjoin(alpha)
     end
 
     def transparent_canvas
@@ -65,11 +99,17 @@ class ComposeShareVideoJob
       edition = edition_label_image(max_w)
 
       stack_h = brand.height + (edition ? edition.height + 8 : 0)
-      brand_y = ((@top_bar_h - stack_h) / 2.0).round.clamp(0, @top_bar_h)
+      brand_y = top_brand_y(stack_h)
       overlay = overlay.composite(brand, :over, x: PADDING_X, y: brand_y)
       return overlay unless edition
 
       overlay.composite(edition, :over, x: PADDING_X, y: brand_y + brand.height + 8)
+    end
+
+    def top_brand_y(stack_h)
+      safe_top = SafeAreas::PLATFORM_TOP_RESERVE
+      extra = [ @top_bar_h - safe_top - stack_h, 0 ].max
+      (safe_top + (extra / 2.0)).round
     end
 
     def edition_label_image(max_w)
@@ -90,11 +130,11 @@ class ComposeShareVideoJob
       caption_limit = SafeAreas.caption_bottom_limit(frame_height: @height)
       secondary_line_box = (META_SECONDARY_FONT_SIZE * META_LINE_HEIGHT).round
 
-      overlay, y = composite_title(overlay, y, max_w, secondary_line_box, caption_limit)
+      overlay, y = composite_title(overlay, y, max_w, secondary_line_box)
       composite_meta_rows(overlay, y, max_w, caption_limit)
     end
 
-    def composite_title(overlay, y, max_w, secondary_line_box, caption_limit)
+    def composite_title(overlay, y, max_w, secondary_line_box)
       return [ overlay, y ] if @title.blank?
 
       title_line_box = (TITLE_FONT_SIZE * TITLE_LINE_HEIGHT).round

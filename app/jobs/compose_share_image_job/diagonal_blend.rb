@@ -1,7 +1,7 @@
 require "vips"
 
 class ComposeShareImageJob
-  # Soft diagonal B&W → colour blend for still share images (and share video wipe).
+  # Soft diagonal B&W → colour blend for still share images.
   # +center+ is the midpoint of the feathered band along t = (x + y) / 2
   # (0 top-left … 1 bottom-right). Raise center toward 1+feather for more B&W;
   # lower toward 0−feather for more colour.
