@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.21.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.20.4...v0.21.0) (2026-08-28)
+
+
+### Features
+
+* **share-video:** run the compare wipe on a frosted letterboxed card ([#117](https://github.com/joshmcarthur/aotearoa-again/issues/117)) ([e130f3f](https://github.com/joshmcarthur/aotearoa-again/commit/e130f3fa34cd32341b135745c2376ed39ba9b070))
+
 ## [0.20.4](https://github.com/joshmcarthur/aotearoa-again/compare/v0.20.3...v0.20.4) (2026-08-07)
 
 
