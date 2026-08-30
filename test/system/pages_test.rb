@@ -5,6 +5,6 @@ class PagesTest < ApplicationSystemTestCase
     visit about_path
 
     assert_text "About"
-    assert_text "Colours are interpretive"
+    assert_text "Images are interpretive"
   end
 end

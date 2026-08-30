@@ -21,7 +21,7 @@ Out of copyright / appropriate CC material may also be composited and uploaded w
 When uploading transformed files to Instagram, acknowledge:
 
 - Source image (partner, creator, rights, record URL, via DigitalNZ)
-- Modifications made (AI colourisation; interpretive colours; branded share treatment)
+- Modifications made (AI colourisation; interpretive images; branded share treatment)
 
 ## People and tikanga
 
