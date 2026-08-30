@@ -1,6 +1,6 @@
 class Edition
   class Copy
-    AI_NOTICE = "AI colourised — colours are interpretive.".freeze
+    AI_NOTICE = "AI colourised — images are interpretive.".freeze
     INSTAGRAM_CAPTION_LIMIT = 2200
     YOUTUBE_DESCRIPTION_LIMIT = 5000
     BLUESKY_TEXT_LIMIT = 300

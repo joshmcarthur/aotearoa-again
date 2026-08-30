@@ -5,7 +5,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     get about_url
     assert_response :success
     assert_match "About", response.body
-    assert_match "Colours are interpretive", response.body
+    assert_match "Images are interpretive", response.body
     assert_match "Alexander Turnbull Library", response.body
   end
 
