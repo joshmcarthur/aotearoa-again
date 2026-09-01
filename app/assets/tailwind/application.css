@@ -48,7 +48,11 @@
   }
 
   .aa-nav {
-    @apply flex gap-4 text-sm font-semibold uppercase tracking-wide;
+    @apply flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-semibold uppercase tracking-wide;
+  }
+
+  .aa-nav-social {
+    @apply inline-flex flex-wrap items-center gap-3 max-sm:basis-full;
   }
 
   .aa-nav a {
