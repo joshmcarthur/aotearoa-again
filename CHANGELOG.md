@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.21.1](https://github.com/joshmcarthur/aotearoa-again/compare/v0.21.0...v0.21.1) (2026-09-01)
+
+
+### Bug Fixes
+
+* Change interpretive wording from colours to images ([#122](https://github.com/joshmcarthur/aotearoa-again/issues/122)) ([376b05d](https://github.com/joshmcarthur/aotearoa-again/commit/376b05d197267260b52304da3546ca535e330669))
+* Fix mobile header social icon overflow ([#123](https://github.com/joshmcarthur/aotearoa-again/issues/123)) ([dddbc7c](https://github.com/joshmcarthur/aotearoa-again/commit/dddbc7c050c40e66170c1cf441d50e57ceb41b1c))
+
 ## [0.21.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.20.4...v0.21.0) (2026-08-28)
 
 
