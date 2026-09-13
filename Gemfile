@@ -38,7 +38,7 @@ gem "thruster", require: false
 gem "foreman", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-gem "image_processing", "~> 2.0"
+gem "image_processing", "~> 2.1"
 # Soft dependency of image_processing 2.x; required for share image composition (`require "vips"`)
 gem "ruby-vips", "~> 2.2", require: false
 
