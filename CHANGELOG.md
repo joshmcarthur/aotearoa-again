@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.21.2](https://github.com/joshmcarthur/aotearoa-again/compare/v0.21.1...v0.21.2) (2026-09-13)
+
+
+### Bug Fixes
+
+* Rotate to non-expiring OpenRouter key. Limit by spend instead ([#131](https://github.com/joshmcarthur/aotearoa-again/issues/131)) ([40671c4](https://github.com/joshmcarthur/aotearoa-again/commit/40671c4d6ae96a940e46b2fae8fb869cfeff9208))
+
 ## [0.21.1](https://github.com/joshmcarthur/aotearoa-again/compare/v0.21.0...v0.21.1) (2026-09-01)
 
 
