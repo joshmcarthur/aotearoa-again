@@ -2,4 +2,8 @@
 # CVEs that are not relevant to the application can be enumerated on the ignore list below.
 
 ignore:
-  - CVE-THAT-DOES-NOT-APPLY
+  # ReDoS in tool/agent name underscoring, documented against Ruby 3.1.x.
+  # This app runs 3.4.9 and only calls RubyLLM.paint with our own prompts/models —
+  # no untrusted class, agent, or tool names. No 1.x patch exists; the advisory's
+  # ">= 2.0.0.rc1" is a major prerelease with breaking API changes.
+  - CVE-2026-67991
