@@ -15,6 +15,9 @@ Rails.application.routes.draw do
   namespace :admin do
     root to: "candidates#index"
     resources :candidates, only: %i[index show] do
+      collection do
+        post :harvest
+      end
       member do
         post :approve
         post :reject
