@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.22.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.21.2...v0.22.0) (2026-09-19)
+
+
+### Features
+
+* add admin button to queue harvest job ([#135](https://github.com/joshmcarthur/aotearoa-again/issues/135)) ([1c13a31](https://github.com/joshmcarthur/aotearoa-again/commit/1c13a313e5578ec7466160e9f0a82d31ef6963c1))
+
 ## [0.21.2](https://github.com/joshmcarthur/aotearoa-again/compare/v0.21.1...v0.21.2) (2026-09-13)
 
 
