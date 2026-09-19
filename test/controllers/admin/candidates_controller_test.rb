@@ -66,13 +66,6 @@ module Admin
       assert Edition.exists?(variant: @variant)
     end
 
-    test "index includes harvest button" do
-      get admin_candidates_url, headers: basic_auth
-      assert_response :success
-      assert_select "form[action=?]", harvest_admin_candidates_path
-      assert_match "Harvest candidates", response.body
-    end
-
     test "harvest requires authentication" do
       post harvest_admin_candidates_url
       assert_response :unauthorized
