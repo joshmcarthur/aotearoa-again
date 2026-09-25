@@ -18,9 +18,9 @@ bin/dev
 Environment-specific credentials live in `config/credentials/<env>.yml.enc`.
 Edit with `bin/rails credentials:edit --environment <env>`.
 
-- Public site: http://localhost:3000
-- Admin: http://localhost:3000/admin (HTTP Basic from credentials)
-- Feed: http://localhost:3000/feed.xml
+- Public site: http://localhost:3000  
+- Admin: http://localhost:3000/admin (HTTP Basic from credentials)  
+- Feed: http://localhost:3000/feed.xml  
 
 See `config/initializers/app_config.rb` for the credentials shape.
 
@@ -32,13 +32,13 @@ Share video (9:16 shorts) needs **ffmpeg** on `PATH` in addition to libvips. The
 
 ## Pipeline
 
-1. `HarvestCandidatesJob` — DigitalNZ ATL images with Modify + Use commercially
-2. `ColouriseCandidateJob` — RubyLLM.paint (OpenRouter images API, `with:` the plate) via preferred `Model` rows
-3. Admin approve → schedule `Edition`
-4. `PublishEditionJob` (07:00 NZ) publishes the edition, then enqueues per-channel delivery jobs (Buttondown, Instagram, Facebook, YouTube Shorts, Bluesky)
+1. `HarvestCandidatesJob` — DigitalNZ ATL images with Modify + Use commercially  
+2. `ColouriseCandidateJob` — RubyLLM.paint via preferred `Model` rows  
+3. Admin approve → schedule `Edition`  
+4. `PublishEditionJob` (07:00 NZ) publishes the edition, then enqueues per-channel delivery jobs (Buttondown, Instagram, Facebook, YouTube Shorts, Bluesky)  
 
-See [docs/deploy.md](docs/deploy.md) for home hosting + Cloudflare Tunnel.
-See [docs/natlib-social-media.md](docs/natlib-social-media.md) for NatLib social media rules.
-See [docs/meta-setup.md](docs/meta-setup.md) for Meta Graph API setup (Instagram + Facebook Page).
-See [docs/youtube-setup.md](docs/youtube-setup.md) for YouTube Data API setup (Shorts).
+See [docs/deploy.md](docs/deploy.md) for home hosting + Cloudflare Tunnel.  
+See [docs/natlib-social-media.md](docs/natlib-social-media.md) for NatLib social media rules.  
+See [docs/meta-setup.md](docs/meta-setup.md) for Meta Graph API setup (Instagram + Facebook Page).  
+See [docs/youtube-setup.md](docs/youtube-setup.md) for YouTube Data API setup (Shorts).  
 See [docs/bluesky-setup.md](docs/bluesky-setup.md) for Bluesky + Standard.site setup.
