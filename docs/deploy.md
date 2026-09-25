@@ -50,7 +50,7 @@ Files:
 | `app.host` | Public hostname (no protocol), e.g. `aotearoa-again.example` |
 | `smtp.*` | Optional SMTP for admin alerts |
 
-Colourise model choice lives in the DB (`models.preferred_for_colourise`). After boot:
+Colourise model choice lives in the DB (`ruby_llm_models.preferred_for_colourise`). After boot:
 
 ```bash
 bin/rails ruby_llm:load_models

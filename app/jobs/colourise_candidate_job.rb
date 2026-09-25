@@ -21,7 +21,8 @@ class ColouriseCandidateJob < ApplicationJob
       result = colouriser.call(attachment: candidate.original_image, model: model)
       variant = candidate.variants.create!(
         model: result[:model],
-        prompt: result[:prompt]
+        prompt: result[:prompt],
+        colourise_usage: result[:usage] || {}
       )
       variant.colourised_image.attach(
         io: result[:io],

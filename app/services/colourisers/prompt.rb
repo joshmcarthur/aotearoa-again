@@ -4,10 +4,8 @@ module Colourisers
       Colourise this historical black-and-white photograph with historically
       plausible colours. Preserve the exact composition, geometry, faces, clothing
       details, and scene content. Do not invent major objects, people, text, or
-      modern elements. Keep lighting natural to the era. Avoid watermarks, logos,
-      borders, or overlaid captions.
+      modern elements. Keep lighting natural to the era. Do not add text overlay,
+      watermarks, logos, borders, modern clothing, anachronisms, or invented objects.
     PROMPT
-
-    NEGATIVE = "text overlay, watermark, logo, border, modern clothing, anachronism, invented objects".freeze
   end
 end
