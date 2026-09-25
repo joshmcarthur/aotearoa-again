@@ -7,7 +7,5 @@ module Colourisers
       modern elements. Keep lighting natural to the era. Avoid watermarks, logos,
       borders, or overlaid captions.
     PROMPT
-
-    NEGATIVE = "text overlay, watermark, logo, border, modern clothing, anachronism, invented objects".freeze
   end
 end

@@ -8,7 +8,8 @@ class ColouriseCandidateJobTest < ActiveJob::TestCase
         prompt: Colourisers::Prompt::TEXT,
         io: StringIO.new(File.binread(Rails.root.join("test/fixtures/files/mono_plate.jpg"))),
         filename: "colourised.jpg",
-        content_type: "image/jpeg"
+        content_type: "image/jpeg",
+        usage: { "input_tokens" => 3, "output_tokens" => 9, "cost" => 0.01 }
       }
     end
   end
@@ -36,6 +37,10 @@ class ColouriseCandidateJobTest < ActiveJob::TestCase
     @candidate.reload
     assert_equal "ready", @candidate.status
     assert @candidate.variants.first.colourised_image.attached?
+    assert_equal(
+      { "input_tokens" => 3, "output_tokens" => 9, "cost" => 0.01 },
+      @candidate.variants.first.colourise_usage
+    )
   ensure
     Colourisers::RubyLlmColouriser.singleton_class.remove_method(:new)
   end
