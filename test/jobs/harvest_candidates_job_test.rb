@@ -40,7 +40,8 @@ class HarvestCandidatesJobTest < ActiveJob::TestCase
   private
 
   def build_harvested_candidate
-    source = create_source_item(digitalnz_id: "fresh", dedupe_key: "fresh")
+    suffix = SecureRandom.hex(4)
+    source = create_source_item(digitalnz_id: "fresh-#{suffix}", dedupe_key: "fresh-#{suffix}")
     candidate = source.candidates.create!(status: "pending_colour")
     attach_fixture_image(candidate)
     candidate

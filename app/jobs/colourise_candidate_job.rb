@@ -3,6 +3,9 @@ class ColouriseCandidateJob < ApplicationJob
 
   discard_on ActiveRecord::RecordNotFound
 
+  # OpenRouter daily credit limits often need hours before retrying.
+  retry_on Colourisers::RubyLlmColouriser::Error, wait: 1.hour, attempts: 48
+
   def perform(candidate_id, model_ids: nil, replace: false)
     candidate = Candidate.find(candidate_id)
     return if candidate.status == "rejected"
@@ -18,6 +21,8 @@ class ColouriseCandidateJob < ApplicationJob
 
     colouriser = Colourisers::RubyLlmColouriser.new
     models.each do |model|
+      next if candidate.variants.exists?(model_id: model.id)
+
       result = colouriser.call(attachment: candidate.original_image, model: model)
       variant = candidate.variants.create!(
         model: result[:model],
