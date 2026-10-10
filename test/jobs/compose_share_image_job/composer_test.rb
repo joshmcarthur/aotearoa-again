@@ -8,7 +8,8 @@ class ComposeShareImageJob
       result = Composer.new(
         original_path: path,
         colourised_path: path,
-        short_url: "http://www.example.com/s/abc123"
+        short_url: "http://www.example.com/s/abc123",
+        content_partner: "Canterbury Museum"
       ).call
 
       assert_equal "composite.jpg", result.composite.filename

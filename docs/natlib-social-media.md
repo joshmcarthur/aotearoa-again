@@ -12,7 +12,9 @@ Images that **may** be saved, modified/remixed, and uploaded to social media:
 - DigitalNZ equivalent: ATL + **Use commercially**  
   https://digitalnz.org/records?text=&i[content_partner]=Alexander%20Turnbull%20Library&i[usage]=Use%20commercially&page=1
 
-This app **narrows harvest** to DigitalNZ ATL images with both **Modify** and **Use commercially**, so every pipeline candidate is Meta-upload-eligible. That shrinks the candidate pool versus Modify-only harvest.
+This app **narrows harvest** to DigitalNZ images with both **Modify** and **Use commercially**, so every pipeline candidate is Meta-upload-eligible. That shrinks the candidate pool versus Modify-only harvest.
+
+Harvest is no longer ATL-only: it also samples NZ councils, museums, and public libraries. NatLib's free-download / upload guidance still applies to ATL items. Other partners are included only when DigitalNZ marks them **Modify** + **Use commercially**. Portrait and people-prominent subject tags are skipped, as are already-colour images.
 
 Out of copyright / appropriate CC material may also be composited and uploaded with caption acknowledgement; we rely on the Use commercially filter as the practical proxy for the free-download set.
 
