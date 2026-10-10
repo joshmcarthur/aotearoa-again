@@ -1,7 +1,7 @@
 module Digitalnz
   class RightsFilter
     REQUIRED_USAGE = "Modify".freeze
-    # NatLib free-download / Meta-upload-eligible ATL subset.
+    # Remix / social-upload eligible subset (Modify + Use commercially).
     COMMERCIAL_USAGE = "Use commercially".freeze
     PREFERRED_USAGE = "Share".freeze
     COLOUR_KEYWORDS = /\b(colour|color|coloured|colored|hand[- ]?coloured|hand[- ]?colored)\b/i
@@ -41,7 +41,12 @@ module Digitalnz
     end
 
     def colour_keyword_hit?
-      text = [ @record[:title], @record[:description] ].compact.join(" ")
+      text = [
+        @record[:title],
+        @record[:description],
+        Array(@record[:subject]).join(" "),
+        Array(@record[:dc_type]).join(" ")
+      ].compact.join(" ")
       text.match?(COLOUR_KEYWORDS)
     end
   end

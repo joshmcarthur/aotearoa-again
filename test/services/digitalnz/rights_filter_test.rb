@@ -45,5 +45,15 @@ module Digitalnz
       }
       assert_not RightsFilter.acceptable?(record)
     end
+
+    test "rejects colour subject tags" do
+      record = {
+        title: "Street scene",
+        rights: [ "No known copyright restrictions" ],
+        usage: [ "Modify", "Use commercially" ],
+        subject: [ "coloured image" ]
+      }
+      assert_not RightsFilter.acceptable?(record)
+    end
   end
 end
