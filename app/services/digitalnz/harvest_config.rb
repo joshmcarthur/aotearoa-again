@@ -6,6 +6,11 @@ module Digitalnz
       partners: "without[content_partner]",
       types: "without[dc_type]"
     }.freeze
+    RECORD_FIELDS = {
+      title: :title,
+      subjects: :subject,
+      types: :dc_type
+    }.freeze
 
     def self.current
       @current ||= new
@@ -40,11 +45,9 @@ module Digitalnz
 
     def excluded_record?(record)
       record = record.with_indifferent_access
-      return true if title_excluded?(record[:title])
-      return true if any_value_matches?(record[:subject], exclude_list(:subjects))
-      return true if any_value_matches?(record[:dc_type], exclude_list(:types))
-
-      false
+      RECORD_FIELDS.any? do |field, key|
+        any_value_matches?(record[key], exclude_list(field))
+      end
     end
 
     private
@@ -104,11 +107,6 @@ module Digitalnz
 
     def exclude_list(field)
       Array(@data.dig(:exclude, field)).map(&:to_s)
-    end
-
-    def title_excluded?(title)
-      haystack = title.to_s.downcase
-      Array(@data.dig(:exclude, :title_contains)).any? { |needle| haystack.include?(needle.to_s.downcase) }
     end
 
     def any_value_matches?(values, patterns)

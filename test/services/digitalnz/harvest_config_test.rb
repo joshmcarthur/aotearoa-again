@@ -62,12 +62,12 @@ module Digitalnz
       assert_not config.allowed_partner?("University of Otago")
     end
 
-    test "excludes records by title substring, subject, and type" do
+    test "excludes records by title, subject, and type patterns" do
       config = HarvestConfig.new(
         "exclude" => {
           "subjects" => [ "Portraits", "*colour*" ],
           "types" => [ "Map", "*portrait*" ],
-          "title_contains" => [ "portrait", "colour" ]
+          "title" => [ "*portrait*", "*colour*" ]
         }
       )
 
@@ -106,6 +106,8 @@ module Digitalnz
       assert config.allowed_partner?("MOTAT")
       assert_not config.allowed_partner?("The British Library")
       assert_not config.allowed_partner?("National Library of New Zealand")
+      assert config.excluded_record?(title: "Street", subject: [ "studio portraits" ], dc_type: [])
+      assert config.excluded_record?(title: "Hand coloured postcard", subject: [], dc_type: [])
     end
   end
 end

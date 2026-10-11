@@ -1,7 +1,7 @@
 # Harvest pool: DigitalNZ search (url + params) plus include/exclude criteria.
-# Exact exclude values are sent as without[] prefilters; globs and title
-# substrings are applied when sampling partners / checking records.
-# Patterns are exact (case-insensitive) or globs (* and ?).
+# Every pattern is exact (case-insensitive) or a glob (* and ?). Wrap a word
+# in *...* to match it anywhere. Exact excludes on partners/subjects/types are
+# prefiltered as without[]; globs are applied when sampling and checking records.
 shared:
   url: https://digitalnz.org/records
   params:
@@ -33,13 +33,11 @@ shared:
       - "*State Library*"
     subjects:
       - Portraits
-      - portraits
-      - studio portraits
-      - Group portraits
       - people
       - Men
       - Women
       - Children
+      - "*portrait*"
       - "*colour*"
       - "*color*"
     types:
@@ -51,7 +49,7 @@ shared:
       - Art work
       - Card
       - "*portrait*"
-    title_contains:
-      - portrait
-      - colour
-      - color
+    title:
+      - "*portrait*"
+      - "*colour*"
+      - "*color*"
