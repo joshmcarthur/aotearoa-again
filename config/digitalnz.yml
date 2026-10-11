@@ -1,8 +1,14 @@
-# Harvest pool is this DigitalNZ search (the part after ?; a full URL also works).
-# Partner globs cannot go in the query — the API has no content_partner wildcard —
-# so include.partners is applied when sampling facets. Empty include = all partners.
+# Harvest pool: DigitalNZ search (url + params) plus include/exclude criteria.
+# Exact exclude values are sent as without[] prefilters; globs and title
+# substrings are applied when sampling partners / checking records.
+# Patterns are exact (case-insensitive) or globs (* and ?).
 shared:
-  query: "i[category]=Images&i[usage][]=Modify&i[usage][]=Use+commercially&without[subject][]=Portraits&without[subject][]=studio+portraits&without[subject][]=Group+portraits&without[subject][]=people&without[subject][]=Men&without[subject][]=Women&without[subject][]=Children&without[content_partner][]=The+British+Library&without[content_partner][]=National+Library+of+New+Zealand&without[content_partner][]=Digital+Public+Library+of+America&without[content_partner][]=Museums+Victoria&without[content_partner][]=Australian+National+Maritime+Museum&without[content_partner][]=State+Library+of+Victoria&without[content_partner][]=State+Library+of+New+South+Wales&without[content_partner][]=John+Kinder+Theological+Library"
+  url: https://digitalnz.org/records
+  params:
+    "i[category]": Images
+    "i[usage]":
+      - Modify
+      - Use commercially
 
   include:
     partners:
@@ -12,3 +18,40 @@ shared:
       - "*Libraries*"
       - MOTAT
       - Puke Ariki
+
+  exclude:
+    partners:
+      - The British Library
+      - Museums Victoria
+      - Australian National Maritime Museum
+      - National Library of New Zealand
+      - Digital Public Library of America
+      - "*University*"
+      - "*Theological*"
+      - "*College*"
+      - "*Parliamentary*"
+      - "*State Library*"
+    subjects:
+      - Portraits
+      - portraits
+      - studio portraits
+      - Group portraits
+      - people
+      - Men
+      - Women
+      - Children
+      - "*colour*"
+      - "*color*"
+    types:
+      - Transparency
+      - Photograph slide
+      - Map
+      - Poster
+      - Specimen
+      - Art work
+      - Card
+      - "*portrait*"
+    title_contains:
+      - portrait
+      - colour
+      - color

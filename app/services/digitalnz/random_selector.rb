@@ -1,6 +1,6 @@
 module Digitalnz
   class RandomSelector
-    # Search params come from config/digitalnz.yml query.
+    # Search params come from config/digitalnz.yml (url, params, exact exclude prefilters).
     # Use "and[usage]" (not "and[usage][]") so Faraday NestedParamsEncoder
     # emits and[usage][]=Modify&and[usage][]=Use+commercially.
 

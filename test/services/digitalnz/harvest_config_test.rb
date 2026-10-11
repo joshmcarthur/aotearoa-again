@@ -2,22 +2,22 @@ require "test_helper"
 
 module Digitalnz
   class HarvestConfigTest < ActiveSupport::TestCase
-    test "parses a DigitalNZ query string into API params" do
+    test "merges url query and params into API search params" do
       config = HarvestConfig.new(
-        "query" => "i[category]=Images&i[usage]=Modify&i[usage]=Use commercially&without[subject][]=Portraits"
+        "url" => "https://digitalnz.org/records?i[category]=Images",
+        "params" => { "i[usage]" => [ "Modify", "Use commercially" ] }
       )
 
       assert_equal [ "Images" ], config.search_params["and[category]"]
       assert_equal [ "Modify", "Use commercially" ], config.search_params["and[usage]"]
-      assert_equal [ "Portraits" ], config.search_params["without[subject]"]
     end
 
-    test "parses a pasted website or API URL by taking the query string" do
+    test "parses params from a pasted website or API URL" do
       website = HarvestConfig.new(
-        "query" => "https://digitalnz.org/records?i[category]=Images&i[usage]=Modify&i[usage]=Use commercially"
+        "url" => "https://digitalnz.org/records?i[category]=Images&i[usage]=Modify&i[usage]=Use commercially"
       )
       api = HarvestConfig.new(
-        "query" => "https://api.digitalnz.org/v3/records.json?and[category][]=Images&and[usage][]=Modify"
+        "url" => "https://api.digitalnz.org/v3/records.json?and[category][]=Images&and[usage][]=Modify"
       )
 
       assert_equal [ "Images" ], website.search_params["and[category]"]
@@ -26,22 +26,56 @@ module Digitalnz
       assert_equal [ "Modify" ], api.search_params["and[usage]"]
     end
 
-    test "include partners with globs and exact names" do
+    test "prefilters exact exclude values as without params and skips globs" do
       config = HarvestConfig.new(
-        "include" => { "partners" => [ "*Library*", "MOTAT" ] }
+        "params" => { "i[category]" => "Images" },
+        "exclude" => {
+          "subjects" => [ "Portraits", "*colour*" ],
+          "partners" => [ "The British Library", "*University*" ],
+          "types" => [ "Map", "*portrait*" ]
+        }
+      )
+
+      assert_equal [ "Portraits" ], config.search_params["without[subject]"]
+      assert_equal [ "The British Library" ], config.search_params["without[content_partner]"]
+      assert_equal [ "Map" ], config.search_params["without[dc_type]"]
+    end
+
+    test "include then exclude partners with globs and exact names" do
+      config = HarvestConfig.new(
+        "include" => { "partners" => [ "*Library*", "MOTAT" ] },
+        "exclude" => { "partners" => [ "The British Library", "*University*" ] }
       )
 
       assert config.allowed_partner?("Alexander Turnbull Library")
       assert config.allowed_partner?("MOTAT")
+      assert_not config.allowed_partner?("The British Library")
+      assert_not config.allowed_partner?("Hocken Collections - University of Otago")
       assert_not config.allowed_partner?("iNaturalist NZ — Mātaki Taiao")
       assert_not config.allowed_partner?(nil)
     end
 
-    test "empty include allows any named partner" do
-      config = HarvestConfig.new({})
+    test "empty include allows any partner that is not excluded" do
+      config = HarvestConfig.new("exclude" => { "partners" => [ "*University*" ] })
 
       assert config.allowed_partner?("iNaturalist NZ — Mātaki Taiao")
-      assert_not config.allowed_partner?(nil)
+      assert_not config.allowed_partner?("University of Otago")
+    end
+
+    test "excludes records by title substring, subject, and type" do
+      config = HarvestConfig.new(
+        "exclude" => {
+          "subjects" => [ "Portraits", "*colour*" ],
+          "types" => [ "Map", "*portrait*" ],
+          "title_contains" => [ "portrait", "colour" ]
+        }
+      )
+
+      assert config.excluded_record?(title: "Portrait of Jane", subject: [], dc_type: [])
+      assert config.excluded_record?(title: "Street", subject: [ "Portraits" ], dc_type: [])
+      assert config.excluded_record?(title: "Street", subject: [ "coloured image" ], dc_type: [])
+      assert config.excluded_record?(title: "Street", subject: [], dc_type: [ "Map" ])
+      assert_not config.excluded_record?(title: "Street", subject: [ "Womens clothing" ], dc_type: [ "Photograph - print" ])
     end
 
     test "search param keys omit trailing [] so Faraday NestedParamsEncoder can add them" do
@@ -50,7 +84,7 @@ module Digitalnz
       end
     end
 
-    test "app YAML query is Images with Modify, Use commercially, and without Portraits" do
+    test "app YAML searches Images with Modify and Use commercially" do
       params = HarvestConfig.current.search_params
 
       assert_equal [ "Images" ], params["and[category]"]
@@ -58,9 +92,11 @@ module Digitalnz
       assert_includes params["and[usage]"], "Use commercially"
       assert_includes params["without[subject]"], "Portraits"
       assert_includes params["without[content_partner]"], "The British Library"
+      assert_includes params["without[dc_type]"], "Map"
+      assert_not_includes params["without[subject]"], "*colour*"
     end
 
-    test "app YAML include globs allow ATL councils museums and extras" do
+    test "app YAML allows ATL councils museums and extras" do
       config = HarvestConfig.current
 
       assert config.allowed_partner?("Alexander Turnbull Library")
@@ -68,7 +104,8 @@ module Digitalnz
       assert config.allowed_partner?("Canterbury Museum")
       assert config.allowed_partner?("Auckland Libraries")
       assert config.allowed_partner?("MOTAT")
-      assert_not config.allowed_partner?("iNaturalist NZ — Mātaki Taiao")
+      assert_not config.allowed_partner?("The British Library")
+      assert_not config.allowed_partner?("National Library of New Zealand")
     end
   end
 end

@@ -17,10 +17,10 @@ module Digitalnz
       assert RightsFilter.new(reusable).commercial_use?
     end
 
-    test "allows partners from harvest config include globs" do
+    test "allows partners from harvest config" do
       assert RightsFilter.allowed_partner?("Wellington City Council Archives")
       assert RightsFilter.allowed_partner?("MOTAT")
-      assert_not RightsFilter.allowed_partner?("iNaturalist NZ — Mātaki Taiao")
+      assert_not RightsFilter.allowed_partner?("The British Library")
       assert_not RightsFilter.allowed_partner?(nil)
     end
 
@@ -40,6 +40,42 @@ module Digitalnz
       record = reusable(usage: %w[Modify Share])
       assert_not RightsFilter.acceptable?(record)
       assert_not RightsFilter.new(record).commercial_use?
+    end
+
+    test "rejects colour keyword titles and tags" do
+      assert_not RightsFilter.acceptable?(reusable(title: "Hand coloured postcard"))
+      assert_not RightsFilter.acceptable?(reusable(subject: [ "coloured image" ]))
+      assert_not RightsFilter.acceptable?(reusable(dc_type: [ "Transparency" ]))
+      assert_not RightsFilter.acceptable?(reusable(dc_type: [ "Photograph slide" ]))
+    end
+
+    test "rejects non-photograph image types" do
+      assert_not RightsFilter.acceptable?(reusable(dc_type: [ "Map" ]))
+      assert_not RightsFilter.acceptable?(reusable(dc_type: [ "Poster" ]))
+      assert_not RightsFilter.acceptable?(reusable(dc_type: [ "Specimen" ]))
+    end
+
+    test "accepts photograph negatives prints and lantern slides" do
+      assert RightsFilter.acceptable?(reusable(dc_type: [ "Photograph - negative" ]))
+      assert RightsFilter.acceptable?(reusable(
+        content_partner: [ "Wellington City Council Archives" ],
+        dc_type: [ "Photograph - print" ]
+      ))
+      assert RightsFilter.acceptable?(reusable(dc_type: [ "Lantern slides." ]))
+    end
+
+    test "rejects portrait and people-prominent tags" do
+      assert_not RightsFilter.acceptable?(reusable(subject: [ "Portraits" ]))
+      assert_not RightsFilter.acceptable?(reusable(subject: [ "people" ]))
+      assert_not RightsFilter.acceptable?(reusable(subject: [ "Men" ]))
+      assert_not RightsFilter.acceptable?(reusable(dc_type: [ "Portrait photographs." ]))
+      assert_not RightsFilter.acceptable?(reusable(title: "Portrait of Mr James Coutt Crawford"))
+    end
+
+    test "does not treat clothing or description mentions as portraits" do
+      assert RightsFilter.acceptable?(reusable(subject: [ "Womens clothing" ]))
+      assert RightsFilter.acceptable?(reusable(subject: [ "Women photographers--New Zealand" ]))
+      assert RightsFilter.acceptable?(reusable(description: "People on a street"))
     end
   end
 end
