@@ -1,7 +1,7 @@
 module StandardSite
   class PublicationBootstrap
     SITE_NAME = "Aotearoa, Again".freeze
-    SITE_DESCRIPTION = "Daily photographs from the Alexander Turnbull Library, seen again in colour.".freeze
+    SITE_DESCRIPTION = "Daily photographs from Aotearoa's archives, seen again in colour.".freeze
 
     def self.call(client: Bluesky::Client.new, icon_path: Rails.root.join("public/icon.png"))
       new(client: client, icon_path: icon_path).call
