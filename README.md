@@ -32,7 +32,7 @@ Share video (9:16 shorts) needs **ffmpeg** on `PATH` in addition to libvips. The
 
 ## Pipeline
 
-1. `HarvestCandidatesJob` — DigitalNZ Images with Modify + Use commercially, from ATL / councils / museums / public libraries; black-and-white photographs only  
+1. `HarvestCandidatesJob` — DigitalNZ search from `config/digitalnz.yml` (search URL plus include/exclude partners, subjects, and types)  
 2. `ColouriseCandidateJob` — RubyLLM.paint via preferred `Model` rows  
 3. Admin approve → schedule `Edition`  
 4. `PublishEditionJob` (07:00 NZ) publishes the edition, then enqueues per-channel delivery jobs (Buttondown, Instagram, Facebook, YouTube Shorts, Bluesky)  

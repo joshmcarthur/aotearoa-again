@@ -106,9 +106,9 @@ module Digitalnz
       record = RandomSelector.new(client: client, exclude_ids: []).call
 
       assert_equal 77, record["id"]
-      partner_queries = searches.select { |params| params["and[content_partner][]"] }
+      partner_queries = searches.select { |params| params["and[content_partner]"] }
       assert partner_queries.any?
-      assert partner_queries.all? { |params| params["and[content_partner][]"] == "Wellington City Council Archives" }
+      assert partner_queries.all? { |params| Array(params["and[content_partner]"]) == [ "Wellington City Council Archives" ] }
     end
 
     test "caps anonymous pagination at page 100" do

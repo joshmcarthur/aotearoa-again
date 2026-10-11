@@ -1,0 +1,54 @@
+# Harvest pool. Paste a DigitalNZ search (website or API) as search_url;
+# include/exclude are applied on top with standard whitelist then blacklist
+# rules. Patterns may be exact (case-insensitive) or globs (* and ?).
+#
+# Website: https://digitalnz.org/records?i[category]=Images&i[usage]=Modify
+# API:     https://api.digitalnz.org/v3/records.json?and[category][]=Images
+shared:
+  search_url: "https://digitalnz.org/records?i[category]=Images&i[usage][]=Modify&i[usage][]=Use+commercially"
+
+  include:
+    partners:
+      - "*Council*"
+      - "*Museum*"
+      - "*Library*"
+      - "*Libraries*"
+      - MOTAT
+      - Puke Ariki
+
+  exclude:
+    partners:
+      - The British Library
+      - Museums Victoria
+      - Australian National Maritime Museum
+      - National Library of New Zealand
+      - Digital Public Library of America
+      - "*University*"
+      - "*Theological*"
+      - "*College*"
+      - "*Parliamentary*"
+      - "*State Library*"
+    subjects:
+      - Portraits
+      - portraits
+      - studio portraits
+      - Group portraits
+      - people
+      - Men
+      - Women
+      - Children
+      - "*colour*"
+      - "*color*"
+    types:
+      - Transparency
+      - Photograph slide
+      - Map
+      - Poster
+      - Specimen
+      - Art work
+      - Card
+      - "*portrait*"
+    title_contains:
+      - portrait
+      - colour
+      - color

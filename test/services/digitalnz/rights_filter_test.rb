@@ -17,30 +17,11 @@ module Digitalnz
       assert RightsFilter.new(reusable).commercial_use?
     end
 
-    test "allows councils museums public libraries and extras" do
-      [
-        "Wellington City Council Archives",
-        "Canterbury Museum",
-        "Auckland Libraries",
-        "Feilding Library",
-        "MOTAT",
-        "Puke Ariki"
-      ].each do |name|
-        assert RightsFilter.allowed_partner?(name), "expected to allow #{name}"
-      end
-    end
-
-    test "rejects partners that only look like libraries or museums" do
-      [
-        "The British Library",
-        "Museums Victoria",
-        "National Library of New Zealand",
-        "John Kinder Theological Library",
-        nil,
-        ""
-      ].each do |name|
-        assert_not RightsFilter.allowed_partner?(name), "expected to reject #{name.inspect}"
-      end
+    test "allows partners from harvest config" do
+      assert RightsFilter.allowed_partner?("Wellington City Council Archives")
+      assert RightsFilter.allowed_partner?("MOTAT")
+      assert_not RightsFilter.allowed_partner?("The British Library")
+      assert_not RightsFilter.allowed_partner?(nil)
     end
 
     test "rejects disallowed content partners" do

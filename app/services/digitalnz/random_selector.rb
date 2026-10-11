@@ -1,14 +1,8 @@
 module Digitalnz
   class RandomSelector
-    # Modify: colourisation allowed. Use commercially: remix / social-upload
-    # eligible subset (see docs/natlib-social-media.md).
-    # Use "and[usage]" / "without[subject]" (not the [] form) so Faraday
-    # NestedParamsEncoder emits and[usage][]=Modify&and[usage][]=Use+commercially.
-    BASE_FILTERS = {
-      "and[category][]" => "Images",
-      "and[usage]" => [ "Modify", "Use commercially" ],
-      "without[subject]" => RightsFilter::PEOPLE_SUBJECTS
-    }.freeze
+    # Search params come from config/digitalnz.yml (search_url + exclude subjects).
+    # Use "and[usage]" (not "and[usage][]") so Faraday NestedParamsEncoder
+    # emits and[usage][]=Modify&and[usage][]=Use+commercially.
 
     PER_PAGE = 20
     MAX_ATTEMPTS = 12
@@ -45,7 +39,7 @@ module Digitalnz
     private
 
     def pick_partner
-      data = @client.search(BASE_FILTERS.merge(facets: "content_partner", facets_per_page: 150, per_page: 0))
+      data = @client.search(search_filters.merge(facets: "content_partner", facets_per_page: 150, per_page: 0))
       facets = data.dig("search", "facets", "content_partner") || data.dig("facets", "content_partner") || {}
       partners = normalize_facet_values(facets).select { |value| RightsFilter.allowed_partner?(value[:name]) }
       return nil if partners.empty?
@@ -114,8 +108,12 @@ module Digitalnz
       Array(data.dig("search", "results") || data["results"])
     end
 
+    def search_filters
+      HarvestConfig.current.search_params
+    end
+
     def partner_filters(partner)
-      BASE_FILTERS.merge("and[content_partner][]" => partner)
+      search_filters.merge("and[content_partner]" => [ partner ])
     end
 
     def acceptable_new?(record)
