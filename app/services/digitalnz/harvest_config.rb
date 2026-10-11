@@ -15,42 +15,6 @@ module Digitalnz
     end
 
     def search_params
-      params = parse_query
-      exact_subjects = exclude_list(:subjects).reject { |pattern| glob?(pattern) }
-      if exact_subjects.any?
-        params["without[subject]"] = (Array(params["without[subject]"]) + exact_subjects).uniq { |value| value.downcase }
-      end
-      params
-    end
-
-    # Whitelist then blacklist: must match include (if any), then exclude wins.
-    def allowed_partner?(name)
-      name = name.to_s.strip
-      return false if name.blank?
-
-      includes = include_list(:partners)
-      return false if includes.any? && !matches_any?(name, includes)
-      return false if matches_any?(name, exclude_list(:partners))
-
-      true
-    end
-
-    def excluded_record?(record)
-      record = record.with_indifferent_access
-      return true if title_excluded?(record[:title])
-      return true if any_value_matches?(record[:subject], exclude_list(:subjects))
-      return true if any_value_matches?(record[:dc_type], exclude_list(:types))
-
-      false
-    end
-
-    private
-
-    def load_file
-      Rails.application.config_for(:digitalnz)
-    end
-
-    def parse_query
       params = {}
 
       URI.decode_www_form(query_string).each do |raw_key, value|
@@ -61,6 +25,23 @@ module Digitalnz
       end
 
       params
+    end
+
+    # DigitalNZ cannot glob content_partner. Empty include = every partner in the query.
+    def allowed_partner?(name)
+      name = name.to_s.strip
+      return false if name.blank?
+
+      includes = Array(@data.dig(:include, :partners)).map(&:to_s)
+      return true if includes.empty?
+
+      includes.any? { |pattern| match_pattern?(pattern, name) }
+    end
+
+    private
+
+    def load_file
+      Rails.application.config_for(:digitalnz)
     end
 
     def query_string
@@ -79,37 +60,12 @@ module Digitalnz
       end
     end
 
-    def include_list(field)
-      Array(@data.dig(:include, field)).map(&:to_s)
-    end
-
-    def exclude_list(field)
-      Array(@data.dig(:exclude, field)).map(&:to_s)
-    end
-
-    def title_excluded?(title)
-      haystack = title.to_s.downcase
-      Array(@data.dig(:exclude, :title_contains)).any? { |needle| haystack.include?(needle.to_s.downcase) }
-    end
-
-    def any_value_matches?(values, patterns)
-      Array(values).any? { |value| matches_any?(value.to_s, patterns) }
-    end
-
-    def matches_any?(value, patterns)
-      patterns.any? { |pattern| match_pattern?(pattern, value) }
-    end
-
     def match_pattern?(pattern, value)
-      if glob?(pattern)
+      if pattern.match?(/[*?]/)
         File.fnmatch?(pattern, value, File::FNM_CASEFOLD)
       else
         value.casecmp?(pattern)
       end
-    end
-
-    def glob?(pattern)
-      pattern.match?(/[*?]/)
     end
   end
 end
