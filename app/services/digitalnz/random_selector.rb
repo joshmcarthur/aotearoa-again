@@ -1,14 +1,8 @@
 module Digitalnz
   class RandomSelector
-    # Modify: colourisation allowed. Use commercially: NatLib free-download /
-    # Meta-upload-eligible ATL subset (see docs/natlib-social-media.md).
+    # Search params come from config/digitalnz.yml (url, params, exact exclude prefilters).
     # Use "and[usage]" (not "and[usage][]") so Faraday NestedParamsEncoder
     # emits and[usage][]=Modify&and[usage][]=Use+commercially.
-    BASE_FILTERS = {
-      "and[content_partner][]" => "Alexander Turnbull Library",
-      "and[category][]" => "Images",
-      "and[usage]" => [ "Modify", "Use commercially" ]
-    }.freeze
 
     PER_PAGE = 20
     MAX_ATTEMPTS = 12
@@ -42,7 +36,7 @@ module Digitalnz
     private
 
     def pick_decade
-      data = @client.search(BASE_FILTERS.merge(facets: "decade", facets_per_page: 100, per_page: 0))
+      data = @client.search(search_filters.merge(facets: "decade", facets_per_page: 100, per_page: 0))
       facets = data.dig("search", "facets", "decade") || data.dig("facets", "decade") || {}
       values = normalize_facet_values(facets)
       return nil if values.empty?
@@ -84,7 +78,7 @@ module Digitalnz
     end
 
     def pick_page(decade)
-      data = @client.search(BASE_FILTERS.merge("and[decade][]" => decade, per_page: PER_PAGE, page: 1))
+      data = @client.search(search_filters.merge("and[decade][]" => decade, per_page: PER_PAGE, page: 1))
       result_count = (data.dig("search", "result_count") || data["result_count"]).to_i
       return nil if result_count <= 0
 
@@ -98,8 +92,12 @@ module Digitalnz
     end
 
     def fetch_page(decade, page)
-      data = @client.search(BASE_FILTERS.merge("and[decade][]" => decade, per_page: PER_PAGE, page: page))
+      data = @client.search(search_filters.merge("and[decade][]" => decade, per_page: PER_PAGE, page: page))
       Array(data.dig("search", "results") || data["results"])
+    end
+
+    def search_filters
+      HarvestConfig.current.search_params
     end
 
     def acceptable_new?(record)

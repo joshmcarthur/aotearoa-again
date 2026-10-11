@@ -86,7 +86,7 @@ If DigitalNZ/ATL request removal:
 
 ## Instagram / Facebook
 
-Harvest is limited to NatLib's Meta-upload-eligible ATL subset (DigitalNZ **Use commercially** + **Modify**). See [natlib-social-media.md](natlib-social-media.md) for caption, people/tikanga, and takedown rules.
+Harvest follows `config/digitalnz.yml` (DigitalNZ url + params, plus include/exclude). See [natlib-social-media.md](natlib-social-media.md) for caption, people/tikanga, and takedown rules.
 
 Optional Instagram and Facebook Page deliveries via the Meta Graph API. Credentials are optional — when a channel’s credentials are blank, or when the source item lacks DigitalNZ **Use commercially** (`SourceItem#commercial_use?`), `EnsureEditionDeliveriesJob` marks that delivery `skipped` (email still delivers).
 
