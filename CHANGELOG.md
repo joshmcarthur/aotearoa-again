@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.22.1](https://github.com/joshmcarthur/aotearoa-again/compare/v0.22.0...v0.22.1) (2026-10-11)
+
+
+### Bug Fixes
+
+* retain plate mounts and equipment in colourise prompt ([#151](https://github.com/joshmcarthur/aotearoa-again/issues/151)) ([cd70274](https://github.com/joshmcarthur/aotearoa-again/commit/cd70274b1c812f440c15722b563957fb5862daa5))
+
 ## [0.22.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.21.2...v0.22.0) (2026-09-19)
 
 
