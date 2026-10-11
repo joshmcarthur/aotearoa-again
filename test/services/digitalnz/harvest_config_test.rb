@@ -2,31 +2,45 @@ require "test_helper"
 
 module Digitalnz
   class HarvestConfigTest < ActiveSupport::TestCase
-    test "parses a DigitalNZ website search URL into API params" do
+    test "parses a DigitalNZ query string into API params" do
       config = HarvestConfig.new(
-        "search_url" => "https://digitalnz.org/records?i[category]=Images&i[usage]=Modify&i[usage]=Use commercially"
+        "query" => "i[category]=Images&i[usage]=Modify&i[usage]=Use commercially"
       )
 
       assert_equal [ "Images" ], config.search_params["and[category]"]
       assert_equal [ "Modify", "Use commercially" ], config.search_params["and[usage]"]
     end
 
-    test "parses an API search URL" do
-      config = HarvestConfig.new(
-        "search_url" => "https://api.digitalnz.org/v3/records.json?and[category][]=Images&and[usage][]=Modify"
+    test "parses a pasted website or API URL by taking the query string" do
+      website = HarvestConfig.new(
+        "query" => "https://digitalnz.org/records?i[category]=Images&i[usage]=Modify&i[usage]=Use commercially"
+      )
+      api = HarvestConfig.new(
+        "query" => "https://api.digitalnz.org/v3/records.json?and[category][]=Images&and[usage][]=Modify"
       )
 
-      assert_equal [ "Images" ], config.search_params["and[category]"]
-      assert_equal [ "Modify" ], config.search_params["and[usage]"]
+      assert_equal [ "Images" ], website.search_params["and[category]"]
+      assert_equal [ "Modify", "Use commercially" ], website.search_params["and[usage]"]
+      assert_equal [ "Images" ], api.search_params["and[category]"]
+      assert_equal [ "Modify" ], api.search_params["and[usage]"]
     end
 
     test "adds exact exclude subjects as without[subject] search params" do
       config = HarvestConfig.new(
-        "search_url" => "https://digitalnz.org/records?i[category]=Images",
+        "query" => "i[category]=Images",
         "exclude" => { "subjects" => [ "Portraits", "*colour*" ] }
       )
 
       assert_equal [ "Portraits" ], config.search_params["without[subject]"]
+    end
+
+    test "keeps without[subject] values already in the query string" do
+      config = HarvestConfig.new(
+        "query" => "i[category]=Images&without[subject][]=people",
+        "exclude" => { "subjects" => [ "Portraits" ] }
+      )
+
+      assert_equal [ "people", "Portraits" ], config.search_params["without[subject]"]
     end
 
     test "include then exclude partners with globs and exact names" do
@@ -82,7 +96,7 @@ module Digitalnz
       assert_not config.allowed_partner?("The British Library")
     end
 
-    test "app YAML search URL is Images with Modify and Use commercially" do
+    test "app YAML query is Images with Modify and Use commercially" do
       params = HarvestConfig.current.search_params
 
       assert_equal [ "Images" ], params["and[category]"]

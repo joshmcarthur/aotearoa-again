@@ -1,11 +1,12 @@
-# Harvest pool. Paste a DigitalNZ search (website or API) as search_url;
-# include/exclude are applied on top with standard whitelist then blacklist
-# rules. Patterns may be exact (case-insensitive) or globs (* and ?).
+# Harvest pool. `query` is the DigitalNZ search string (the part after ?).
+# A full website or API URL also works. include/exclude are applied on top
+# with standard whitelist then blacklist rules. Patterns may be exact
+# (case-insensitive) or globs (* and ?).
 #
-# Website: https://digitalnz.org/records?i[category]=Images&i[usage]=Modify
-# API:     https://api.digitalnz.org/v3/records.json?and[category][]=Images
+#   i[category]=Images&i[usage][]=Modify&i[usage][]=Use+commercially
+#   and[category][]=Images&and[usage][]=Modify
 shared:
-  search_url: "https://digitalnz.org/records?i[category]=Images&i[usage][]=Modify&i[usage][]=Use+commercially"
+  query: "i[category]=Images&i[usage][]=Modify&i[usage][]=Use+commercially"
 
   include:
     partners:

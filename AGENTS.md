@@ -2,7 +2,7 @@
 
 ## Cursor Cloud specific instructions
 
-Rails 8 app ("Aotearoa, Again"): harvests reusable black-and-white photographs via DigitalNZ. The harvest pool is `config/digitalnz.yml` (a DigitalNZ search URL plus include/exclude partners, subjects, and types — currently ATL plus NZ councils, museums, and public libraries). Images are AI-colourised (RubyLLM/OpenRouter), human-reviewed in an admin UI, and published daily to the web/Atom feed/Buttondown/Instagram/Facebook/YouTube Shorts/Bluesky. SQLite + the Solid stack (Queue/Cache/Cable) — no external DB/Redis needed.
+Rails 8 app ("Aotearoa, Again"): harvests reusable black-and-white photographs via DigitalNZ. The harvest pool is `config/digitalnz.yml` (a DigitalNZ query string plus include/exclude partners, subjects, and types — currently ATL plus NZ councils, museums, and public libraries). Images are AI-colourised (RubyLLM/OpenRouter), human-reviewed in an admin UI, and published daily to the web/Atom feed/Buttondown/Instagram/Facebook/YouTube Shorts/Bluesky. SQLite + the Solid stack (Queue/Cache/Cable) — no external DB/Redis needed.
 
 ### Environment (already provisioned in the VM snapshot)
 - Ruby 3.4.9 is installed via `rbenv` under `~/.rbenv` (interactive shells get it from `~/.bashrc`). Non-interactive commands can call binaries through the shims, e.g. `~/.rbenv/shims/bundle`, or run `eval "$(rbenv init - bash)"` first.

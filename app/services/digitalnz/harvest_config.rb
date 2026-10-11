@@ -15,9 +15,11 @@ module Digitalnz
     end
 
     def search_params
-      params = parse_search_url
+      params = parse_query
       exact_subjects = exclude_list(:subjects).reject { |pattern| glob?(pattern) }
-      params["without[subject]"] = exact_subjects if exact_subjects.any?
+      if exact_subjects.any?
+        params["without[subject]"] = (Array(params["without[subject]"]) + exact_subjects).uniq { |value| value.downcase }
+      end
       params
     end
 
@@ -48,11 +50,10 @@ module Digitalnz
       Rails.application.config_for(:digitalnz)
     end
 
-    def parse_search_url
-      query = URI.parse(search_url).query.to_s
+    def parse_query
       params = {}
 
-      URI.decode_www_form(query).each do |raw_key, value|
+      URI.decode_www_form(query_string).each do |raw_key, value|
         key = api_param_key(raw_key)
         next if key.blank? || SKIP_QUERY_KEYS.include?(key) || value.blank?
 
@@ -60,6 +61,12 @@ module Digitalnz
       end
 
       params
+    end
+
+    def query_string
+      raw = @data[:query].to_s.strip
+      raw = URI.parse(raw).query.to_s if raw.match?(%r{\A[a-z][a-z0-9+\-.]*://}i)
+      raw.delete_prefix("?")
     end
 
     def api_param_key(raw_key)
@@ -70,10 +77,6 @@ module Digitalnz
       when "text"
         "text"
       end
-    end
-
-    def search_url
-      @data[:search_url].to_s
     end
 
     def include_list(field)
