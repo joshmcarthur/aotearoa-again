@@ -16,7 +16,7 @@ module Digitalnz
 
       attrs = RecordMapper.to_source_attributes(record)
       return nil if attrs[:image_url].blank?
-      return nil unless RecordFilter.acceptable?(record)
+      return nil unless RightsFilter.acceptable?(record)
 
       source_item = SourceItem.find_or_initialize_by(digitalnz_id: attrs[:digitalnz_id])
       source_item.assign_attributes(attrs)

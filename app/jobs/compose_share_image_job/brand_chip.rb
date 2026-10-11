@@ -42,11 +42,10 @@ class ComposeShareImageJob
     module_function
 
     def attribution_line(content_partner, short_url)
-      partner = content_partner.presence || "Alexander Turnbull Library"
-      "AI colourised · #{partner} · #{short_url}"
+      [ "AI colourised", content_partner.presence, short_url ].compact.join(" · ")
     end
 
-    def stamp(image, width, height, short_url, opacity: 1.0, content_partner: nil)
+    def stamp(image, width, height, short_url, opacity: 1.0, caption: nil)
       opacity = opacity.to_f.clamp(0.0, 1.0)
       return image if opacity <= 0.0
 
@@ -56,7 +55,7 @@ class ComposeShareImageJob
 
       fade_height = (height * 0.175).round.clamp(72, 160)
       content_height = (height * 0.1).round.clamp(48, 90)
-      overlay = build_overlay(width, height, short_url, fade_height:, content_height:, content_partner:)
+      overlay = build_overlay(width, height, short_url, fade_height:, content_height:, caption:)
       if opacity < 1.0
         rgb = overlay.extract_band(0, n: 3)
         alpha = (overlay.extract_band(3).cast(:float) * opacity).cast(:uchar)
@@ -89,10 +88,10 @@ class ComposeShareImageJob
         .bandjoin(alpha)
     end
 
-    def build_overlay(width, height, short_url, fade_height:, content_height:, content_partner: nil)
+    def build_overlay(width, height, short_url, fade_height:, content_height:, caption: nil)
       overlay = transparent_canvas(width, height)
       overlay = overlay.composite(scrim(width, fade_height), :over, x: 0, y: height - fade_height)
-      overlay.composite(content_row(width, short_url, content_height, content_partner), :over, x: 0, y: height - content_height)
+      overlay.composite(content_row(width, short_url, content_height, caption), :over, x: 0, y: height - content_height)
     end
 
     def scrim(width, fade_height)
@@ -124,7 +123,7 @@ class ComposeShareImageJob
       SCRIM_STOPS.last.last
     end
 
-    def content_row(width, short_url, content_h, content_partner = nil)
+    def content_row(width, short_url, content_h, caption)
       qr = qr_rgba(short_url, QR_SIZE)
       text_max_w = width - PAD_X * 2 - QR_SIZE - GAP
 
@@ -133,7 +132,7 @@ class ComposeShareImageJob
       title_row = join_horizontal([ brand, icons ].compact, gap: 6)
 
       body = paint_text(
-        attribution_line(content_partner, short_url),
+        caption.presence || attribution_line(nil, short_url),
         width: text_max_w,
         font_height: BODY_PX,
         style: :body,

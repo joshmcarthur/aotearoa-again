@@ -7,13 +7,7 @@ module Digitalnz
     BASE_FILTERS = {
       "and[category][]" => "Images",
       "and[usage]" => [ "Modify", "Use commercially" ],
-      "without[subject]" => [
-        "Portraits",
-        "portraits",
-        "studio portraits",
-        "Group portraits",
-        "people"
-      ]
+      "without[subject]" => RightsFilter::PEOPLE_SUBJECTS
     }.freeze
 
     PER_PAGE = 20
@@ -53,7 +47,7 @@ module Digitalnz
     def pick_partner
       data = @client.search(BASE_FILTERS.merge(facets: "content_partner", facets_per_page: 150, per_page: 0))
       facets = data.dig("search", "facets", "content_partner") || data.dig("facets", "content_partner") || {}
-      partners = normalize_facet_values(facets).select { |value| PartnerFilter.allowed?(value[:name]) }
+      partners = normalize_facet_values(facets).select { |value| RightsFilter.allowed_partner?(value[:name]) }
       return nil if partners.empty?
 
       partners.sample[:name]
@@ -127,7 +121,7 @@ module Digitalnz
     def acceptable_new?(record)
       id = record["id"] || record[:id]
       return false if id.blank? || @exclude_ids.include?(id.to_s)
-      return false unless RecordFilter.acceptable?(record)
+      return false unless RightsFilter.acceptable?(record)
 
       true
     end
