@@ -86,7 +86,7 @@ If DigitalNZ/ATL request removal:
 
 ## Instagram / Facebook
 
-Harvest is limited to DigitalNZ **Use commercially** + **Modify** images from the Alexander Turnbull Library, NZ councils, museums, and public libraries (black-and-white photographs; portraits skipped). See [natlib-social-media.md](natlib-social-media.md) for caption, people/tikanga, and takedown rules.
+Harvest is limited to DigitalNZ **Use commercially** + **Modify** images from the Alexander Turnbull Library, NZ councils, museums, and public libraries (photographs; portraits and colour-tagged records skipped). See [natlib-social-media.md](natlib-social-media.md) for caption, people/tikanga, and takedown rules.
 
 Optional Instagram and Facebook Page deliveries via the Meta Graph API. Credentials are optional — when a channel’s credentials are blank, or when the source item lacks DigitalNZ **Use commercially** (`SourceItem#commercial_use?`), `EnsureEditionDeliveriesJob` marks that delivery `skipped` (email still delivers).
 

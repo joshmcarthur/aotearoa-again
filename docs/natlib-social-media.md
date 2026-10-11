@@ -14,7 +14,7 @@ Images that **may** be saved, modified/remixed, and uploaded to social media:
 
 This app **narrows harvest** to DigitalNZ images with both **Modify** and **Use commercially**, so every pipeline candidate is Meta-upload-eligible. That shrinks the candidate pool versus Modify-only harvest.
 
-Harvest is no longer ATL-only: it also samples NZ councils, museums, and public libraries. NatLib's free-download / upload guidance still applies to ATL items. Other partners are included only when DigitalNZ marks them **Modify** + **Use commercially**. Portrait and people-prominent subject tags are skipped, as are already-colour images.
+Harvest is no longer ATL-only: it also samples NZ councils, museums, and public libraries. NatLib's free-download / upload guidance still applies to ATL items. Other partners are included only when DigitalNZ marks them **Modify** + **Use commercially**. Portrait and people-prominent subject tags are skipped, as are records whose metadata already describes them as colour.
 
 Out of copyright / appropriate CC material may also be composited and uploaded with caption acknowledgement; we rely on the Use commercially filter as the practical proxy for the free-download set.
 

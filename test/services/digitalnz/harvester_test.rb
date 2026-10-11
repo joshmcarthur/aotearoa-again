@@ -13,11 +13,18 @@ module Digitalnz
     end
 
     class FakeDownloader
-      def initialize(body)
+      def initialize(body: nil, error: nil)
         @body = body
+        @error = error
+        @calls = 0
       end
 
+      attr_reader :calls
+
       def call(_url)
+        @calls += 1
+        raise @error if @error
+
         {
           io: StringIO.new(@body),
           filename: "original.jpg",
@@ -41,11 +48,11 @@ module Digitalnz
       }
     end
 
-    test "creates a candidate for a greyscale photograph" do
+    test "creates a candidate from the selected record" do
       body = File.binread(Rails.root.join("test/fixtures/files/mono_plate.jpg"))
       harvester = Harvester.new(
         selector: FakeSelector.new([ reusable_record ]),
-        downloader: FakeDownloader.new(body)
+        downloader: FakeDownloader.new(body: body)
       )
 
       candidate = harvester.call
@@ -55,15 +62,30 @@ module Digitalnz
       assert_equal "Auckland Libraries", candidate.source_item.content_partner
     end
 
-    test "skips colour downloads without persisting a source item" do
+    test "persists a downloaded image even when it is colour" do
       red = Vips::Image.black(16, 16, bands: 3).new_from_image([ 220, 20, 20 ]).copy(interpretation: :srgb)
       harvester = Harvester.new(
         selector: FakeSelector.new([ reusable_record ]),
-        downloader: FakeDownloader.new(red.jpegsave_buffer(Q: 90))
+        downloader: FakeDownloader.new(body: red.jpegsave_buffer(Q: 90))
       )
 
-      assert_nil harvester.call
-      assert_equal 0, SourceItem.where(digitalnz_id: "harvest-1").count
+      candidate = harvester.call
+
+      assert_not_nil candidate
+      assert_equal "harvest-1", candidate.source_item.digitalnz_id
+    end
+
+    test "does not retry when download fails" do
+      downloader = FakeDownloader.new(error: ImageDownloader::Error.new("boom"))
+      harvester = Harvester.new(
+        selector: FakeSelector.new([ reusable_record, reusable_record.merge("id" => "harvest-2") ]),
+        downloader: downloader
+      )
+
+      error = assert_raises(ImageDownloader::Error) { harvester.call }
+      assert_equal "boom", error.message
+      assert_equal 1, downloader.calls
+      assert_nil SourceItem.find_by(digitalnz_id: "harvest-2")
     end
   end
 end
