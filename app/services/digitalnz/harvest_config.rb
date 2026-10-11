@@ -32,7 +32,7 @@ module Digitalnz
       params
     end
 
-    # Whitelist then blacklist: must match include (if any), then exclude wins.
+    # Allow then deny: must match include (if any), then exclude wins.
     # Empty include means the search params already define the partner pool.
     def allowed_partner?(name)
       name = name.to_s.strip
