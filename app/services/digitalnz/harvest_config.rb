@@ -1,6 +1,7 @@
 module Digitalnz
   class HarvestConfig
     SKIP_QUERY_KEYS = %w[page per_page utf8 facets facets_per_page fields].freeze
+    FILTER_KEY = /\A(i|and|or|without)\[([^\]]+)\](?:\[\])?\z/
     PREFILTERS = {
       subjects: "without[subject]",
       partners: "without[content_partner]",
@@ -26,8 +27,7 @@ module Digitalnz
     end
 
     def search_params
-      params = parse_query_string(url_query_string)
-      merge_configured_params!(params)
+      params = flatten_search_params(permitted_query_params)
       apply_prefilters!(params)
       params
     end
@@ -59,28 +59,76 @@ module Digitalnz
 
     def url_query_string
       raw = @data[:url].to_s.strip
-      return URI.parse(raw).query.to_s if raw.match?(%r{\A[a-z][a-z0-9+\-.]*://}i)
-
+      uri = URI.parse(raw)
+      uri.scheme ? uri.query.to_s : raw.delete_prefix("?")
+    rescue URI::InvalidURIError
       raw.delete_prefix("?")
     end
 
-    def parse_query_string(query)
-      params = {}
-      URI.decode_www_form(query.to_s).each { |raw_key, value| add_param!(params, raw_key, value) }
-      params
+    def permitted_query_params
+      nested = merge_nested_params(
+        nest_query_params(Rack::Utils.parse_query(url_query_string)),
+        nest_query_params(Hash(@data[:params]))
+      )
+
+      ActionController::Parameters.new(nested)
+        .except(*SKIP_QUERY_KEYS)
+        .slice(:text, :i, :and, :or, :without)
+        .permit(:text, text: [], i: {}, and: {}, or: {}, without: {})
+        .to_h
     end
 
-    def merge_configured_params!(params)
-      Hash(@data[:params]).each do |raw_key, value|
-        Array(value).each { |item| add_param!(params, raw_key, item) }
+    def nest_query_params(hash)
+      nested = {}
+
+      hash.each do |raw_key, value|
+        values = Array(value).map(&:to_s).reject(&:blank?)
+        next if values.empty?
+
+        key = raw_key.to_s
+        if (match = FILTER_KEY.match(key))
+          namespace, field = match.captures
+          fields = nested[namespace] ||= {}
+          fields[field] = Array(fields[field]) + values
+        else
+          nested[key] = Array(nested[key]) + values
+        end
+      end
+
+      nested
+    end
+
+    def merge_nested_params(base, extra)
+      extra.each_with_object(base.deep_dup) do |(key, value), memo|
+        if value.is_a?(Hash)
+          memo[key] = Hash(memo[key]).merge(value) { |_field, left, right| Array(left) + Array(right) }
+        else
+          memo[key] = Array(memo[key]) + Array(value)
+        end
       end
     end
 
-    def add_param!(params, raw_key, value)
-      key = api_param_key(raw_key)
-      return if key.blank? || SKIP_QUERY_KEYS.include?(key) || value.blank?
+    def flatten_search_params(permitted)
+      permitted = permitted.with_indifferent_access
+      params = {}
 
-      params[key] = Array(params[key]) + [ value.to_s ]
+      text = Array(permitted[:text]).map(&:to_s).reject(&:blank?)
+      params["text"] = text if text.any?
+
+      and_fields = Hash(permitted[:i]).merge(Hash(permitted[:and])) { |_field, left, right| Array(left) + Array(right) }
+      flatten_namespace!(params, "and", and_fields)
+      flatten_namespace!(params, "or", permitted[:or])
+      flatten_namespace!(params, "without", permitted[:without])
+      params
+    end
+
+    def flatten_namespace!(params, namespace, fields)
+      Hash(fields).each do |field, values|
+        values = Array(values).map(&:to_s).reject(&:blank?)
+        next if values.empty?
+
+        params["#{namespace}[#{field}]"] = values
+      end
     end
 
     def apply_prefilters!(params)
@@ -89,16 +137,6 @@ module Digitalnz
         next if exact.empty?
 
         params[key] = (Array(params[key]) + exact).uniq
-      end
-    end
-
-    def api_param_key(raw_key)
-      case raw_key.to_s
-      when /^(i|and|or|without)\[([^\]]+)\](?:\[\])?$/
-        namespace = $1 == "i" ? "and" : $1
-        "#{namespace}[#{$2}]"
-      when "text"
-        "text"
       end
     end
 

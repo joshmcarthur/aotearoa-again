@@ -26,6 +26,38 @@ module Digitalnz
       assert_equal [ "Modify" ], api.search_params["and[usage]"]
     end
 
+    test "parses a scheme-less query string" do
+      config = HarvestConfig.new("url" => "?i[category]=Images&i[usage]=Modify")
+
+      assert_equal [ "Images" ], config.search_params["and[category]"]
+      assert_equal [ "Modify" ], config.search_params["and[usage]"]
+    end
+
+    test "omits pagination facet and unknown query keys" do
+      config = HarvestConfig.new(
+        "url" => "https://digitalnz.org/records?i[category]=Images&page=2&per_page=20&utf8=%E2%9C%93&facets=decade&facets_per_page=100&fields=verbose&sort=date"
+      )
+      params = config.search_params
+
+      assert_equal [ "Images" ], params["and[category]"]
+      %w[page per_page utf8 facets facets_per_page fields sort].each do |key|
+        assert_nil params[key], key
+      end
+    end
+
+    test "drops blank values and keeps text and or filters" do
+      config = HarvestConfig.new(
+        "url" => "https://api.digitalnz.org/v3/records.json?text=wellington&or[decade][]=1950&i[usage]=",
+        "params" => { "i[content_partner]" => "" }
+      )
+      params = config.search_params
+
+      assert_equal [ "wellington" ], params["text"]
+      assert_equal [ "1950" ], params["or[decade]"]
+      assert_nil params["and[usage]"]
+      assert_nil params["and[content_partner]"]
+    end
+
     test "prefilters exact exclude values as without params and skips globs" do
       config = HarvestConfig.new(
         "params" => { "i[category]" => "Images" },
