@@ -1,24 +1,25 @@
 module Digitalnz
   class RightsFilter
-    REQUIRED_USAGE = "Modify".freeze
-    # NatLib free-download / Meta-upload-eligible ATL subset.
     COMMERCIAL_USAGE = "Use commercially".freeze
-    PREFERRED_USAGE = "Share".freeze
-    COLOUR_KEYWORDS = /\b(colour|color|coloured|colored|hand[- ]?coloured|hand[- ]?colored)\b/i
 
-    def self.acceptable?(record)
-      new(record).acceptable?
+    def self.allowed_partner?(name, config: HarvestConfig.current)
+      config.allowed_partner?(name)
     end
 
-    def initialize(record)
+    def self.acceptable?(record, config: HarvestConfig.current)
+      new(record, config: config).acceptable?
+    end
+
+    def initialize(record, config: HarvestConfig.current)
       @record = record.is_a?(Hash) ? record.with_indifferent_access : record
+      @config = config
     end
 
     def acceptable?
-      rights.present? &&
-        usage_includes?(REQUIRED_USAGE) &&
-        commercial_use? &&
-        !colour_keyword_hit?
+      @config.allowed_partner?(partner) &&
+        rights.present? &&
+        required_usage_met? &&
+        !@config.excluded_record?(@record)
     end
 
     def usage_list
@@ -36,13 +37,16 @@ module Digitalnz
 
     private
 
-    def usage_includes?(value)
-      usage_list.any? { |u| u.casecmp?(value) }
+    def partner
+      Array(@record[:content_partner]).first
     end
 
-    def colour_keyword_hit?
-      text = [ @record[:title], @record[:description] ].compact.join(" ")
-      text.match?(COLOUR_KEYWORDS)
+    def required_usage_met?
+      Array(@config.search_params["and[usage]"]).all? { |value| usage_includes?(value) }
+    end
+
+    def usage_includes?(value)
+      usage_list.any? { |u| u.casecmp?(value) }
     end
   end
 end
