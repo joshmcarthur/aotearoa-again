@@ -2,7 +2,7 @@
 
 Daily photographs from the Alexander Turnbull Library, seen again in colour.
 
-A small Rails app that harvests reusable ATL images via DigitalNZ (Modify + Use commercially — NatLib Meta-upload-eligible subset), AI-colourises them with RubyLLM (OpenRouter), human-reviews into a ~30-day runway, and publishes to the web, Atom feed, Buttondown, Instagram, Facebook Page, YouTube Shorts, and Bluesky.
+A small Rails app that harvests reusable black-and-white photographs via DigitalNZ from the Alexander Turnbull Library plus NZ councils, museums, and public libraries (Modify + Use commercially; portraits and already-colour images excluded), AI-colourises them with RubyLLM (OpenRouter), human-reviews into a ~30-day runway, and publishes to the web, Atom feed, Buttondown, Instagram, Facebook Page, YouTube Shorts, and Bluesky.
 
 ## Setup
 

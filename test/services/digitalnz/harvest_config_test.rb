@@ -119,13 +119,31 @@ module Digitalnz
       end
     end
 
-    test "app YAML searches ATL Images with Modify and Use commercially" do
+    test "app YAML searches Images with Modify and Use commercially" do
       params = HarvestConfig.current.search_params
 
       assert_equal [ "Images" ], params["and[category]"]
-      assert_equal [ "Alexander Turnbull Library" ], params["and[content_partner]"]
+      assert_nil params["and[content_partner]"]
       assert_includes params["and[usage]"], "Modify"
       assert_includes params["and[usage]"], "Use commercially"
+      assert_includes params["without[subject]"], "Portraits"
+      assert_includes params["without[content_partner]"], "The British Library"
+      assert_includes params["without[dc_type]"], "Map"
+      assert_not_includes params["without[subject]"], "*colour*"
+    end
+
+    test "app YAML allows ATL councils museums and extras" do
+      config = HarvestConfig.current
+
+      assert config.allowed_partner?("Alexander Turnbull Library")
+      assert config.allowed_partner?("Wellington City Council Archives")
+      assert config.allowed_partner?("Canterbury Museum")
+      assert config.allowed_partner?("Auckland Libraries")
+      assert config.allowed_partner?("MOTAT")
+      assert_not config.allowed_partner?("The British Library")
+      assert_not config.allowed_partner?("National Library of New Zealand")
+      assert config.excluded_record?(title: "Street", subject: [ "studio portraits" ], dc_type: [])
+      assert config.excluded_record?(title: "Hand coloured postcard", subject: [], dc_type: [])
     end
   end
 end

@@ -9,10 +9,48 @@ shared:
     "i[usage]":
       - Modify
       - Use commercially
-    "i[content_partner]": Alexander Turnbull Library
+
+  include:
+    partners:
+      - "*Council*"
+      - "*Museum*"
+      - "*Library*"
+      - "*Libraries*"
+      - MOTAT
+      - Puke Ariki
 
   exclude:
+    partners:
+      - The British Library
+      - Museums Victoria
+      - Australian National Maritime Museum
+      - National Library of New Zealand
+      - Digital Public Library of America
+      - "*University*"
+      - "*Theological*"
+      - "*College*"
+      - "*Parliamentary*"
+      - "*State Library*"
+    subjects:
+      - Portraits
+      - people
+      - Men
+      - Women
+      - Children
+      - "*portrait*"
+      - "*colour*"
+      - "*color*"
+    types:
+      - Transparency
+      - Photograph slide
+      - Map
+      - Poster
+      - Specimen
+      - Art work
+      - Card
+      - "*portrait*"
     title:
+      - "*portrait*"
       - "*colour*"
       - "*color*"
     description:
