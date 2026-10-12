@@ -1,15 +1,17 @@
 module Colourisers
   module Prompt
     TEXT = <<~PROMPT.squish.freeze
-      Colourise this historical black-and-white photograph with historically
-      plausible colours. Preserve the exact composition, geometry, faces, clothing
-      details, and scene content. If the scan includes a plate holder, mount, film
-      rebate, scanner edge, or other equipment or frame, keep it in the image and
-      colourise it as a physical object. Do not crop it out, extend the photograph
-      beyond it, or invent content that the frame or equipment is covering. Do not
-      invent major objects, people, text, or modern elements. Keep lighting natural
-      to the era. Do not add watermarks, logos, decorative borders, or overlaid
-      captions.
+      The input is a scan that may include a photograph plus existing film edges, mounts,
+      captions, labels, or margins. Apply historically plausible colour only to the
+      photographed scene—the people, places, and objects the camera captured. Do not add
+      grey mattes, borders, halos, or fringes around the scene; do not widen neutral
+      margins at the photograph edge. Where the scan already shows non-scene material,
+      match the input exactly—do not colourise it or add new detail. Keep the full
+      input dimensions and crop: do not remove scan edges, reframe, or extend the scene
+      beyond what is visible in the input. Preserve exact composition, geometry, faces,
+      clothing, and scene content. Do not invent objects, people, text, or modern
+      elements. Keep lighting natural to the era. Do not add watermarks, logos, or
+      overlays.
     PROMPT
   end
 end
