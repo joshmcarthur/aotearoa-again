@@ -26,6 +26,7 @@ class ShareLinksControllerTest < ActionDispatch::IntegrationTest
 
     get share_link_url(@share_link.code)
     assert_redirected_to edition_url(edition)
+    assert_includes response.headers["Cache-Control"], "s-maxage="
   end
 
   test "renders not published interstitial when edition is scheduled" do

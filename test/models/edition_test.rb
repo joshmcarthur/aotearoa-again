@@ -17,6 +17,21 @@ class EditionTest < ActiveSupport::TestCase
     attach_fixture_image(@variant, name: :colourised_image)
   end
 
+  test "next_publish_at is 7am today before publish and 7am tomorrow after" do
+    travel_to Time.zone.local(2026, 10, 19, 6, 30) do
+      assert_equal Time.zone.local(2026, 10, 19, 7), Edition.next_publish_at
+    end
+    travel_to Time.zone.local(2026, 10, 19, 7) do
+      assert_equal Time.zone.local(2026, 10, 20, 7), Edition.next_publish_at
+    end
+  end
+
+  test "next_publish_at keeps 7am local across daylight saving change" do
+    travel_to Time.zone.local(2026, 9, 26, 12) do
+      assert_equal Time.zone.local(2026, 9, 27, 7), Edition.next_publish_at
+    end
+  end
+
   test "next_free_publish_on skips occupied dates" do
     tomorrow = Time.zone.tomorrow
     Edition.create!(variant: @variant, publish_on: tomorrow, state: "scheduled")

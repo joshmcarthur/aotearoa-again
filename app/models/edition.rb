@@ -2,6 +2,8 @@ class Edition < ApplicationRecord
   include Rails.application.routes.url_helpers
 
   STATES = %w[scheduled published failed].freeze
+  # Keep in sync with the publish_edition schedule in config/recurring.yml.
+  PUBLISH_HOUR = 7
 
   belongs_to :variant
   has_one :candidate, through: :variant
@@ -24,6 +26,11 @@ class Edition < ApplicationRecord
 
   def self.today
     for_date(Time.zone.today)
+  end
+
+  def self.next_publish_at(now: Time.current)
+    publish_at = now.in_time_zone.change(hour: PUBLISH_HOUR)
+    publish_at > now ? publish_at : publish_at + 1.day
   end
 
   def self.next_free_publish_on(from: Time.zone.tomorrow)
