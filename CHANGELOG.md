@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.23.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.22.1...v0.23.0) (2026-10-19)
+
+
+### Features
+
+* edge-cache public pages until the next edition publishes ([#158](https://github.com/joshmcarthur/aotearoa-again/issues/158)) ([285e5bc](https://github.com/joshmcarthur/aotearoa-again/commit/285e5bcadb16af0a2e9e2619168d74afddec3bcf))
+
 ## [0.22.1](https://github.com/joshmcarthur/aotearoa-again/compare/v0.22.0...v0.22.1) (2026-10-11)
 
 
