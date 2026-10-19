@@ -1,4 +1,6 @@
 class ShareLinksController < ApplicationController
+  include EdgeCacheable
+
   def show
     share_link = ShareLink.find_by!(code: params[:code])
     edition = share_link.variant.edition
@@ -6,6 +8,7 @@ class ShareLinksController < ApplicationController
     if edition&.state == "published"
       redirect_to edition_url(edition), status: :found
     else
+      cache_briefly
       render "editions/not_published", status: :not_found
     end
   end

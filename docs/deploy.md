@@ -77,6 +77,19 @@ Recurring schedules are in `config/recurring.yml` (harvest 01:00, ensure edition
 3. Optional: Cloudflare Access policy on path `/admin*`.
 4. Set credentials `app.host` to the public hostname (no protocol).
 
+### Edge caching
+
+Public pages send `Cache-Control: public, s-maxage=<seconds until the next 07:00 Auckland publish>` (browsers get `max-age` of at most 5 minutes), so Cloudflare can hold them until the next edition changes the homepage, archive, feed, and adjacent-edition links. "Not ready yet" responses (homepage before publish, unpublished editions) are cached for 60 seconds. `/admin` sends `no-store`.
+
+Cloudflare does not cache HTML by default. Add a Cache Rule (**Caching → Cache Rules**):
+
+- **When:** hostname equals your domain **and** URI path does not start with `/admin` **and** URI path does not equal `/up`
+- **Then:** Eligible for cache; Edge TTL → *Use cache-control header if present, bypass cache if not*; Browser TTL → *Respect origin*
+
+Check with `curl -sI https://your-domain/` — `cf-cache-status: HIT` on a second request, and `age` resetting after 07:00. If Tiered Cache is enabled, confirm pages still expire at 07:00.
+
+Changes made during the day to a published edition (admin regenerate, takedown) stay cached until the next 07:00 publish — purge the affected URLs (`/`, `/editions`, `/editions/:publish_on`, `/feed.xml`) in **Caching → Configuration → Custom Purge**.
+
 ## Takedown
 
 If DigitalNZ/ATL request removal:
@@ -86,7 +99,7 @@ If DigitalNZ/ATL request removal:
 
 ## Instagram / Facebook
 
-Harvest is limited to NatLib's Meta-upload-eligible ATL subset (DigitalNZ **Use commercially** + **Modify**). See [natlib-social-media.md](natlib-social-media.md) for caption, people/tikanga, and takedown rules.
+Harvest follows `config/digitalnz.yml` (DigitalNZ url + params, plus include/exclude). See [natlib-social-media.md](natlib-social-media.md) for caption, people/tikanga, and takedown rules.
 
 Optional Instagram and Facebook Page deliveries via the Meta Graph API. Credentials are optional — when a channel’s credentials are blank, or when the source item lacks DigitalNZ **Use commercially** (`SourceItem#commercial_use?`), `EnsureEditionDeliveriesJob` marks that delivery `skipped` (email still delivers).
 

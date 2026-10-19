@@ -1,14 +1,8 @@
 module Digitalnz
   class RandomSelector
-    # Modify: colourisation allowed. Use commercially: NatLib free-download /
-    # Meta-upload-eligible ATL subset (see docs/natlib-social-media.md).
+    # Search params come from config/digitalnz.yml (url, params, exact exclude prefilters).
     # Use "and[usage]" (not "and[usage][]") so Faraday NestedParamsEncoder
     # emits and[usage][]=Modify&and[usage][]=Use+commercially.
-    BASE_FILTERS = {
-      "and[content_partner][]" => "Alexander Turnbull Library",
-      "and[category][]" => "Images",
-      "and[usage]" => [ "Modify", "Use commercially" ]
-    }.freeze
 
     PER_PAGE = 20
     MAX_ATTEMPTS = 12
@@ -24,13 +18,16 @@ module Digitalnz
 
     def call
       MAX_ATTEMPTS.times do
-        decade = pick_decade
+        partner = pick_partner
+        next unless partner
+
+        decade = pick_decade(partner)
         next unless decade
 
-        page = pick_page(decade)
+        page = pick_page(partner, decade)
         next unless page
 
-        records = fetch_page(decade, page)
+        records = fetch_page(partner, decade, page)
         record = records.find { |r| acceptable_new?(r) }
         return record if record
       rescue Client::Error
@@ -41,8 +38,17 @@ module Digitalnz
 
     private
 
-    def pick_decade
-      data = @client.search(BASE_FILTERS.merge(facets: "decade", facets_per_page: 100, per_page: 0))
+    def pick_partner
+      data = @client.search(search_filters.merge(facets: "content_partner", facets_per_page: 150, per_page: 0))
+      facets = data.dig("search", "facets", "content_partner") || data.dig("facets", "content_partner") || {}
+      partners = normalize_facet_values(facets).select { |value| RightsFilter.allowed_partner?(value[:name]) }
+      return nil if partners.empty?
+
+      partners.sample[:name]
+    end
+
+    def pick_decade(partner)
+      data = @client.search(partner_filters(partner).merge(facets: "decade", facets_per_page: 100, per_page: 0))
       facets = data.dig("search", "facets", "decade") || data.dig("facets", "decade") || {}
       values = normalize_facet_values(facets)
       return nil if values.empty?
@@ -83,8 +89,8 @@ module Digitalnz
       end
     end
 
-    def pick_page(decade)
-      data = @client.search(BASE_FILTERS.merge("and[decade][]" => decade, per_page: PER_PAGE, page: 1))
+    def pick_page(partner, decade)
+      data = @client.search(partner_filters(partner).merge("and[decade][]" => decade, per_page: PER_PAGE, page: 1))
       result_count = (data.dig("search", "result_count") || data["result_count"]).to_i
       return nil if result_count <= 0
 
@@ -97,9 +103,17 @@ module Digitalnz
       @authenticated ? AUTHENTICATED_MAX_PAGE : ANONYMOUS_MAX_PAGE
     end
 
-    def fetch_page(decade, page)
-      data = @client.search(BASE_FILTERS.merge("and[decade][]" => decade, per_page: PER_PAGE, page: page))
+    def fetch_page(partner, decade, page)
+      data = @client.search(partner_filters(partner).merge("and[decade][]" => decade, per_page: PER_PAGE, page: page))
       Array(data.dig("search", "results") || data["results"])
+    end
+
+    def search_filters
+      HarvestConfig.current.search_params
+    end
+
+    def partner_filters(partner)
+      search_filters.merge("and[content_partner]" => [ partner ])
     end
 
     def acceptable_new?(record)
