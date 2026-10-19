@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="#f3efe6">
     <meta name="description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : "Daily photographs from Aotearoa's archives, seen again in colour." %>">
-    <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= yield :head %>
     <% if AppConfig.bluesky_publication_uri.present? %>

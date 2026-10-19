@@ -44,6 +44,38 @@ class EditionsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match "Published plate", response.body
   end
 
+  test "today is edge cached until the next publish without setting a cookie" do
+    travel_to Time.zone.today.in_time_zone.change(hour: 8) do
+      get root_url
+    end
+
+    assert_response :success
+    cache_control = response.headers["Cache-Control"]
+    assert_includes cache_control, "public"
+    assert_includes cache_control, "max-age=300"
+    assert_includes cache_control, "s-maxage=#{23.hours.to_i}"
+    assert_includes cache_control, "stale-if-error=#{1.day.to_i}"
+    assert_nil response.headers["Set-Cookie"]
+    assert_no_match "csrf-token", response.body
+  end
+
+  test "browser max-age never outlives the next publish" do
+    travel_to Time.zone.today.in_time_zone.change(hour: 6, min: 58) do
+      get edition_url(@edition)
+    end
+
+    assert_includes response.headers["Cache-Control"], "max-age=120"
+    assert_includes response.headers["Cache-Control"], "s-maxage=120"
+  end
+
+  test "today without edition for today is cached briefly" do
+    @edition.update!(publish_on: 2.days.ago.to_date)
+
+    get root_url
+    assert_response :not_found
+    assert_equal "max-age=60, public, s-maxage=60", response.headers["Cache-Control"]
+  end
+
   test "archive lists editions with unbranded composite thumb" do
     attach_fixture_image(@variant, name: :composite_image)
     attach_fixture_image(@variant, name: :share_image)
@@ -70,6 +102,7 @@ class EditionsControllerTest < ActionDispatch::IntegrationTest
     get edition_url(@edition)
     assert_response :not_found
     assert_match "Not published yet", response.body
+    assert_equal "max-age=60, public, s-maxage=60", response.headers["Cache-Control"]
   end
 
   test "og image uses stable share image url" do
