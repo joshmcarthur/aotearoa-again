@@ -27,6 +27,7 @@ module Admin
     test "requires authentication" do
       get admin_editions_url
       assert_response :unauthorized
+      assert_equal "no-store", response.headers["Cache-Control"]
     end
 
     test "index succeeds when authenticated" do
@@ -34,6 +35,7 @@ module Admin
       assert_response :success
       assert_match @source.title, response.body
       assert_match admin_edition_path(@edition), response.body
+      assert_equal "no-store", response.headers["Cache-Control"]
     end
 
     test "show renders all four image variant labels" do

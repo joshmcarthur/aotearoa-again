@@ -1,8 +1,8 @@
 # Aotearoa, Again
 
-Daily photographs from the Alexander Turnbull Library, seen again in colour.
+Daily photographs from Aotearoa's archives, seen again in colour.
 
-A small Rails app that harvests reusable ATL images via DigitalNZ (Modify + Use commercially — NatLib Meta-upload-eligible subset), AI-colourises them with RubyLLM (OpenRouter), human-reviews into a ~30-day runway, and publishes to the web, Atom feed, Buttondown, Instagram, Facebook Page, YouTube Shorts, and Bluesky.
+A small Rails app that harvests reusable black-and-white photographs via DigitalNZ from the Alexander Turnbull Library plus NZ councils, museums, and public libraries (Modify + Use commercially; portraits and already-colour images excluded), AI-colourises them with RubyLLM (OpenRouter), human-reviews into a ~30-day runway, and publishes to the web, Atom feed, Buttondown, Instagram, Facebook Page, YouTube Shorts, and Bluesky.
 
 ## Setup
 
@@ -32,7 +32,7 @@ Share video (9:16 shorts) needs **ffmpeg** on `PATH` in addition to libvips. The
 
 ## Pipeline
 
-1. `HarvestCandidatesJob` — DigitalNZ ATL images with Modify + Use commercially  
+1. `HarvestCandidatesJob` — DigitalNZ search from `config/digitalnz.yml` (url + params, include/exclude criteria)  
 2. `ColouriseCandidateJob` — RubyLLM.paint via preferred `Model` rows  
 3. Admin approve → schedule `Edition`  
 4. `PublishEditionJob` (07:00 NZ) publishes the edition, then enqueues per-channel delivery jobs (Buttondown, Instagram, Facebook, YouTube Shorts, Bluesky)  

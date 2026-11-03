@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.23.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.22.1...v0.23.0) (2026-10-19)
+
+
+### Features
+
+* edge-cache public pages until the next edition publishes ([#158](https://github.com/joshmcarthur/aotearoa-again/issues/158)) ([285e5bc](https://github.com/joshmcarthur/aotearoa-again/commit/285e5bcadb16af0a2e9e2619168d74afddec3bcf))
+
+## [0.22.1](https://github.com/joshmcarthur/aotearoa-again/compare/v0.22.0...v0.22.1) (2026-10-11)
+
+
+### Bug Fixes
+
+* retain plate mounts and equipment in colourise prompt ([#151](https://github.com/joshmcarthur/aotearoa-again/issues/151)) ([cd70274](https://github.com/joshmcarthur/aotearoa-again/commit/cd70274b1c812f440c15722b563957fb5862daa5))
+
+## [0.22.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.21.2...v0.22.0) (2026-09-19)
+
+
+### Features
+
+* add admin button to queue harvest job ([#135](https://github.com/joshmcarthur/aotearoa-again/issues/135)) ([1c13a31](https://github.com/joshmcarthur/aotearoa-again/commit/1c13a313e5578ec7466160e9f0a82d31ef6963c1))
+
+## [0.21.2](https://github.com/joshmcarthur/aotearoa-again/compare/v0.21.1...v0.21.2) (2026-09-13)
+
+
+### Bug Fixes
+
+* Rotate to non-expiring OpenRouter key. Limit by spend instead ([#131](https://github.com/joshmcarthur/aotearoa-again/issues/131)) ([40671c4](https://github.com/joshmcarthur/aotearoa-again/commit/40671c4d6ae96a940e46b2fae8fb869cfeff9208))
+
 ## [0.21.1](https://github.com/joshmcarthur/aotearoa-again/compare/v0.21.0...v0.21.1) (2026-09-01)
 
 

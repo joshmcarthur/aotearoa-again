@@ -3,15 +3,18 @@
     <h1 class="text-2xl font-semibold">Review queue</h1>
     <p class="text-sm text-stone-600">Ready candidates awaiting approval into the runway.</p>
   </div>
-  <div class="rounded border border-stone-300 bg-white px-4 py-2 text-sm">
-    Runway: <strong><%= @runway_days %></strong> approved days ahead
-    <% if @runway_days < 7 %><span class="text-red-700">(low)</span><% end %>
-    · Pipeline pending: <%= @pending %>
+  <div class="flex flex-wrap items-center gap-3">
+    <%= button_to "Harvest candidates", harvest_admin_candidates_path, class: "rounded bg-stone-900 px-3 py-2 text-sm text-white" %>
+    <div class="rounded border border-stone-300 bg-white px-4 py-2 text-sm">
+      Runway: <strong><%= @runway_days %></strong> approved days ahead
+      <% if @runway_days < 7 %><span class="text-red-700">(low)</span><% end %>
+      · Pipeline pending: <%= @pending %>
+    </div>
   </div>
 </div>
 
 <% if @candidates.empty? %>
-  <p class="text-stone-600">No ready candidates. Run harvest/colourise jobs.</p>
+  <p class="text-stone-600">No ready candidates. Harvest to fill the pipeline, then wait for colourisation.</p>
 <% else %>
   <ul class="space-y-4">
     <% @candidates.each do |candidate| %>

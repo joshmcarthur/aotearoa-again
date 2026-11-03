@@ -1,12 +1,11 @@
-class Model < ApplicationRecord
-  acts_as_model
-
-  has_many :variants, dependent: :restrict_with_exception
+class Model < RubyLLM::ActiveRecord::Model
+  # Avoid STI: ruby_llm_models has no type column.
+  self.inheritance_column = nil
 
   scope :preferred_for_colourise, -> { where(preferred_for_colourise: true) }
   scope :image_capable, -> {
     where(
-      "EXISTS (SELECT 1 FROM json_each(models.modalities, '$.output') WHERE json_each.value = ?)",
+      "EXISTS (SELECT 1 FROM json_each(#{table_name}.modalities, '$.output') WHERE json_each.value = ?)",
       "image"
     )
   }

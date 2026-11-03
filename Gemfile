@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 8.1.3"
+gem "rails", "~> 8.1.4"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use SQLite for Active Record (multi-DB in production for Solid*)
@@ -38,7 +38,7 @@ gem "thruster", require: false
 gem "foreman", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-gem "image_processing", "~> 2.0"
+gem "image_processing", "~> 2.2"
 # Soft dependency of image_processing 2.x; required for share image composition (`require "vips"`)
 gem "ruby-vips", "~> 2.2", require: false
 

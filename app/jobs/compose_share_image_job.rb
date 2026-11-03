@@ -15,7 +15,8 @@ class ComposeShareImageJob < ApplicationJob
         result = Composer.new(
           original_path: original_file.path,
           colourised_path: colourised_file.path,
-          short_url: share_link.url
+          short_url: share_link.url,
+          content_partner: variant.candidate.source_item.content_partner
         ).call
 
         variant.composite_image.attach(

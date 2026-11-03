@@ -6,7 +6,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match "About", response.body
     assert_match "Images are interpretive", response.body
-    assert_match "Alexander Turnbull Library", response.body
+    assert_match "libraries, museums, and councils", response.body
   end
 
   test "nav includes social links when configured" do

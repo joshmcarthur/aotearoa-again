@@ -1,0 +1,58 @@
+# Harvest pool: DigitalNZ search (url + params) plus include/exclude criteria.
+# Every pattern is exact (case-insensitive) or a glob (* and ?). Wrap a word
+# in *...* to match it anywhere. Exact excludes on partners/subjects/types are
+# prefiltered as without[]; globs are applied when sampling and checking records.
+shared:
+  url: https://digitalnz.org/records
+  params:
+    "i[category]": Images
+    "i[usage]":
+      - Modify
+      - Use commercially
+
+  include:
+    partners:
+      - "*Council*"
+      - "*Museum*"
+      - "*Library*"
+      - "*Libraries*"
+      - MOTAT
+      - Puke Ariki
+
+  exclude:
+    partners:
+      - The British Library
+      - Museums Victoria
+      - Australian National Maritime Museum
+      - National Library of New Zealand
+      - Digital Public Library of America
+      - "*University*"
+      - "*Theological*"
+      - "*College*"
+      - "*Parliamentary*"
+      - "*State Library*"
+    subjects:
+      - Portraits
+      - people
+      - Men
+      - Women
+      - Children
+      - "*portrait*"
+      - "*colour*"
+      - "*color*"
+    types:
+      - Transparency
+      - Photograph slide
+      - Map
+      - Poster
+      - Specimen
+      - Art work
+      - Card
+      - "*portrait*"
+    title:
+      - "*portrait*"
+      - "*colour*"
+      - "*color*"
+    description:
+      - "*colour*"
+      - "*color*"

@@ -36,6 +36,11 @@ module Admin
       redirect_to admin_candidate_path(@candidate), notice: "Colourisation queued"
     end
 
+    def harvest
+      HarvestCandidatesJob.perform_later
+      redirect_to admin_candidates_path, notice: "Harvest queued"
+    end
+
     private
 
     def set_candidate

@@ -11,6 +11,6 @@ Model.transaction do
 end
 
 missing = preferred_ids - Model.preferred_for_colourise.pluck(:model_id)
-warn "Missing preferred colourise models (run Model.refresh!): #{missing.join(", ")}" if missing.any?
+warn "Missing preferred colourise models (run RubyLLM.models.refresh): #{missing.join(", ")}" if missing.any?
 
 puts "Preferred colourise models: #{Model.preferred_for_colourise.order(:model_id).pluck(:model_id).join(", ")}"

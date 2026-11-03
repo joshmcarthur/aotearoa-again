@@ -4,8 +4,7 @@
     <title><%= content_for?(:title) ? yield(:title) : "Aotearoa, Again" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="#f3efe6">
-    <meta name="description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : "Daily photographs from the Alexander Turnbull Library, seen again in colour." %>">
-    <%= csrf_meta_tags %>
+    <meta name="description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : "Daily photographs from Aotearoa's archives, seen again in colour." %>">
     <%= csp_meta_tag %>
     <%= yield :head %>
     <% if AppConfig.bluesky_publication_uri.present? %>
@@ -25,7 +24,7 @@
       <div class="aa-header-inner">
         <a href="<%= root_path %>" class="aa-brand">
           <span class="aa-brand-name">Aotearoa, Again</span>
-          <span class="aa-brand-tagline">Daily photographs from the Alexander Turnbull Library, seen again in colour.</span>
+          <span class="aa-brand-tagline">Daily photographs from Aotearoa's archives, seen again in colour.</span>
         </a>
         <nav class="aa-nav">
           <%= link_to "Archive", editions_path %>
@@ -46,7 +45,7 @@
     </main>
     <footer class="aa-footer">
       <p class="aa-footer-attribution">
-        Photographs courtesy of the Alexander Turnbull Library, via DigitalNZ. AI colourised — images are interpretive.
+        Photographs courtesy of libraries, museums, and councils across Aotearoa, via DigitalNZ. AI colourised — images are interpretive.
       </p>
       <p class="aa-footer-meta">
         <%= link_to "About", about_path, class: "aa-footer-link" %>

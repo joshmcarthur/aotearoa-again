@@ -2,6 +2,6 @@ class RefreshRubyLlmModelsJob < ApplicationJob
   queue_as :default
 
   def perform
-    Model.refresh!
+    RubyLLM.models.refresh
   end
 end

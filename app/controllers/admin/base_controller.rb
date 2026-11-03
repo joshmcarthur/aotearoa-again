@@ -1,5 +1,6 @@
 module Admin
   class BaseController < ApplicationController
+    before_action :no_store
     before_action :authenticate_admin
     layout "admin"
 

@@ -18,10 +18,11 @@ class ComposeShareImageJob
     ImageResult = Data.define(:io, :filename, :content_type)
     Result = Data.define(:composite, :share)
 
-    def initialize(original_path:, colourised_path:, short_url:)
+    def initialize(original_path:, colourised_path:, short_url:, content_partner: nil)
       @original_path = original_path
       @colourised_path = colourised_path
       @short_url = short_url
+      @content_partner = content_partner
     end
 
     def call
@@ -47,7 +48,10 @@ class ComposeShareImageJob
 
       # Materialize once — we write the unbranded composite and a branded copy.
       blended = DiagonalBlend.apply(bw, colour, width, height).copy_memory
-      stamped = BrandChip.stamp(blended, width, height, @short_url)
+      stamped = BrandChip.stamp(
+        blended, width, height, @short_url,
+        caption: BrandChip.attribution_line(@content_partner, @short_url)
+      )
 
       Result.new(
         composite: jpeg_result(blended, "composite.jpg"),
