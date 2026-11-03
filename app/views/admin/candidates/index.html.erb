@@ -1,7 +1,7 @@
 <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
   <div>
     <h1 class="text-2xl font-semibold">Review queue</h1>
-    <p class="text-sm text-stone-600">Ready candidates awaiting approval into the runway.</p>
+    <p class="text-sm text-stone-600">Clear harvested originals, then choose a colourised variant for the runway.</p>
   </div>
   <div class="flex flex-wrap items-center gap-3">
     <%= button_to "Harvest candidates", harvest_admin_candidates_path, class: "rounded bg-stone-900 px-3 py-2 text-sm text-white" %>
@@ -13,28 +13,65 @@
   </div>
 </div>
 
-<% if @candidates.empty? %>
-  <p class="text-stone-600">No ready candidates. Harvest to fill the pipeline, then wait for colourisation.</p>
-<% else %>
-  <ul class="space-y-4">
-    <% @candidates.each do |candidate| %>
-      <% history = candidate.review_history %>
-      <li class="rounded border border-stone-300 bg-white p-4 <%= "opacity-75" if history.status != :needs_review %>">
-        <div class="flex flex-wrap items-start justify-between gap-4">
-          <div class="min-w-0 flex-1">
-            <div class="flex flex-wrap items-center gap-2">
-              <h2 class="text-lg font-semibold"><%= candidate.source_item.title %></h2>
-              <span class="rounded border px-2 py-0.5 text-xs font-medium <%= candidate_review_status_classes(history.status) %>">
-                <%= history.status_label %>
-              </span>
+<section class="mb-10">
+  <h2 class="text-lg font-semibold">Clear originals</h2>
+  <p class="mb-3 text-sm text-stone-600">Approve a black-and-white original before colourisation.</p>
+  <% if @clearance_candidates.empty? %>
+    <p class="text-stone-600">No originals waiting for clearance. Harvest to fill this queue.</p>
+  <% else %>
+    <ul class="space-y-4">
+      <% @clearance_candidates.each do |candidate| %>
+        <% history = candidate.review_history %>
+        <li class="rounded border border-stone-300 bg-white p-4">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <h3 class="text-lg font-semibold"><%= candidate.source_item.title %></h3>
+                <span class="rounded border px-2 py-0.5 text-xs font-medium <%= candidate_review_status_classes(history.status) %>">
+                  <%= history.status_label %>
+                </span>
+              </div>
+              <p class="text-sm text-stone-600"><%= [candidate.source_item.display_date, candidate.source_item.placename, candidate.source_item.content_partner].compact.join(" · ") %></p>
+              <p class="mt-1 text-sm text-stone-500"><%= history.summary %></p>
+              <p class="mt-1 text-sm"><%= truncate(candidate.source_item.description.to_s, length: 180) %></p>
             </div>
-            <p class="text-sm text-stone-600"><%= [candidate.source_item.display_date, candidate.source_item.placename].compact.join(" · ") %></p>
-            <p class="mt-1 text-sm text-stone-500"><%= history.summary %></p>
-            <p class="mt-1 text-sm"><%= truncate(candidate.source_item.description.to_s, length: 180) %></p>
+            <% if candidate.original_image.attached? %>
+              <%= image_tag candidate.original_image, class: "h-24 w-24 shrink-0 object-cover" %>
+            <% end %>
+            <%= link_to "Review", admin_candidate_path(candidate), class: "rounded bg-stone-900 px-3 py-2 text-sm text-white" %>
           </div>
-          <%= link_to history.status == :needs_review ? "Review" : "View", admin_candidate_path(candidate), class: "rounded bg-stone-900 px-3 py-2 text-sm text-white" %>
-        </div>
-      </li>
-    <% end %>
-  </ul>
-<% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</section>
+
+<section>
+  <h2 class="text-lg font-semibold">Choose colour</h2>
+  <p class="mb-3 text-sm text-stone-600">Ready candidates awaiting approval into the runway.</p>
+  <% if @candidates.empty? %>
+    <p class="text-stone-600">No colourised candidates. Clear an original to queue colourisation.</p>
+  <% else %>
+    <ul class="space-y-4">
+      <% @candidates.each do |candidate| %>
+        <% history = candidate.review_history %>
+        <li class="rounded border border-stone-300 bg-white p-4 <%= "opacity-75" if history.status != :needs_review %>">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <h3 class="text-lg font-semibold"><%= candidate.source_item.title %></h3>
+                <span class="rounded border px-2 py-0.5 text-xs font-medium <%= candidate_review_status_classes(history.status) %>">
+                  <%= history.status_label %>
+                </span>
+              </div>
+              <p class="text-sm text-stone-600"><%= [candidate.source_item.display_date, candidate.source_item.placename].compact.join(" · ") %></p>
+              <p class="mt-1 text-sm text-stone-500"><%= history.summary %></p>
+              <p class="mt-1 text-sm"><%= truncate(candidate.source_item.description.to_s, length: 180) %></p>
+            </div>
+            <%= link_to history.status == :needs_review ? "Review" : "View", admin_candidate_path(candidate), class: "rounded bg-stone-900 px-3 py-2 text-sm text-white" %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</section>

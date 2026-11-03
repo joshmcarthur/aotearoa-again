@@ -1,5 +1,5 @@
 class Candidate < ApplicationRecord
-  STATUSES = %w[pending_colour colouring ready rejected].freeze
+  STATUSES = %w[pending_review pending_colour colouring ready rejected].freeze
 
   belongs_to :source_item
   has_many :variants, dependent: :destroy
@@ -8,12 +8,17 @@ class Candidate < ApplicationRecord
 
   validates :status, inclusion: { in: STATUSES }
 
+  scope :pending_review, -> { where(status: "pending_review") }
   scope :pending_colour, -> { where(status: "pending_colour") }
   scope :ready, -> { where(status: "ready") }
   scope :without_edition, -> { where.not(id: joins(variants: :edition).select(:id)) }
   scope :in_pipeline, -> { where(status: %w[pending_colour colouring ready]) }
   scope :awaiting_approval, -> { ready.without_edition }
   scope :ready_or_in_pipeline, -> { in_pipeline.without_edition }
+
+  def queue_colourise!
+    update!(status: "pending_colour")
+  end
 
   def mark_colouring!
     update!(status: "colouring")

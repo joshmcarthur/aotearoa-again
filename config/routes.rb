@@ -22,6 +22,7 @@ Rails.application.routes.draw do
         post :approve
         post :reject
         post :regenerate
+        post :queue_colourise
       end
     end
     resources :editions, only: %i[index show] do

@@ -10,31 +10,30 @@ class HarvestCandidatesJobTest < ActiveJob::TestCase
     )
   end
 
-  test "harvests when ready candidates are already in published editions" do
-    3.times do |index|
-      source = create_source_item(digitalnz_id: "published-#{index}", dedupe_key: "published-#{index}")
-      candidate = source.candidates.create!(status: "ready")
-      attach_fixture_image(candidate)
-      variant = candidate.variants.create!(model: @model, prompt: "colourise", chosen: true)
-      attach_fixture_image(variant, name: :colourised_image)
-      Edition.create!(
-        variant: variant,
-        publish_on: (index + 1).days.ago.to_date,
-        state: "published",
-        published_at: (index + 1).days.ago
-      )
-    end
-
-    harvester = Minitest::Mock.new
-    harvester.expect(:call, lazy_candidate_proxy)
-
-    Digitalnz::Harvester.stub(:new, ->(*) { harvester }) do
-      assert_enqueued_with(job: ColouriseCandidateJob) do
+  test "tops up pending_review without enqueueing colourise" do
+    Digitalnz::Harvester.stub(:new, ->(*) { on_demand_harvester }) do
+      assert_no_enqueued_jobs(only: ColouriseCandidateJob) do
         assert_equal 1, HarvestCandidatesJob.perform_now(target: 1)
       end
     end
+  end
 
-    harvester.verify
+  test "does not count ready candidates toward the harvest target" do
+    ready_source = create_source_item(digitalnz_id: "ready-1", dedupe_key: "ready-1")
+    ready_source.candidates.create!(status: "ready")
+
+    Digitalnz::Harvester.stub(:new, ->(*) { on_demand_harvester }) do
+      assert_equal 1, HarvestCandidatesJob.perform_now(target: 1)
+    end
+  end
+
+  test "stops when pending_review already meets the target" do
+    source = create_source_item
+    source.candidates.create!(status: "pending_review")
+
+    Digitalnz::Harvester.stub(:new, ->(*) { flunk "should not harvest" }) do
+      assert_equal 0, HarvestCandidatesJob.perform_now(target: 1)
+    end
   end
 
   private
@@ -42,19 +41,15 @@ class HarvestCandidatesJobTest < ActiveJob::TestCase
   def build_harvested_candidate
     suffix = SecureRandom.hex(4)
     source = create_source_item(digitalnz_id: "fresh-#{suffix}", dedupe_key: "fresh-#{suffix}")
-    candidate = source.candidates.create!(status: "pending_colour")
+    candidate = source.candidates.create!(status: "pending_review")
     attach_fixture_image(candidate)
     candidate
   end
 
-  def lazy_candidate_proxy
+  def on_demand_harvester
     test_case = self
-    candidate = nil
-    Object.new.tap do |proxy|
-      proxy.define_singleton_method(:id) do
-        candidate ||= test_case.send(:build_harvested_candidate)
-        candidate.id
-      end
+    Object.new.tap do |harvester|
+      harvester.define_singleton_method(:call) { test_case.send(:build_harvested_candidate) }
     end
   end
 end

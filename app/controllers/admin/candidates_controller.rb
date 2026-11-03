@@ -1,9 +1,13 @@
 module Admin
   class CandidatesController < BaseController
-    before_action :set_candidate, only: %i[show approve reject regenerate]
+    before_action :set_candidate, only: %i[show approve reject regenerate queue_colourise]
 
     def index
       @runway_days = Edition.approved_runway_days
+      @clearance_candidates = Candidate.pending_review
+        .includes(:source_item)
+        .with_attached_original_image
+        .order(created_at: :desc)
       @candidates = Candidate.awaiting_approval
         .includes(:source_item, variants: [ :model, :edition ], editions: { variant: :model })
         .order(created_at: :desc)
@@ -34,6 +38,16 @@ module Admin
         replace: true
       )
       redirect_to admin_candidate_path(@candidate), notice: "Colourisation queued"
+    end
+
+    def queue_colourise
+      if @candidate.status == "pending_review"
+        @candidate.queue_colourise!
+        ColouriseCandidateJob.perform_later(@candidate.id)
+        redirect_to admin_candidates_path, notice: "Colourisation queued"
+      else
+        redirect_to admin_candidate_path(@candidate), alert: "Original is not awaiting clearance"
+      end
     end
 
     def harvest

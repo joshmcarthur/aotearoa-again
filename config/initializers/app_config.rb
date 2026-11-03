@@ -39,7 +39,7 @@
 #     alert_email: you@example.com
 #   app:
 #     host: aotearoa-again.example
-#     harvest_pipeline_target: 3
+#     harvest_pipeline_target: 30
 #     instagram_url: https://www.instagram.com/...
 #     facebook_url: https://www.facebook.com/...
 #     youtube_url: https://www.youtube.com/@...
@@ -133,7 +133,7 @@ module AppConfig
 
   def bluesky_url = dig(:app, :bluesky_url)
 
-  def harvest_pipeline_target = Integer(dig(:app, :harvest_pipeline_target).presence || 3)
+  def harvest_pipeline_target = Integer(dig(:app, :harvest_pipeline_target).presence || 30)
 
   def smtp = dig(:smtp) || {}
 

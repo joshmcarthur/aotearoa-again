@@ -42,6 +42,13 @@ class CandidateTest < ActiveSupport::TestCase
     assert_includes Candidate.ready_or_in_pipeline, pending
   end
 
+  test "pending_review is a valid status" do
+    candidate = @source.candidates.create!(status: "pending_review")
+
+    assert_includes Candidate.pending_review, candidate
+    assert_includes Candidate::STATUSES, "pending_review"
+  end
+
   test "awaiting_approval includes ready candidates without editions" do
     assert_includes Candidate.awaiting_approval, @candidate
   end

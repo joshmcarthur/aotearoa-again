@@ -74,18 +74,24 @@
 </div>
 
 <div class="mt-8 flex flex-wrap gap-4 border-t border-stone-300 pt-6">
+  <% if @candidate.status == "pending_review" %>
+    <%= button_to "Approve original", queue_colourise_admin_candidate_path(@candidate), class: "rounded bg-emerald-800 px-3 py-2 text-sm text-white" %>
+  <% end %>
+
   <%= button_to "Reject", reject_admin_candidate_path(@candidate), params: { reason: "Not suitable" }, class: "rounded border border-red-700 px-3 py-2 text-sm text-red-800" %>
 
-  <%= form_with url: regenerate_admin_candidate_path(@candidate), method: :post, class: "flex flex-wrap items-end gap-2" do %>
-    <div>
-      <label class="block text-xs font-semibold uppercase">Regenerate with model</label>
-      <select name="model_id" class="rounded border border-stone-400 px-2 py-1 text-sm">
-        <option value="">Preferred set</option>
-        <% Model.openrouter.image_capable.order(:name).each do |model| %>
-          <option value="<%= model.id %>"><%= model.name %> (<%= model.model_id %>)</option>
-        <% end %>
-      </select>
-    </div>
-    <button class="rounded bg-stone-900 px-3 py-2 text-sm text-white">Regenerate colour</button>
+  <% unless @candidate.status == "pending_review" %>
+    <%= form_with url: regenerate_admin_candidate_path(@candidate), method: :post, class: "flex flex-wrap items-end gap-2" do %>
+      <div>
+        <label class="block text-xs font-semibold uppercase">Regenerate with model</label>
+        <select name="model_id" class="rounded border border-stone-400 px-2 py-1 text-sm">
+          <option value="">Preferred set</option>
+          <% Model.openrouter.image_capable.order(:name).each do |model| %>
+            <option value="<%= model.id %>"><%= model.name %> (<%= model.model_id %>)</option>
+          <% end %>
+        </select>
+      </div>
+      <button class="rounded bg-stone-900 px-3 py-2 text-sm text-white">Regenerate colour</button>
+    <% end %>
   <% end %>
 </div>

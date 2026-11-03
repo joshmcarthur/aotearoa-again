@@ -2,7 +2,7 @@ module Admin
   module CandidatesHelper
     def candidate_review_status_classes(status)
       case status
-      when :needs_review
+      when :awaiting_clearance, :needs_review
         "border-amber-300 bg-amber-50 text-amber-900"
       when :scheduled
         "border-emerald-300 bg-emerald-50 text-emerald-900"

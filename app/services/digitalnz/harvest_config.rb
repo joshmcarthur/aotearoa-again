@@ -44,6 +44,17 @@ module Digitalnz
       matches_any?(name, includes)
     end
 
+    def allowed_type?(values)
+      types = Array(values).map { |value| value.to_s.strip }.reject(&:blank?)
+      return false if types.any? { |type| matches_any?(type, exclude_list(:types)) }
+
+      includes = include_list(:types)
+      return true if includes.empty?
+      return false if types.empty?
+
+      types.any? { |type| matches_any?(type, includes) }
+    end
+
     def excluded_record?(record)
       record = record.with_indifferent_access
       RECORD_FIELDS.any? do |field, key|

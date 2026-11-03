@@ -8,7 +8,7 @@ class ColouriseCandidateJob < ApplicationJob
 
   def perform(candidate_id, model_ids: nil, replace: false)
     candidate = Candidate.find(candidate_id)
-    return if candidate.status == "rejected"
+    return if %w[pending_review rejected].include?(candidate.status)
 
     candidate.mark_colouring!
     candidate.variants.destroy_all if replace
