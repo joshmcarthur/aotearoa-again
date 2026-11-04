@@ -28,39 +28,59 @@ module Digitalnz
         next unless page
 
         records = fetch_page(partner, decade, page)
-        record = records.find { |r| acceptable_new?(r) }
+        record = records.find { |candidate| acceptable_new?(candidate) }
         return record if record
+      rescue Client::RateLimited
+        raise
       rescue Client::Error
         next
       end
       nil
     end
 
+    def exclude(id)
+      @exclude_ids.add(id.to_s)
+    end
+
     private
 
     def pick_partner
+      return nil if partner_names.empty?
+
+      partner_names.sample
+    end
+
+    def partner_names
+      return @partner_names if defined?(@partner_names)
+
       data = @client.search(search_filters.merge(facets: "content_partner", facets_per_page: 150, per_page: 0))
       facets = data.dig("search", "facets", "content_partner") || data.dig("facets", "content_partner") || {}
-      partners = normalize_facet_values(facets).select { |value| RightsFilter.allowed_partner?(value[:name]) }
-      return nil if partners.empty?
-
-      partners.sample[:name]
+      @partner_names = normalize_facet_values(facets)
+        .select { |value| RightsFilter.allowed_partner?(value[:name]) }
+        .map { |value| value[:name] }
     end
 
     def pick_decade(partner)
-      data = @client.search(partner_filters(partner).merge(facets: "decade", facets_per_page: 100, per_page: 0))
-      facets = data.dig("search", "facets", "decade") || data.dig("facets", "decade") || {}
-      values = normalize_facet_values(facets)
+      values = decade_values(partner)
       return nil if values.empty?
 
-      total = values.sum { |v| v[:count] }
+      total = values.sum { |value| value[:count] }
       target = rand(total)
       running = 0
-      values.each do |v|
-        running += v[:count]
-        return v[:name] if target < running
+      values.each do |value|
+        running += value[:count]
+        return value[:name] if target < running
       end
       values.last[:name]
+    end
+
+    def decade_values(partner)
+      @decade_values ||= {}
+      return @decade_values[partner] if @decade_values.key?(partner)
+
+      data = @client.search(partner_filters(partner).merge(facets: "decade", facets_per_page: 100, per_page: 0))
+      facets = data.dig("search", "facets", "decade") || data.dig("facets", "decade") || {}
+      @decade_values[partner] = normalize_facet_values(facets)
     end
 
     # DigitalNZ returns facets as { "1950" => 20803, ... }. Older docs/examples
@@ -90,13 +110,21 @@ module Digitalnz
     end
 
     def pick_page(partner, decade)
-      data = @client.search(partner_filters(partner).merge("and[decade][]" => decade, per_page: PER_PAGE, page: 1))
-      result_count = (data.dig("search", "result_count") || data["result_count"]).to_i
+      result_count = result_count_for(partner, decade)
       return nil if result_count <= 0
 
       max_page = [ (result_count.to_f / PER_PAGE).ceil, 1 ].max
       max_page = [ max_page, page_ceiling ].min
       rand(1..max_page)
+    end
+
+    def result_count_for(partner, decade)
+      @result_counts ||= {}
+      key = [ partner, decade ]
+      return @result_counts[key] if @result_counts.key?(key)
+
+      data = @client.search(partner_filters(partner).merge("and[decade][]" => decade, per_page: PER_PAGE, page: 1))
+      @result_counts[key] = (data.dig("search", "result_count") || data["result_count"]).to_i
     end
 
     def page_ceiling

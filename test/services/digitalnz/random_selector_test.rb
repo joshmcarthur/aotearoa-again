@@ -111,6 +111,37 @@ module Digitalnz
       assert partner_queries.all? { |params| Array(params["and[content_partner]"]) == [ "Wellington City Council Archives" ] }
     end
 
+    test "does not start a new search when DigitalNZ rate-limits" do
+      calls = 0
+      client = Object.new
+      client.define_singleton_method(:search) do |*|
+        calls += 1
+        raise Client::RateLimited, "blocked"
+      end
+
+      selector = RandomSelector.new(client: client, exclude_ids: [])
+
+      assert_raises(Client::RateLimited) { selector.call }
+      assert_equal 1, calls
+    end
+
+    test "reuses partner and decade lookups for later photos" do
+      calls = Hash.new(0)
+      client = Object.new
+      client.define_singleton_method(:search) do |params|
+        key = params[:facets] || params["facets"] || "page"
+        calls[key] += 1
+        FakeClient.new.search(params)
+      end
+      selector = RandomSelector.new(client: client, exclude_ids: [])
+
+      2.times { assert_equal 99, selector.call["id"] }
+
+      assert_equal 1, calls["content_partner"]
+      assert_equal 1, calls["decade"]
+      assert_equal 3, calls["page"]
+    end
+
     test "caps anonymous pagination at page 100" do
       client = Object.new
       def client.search(params)

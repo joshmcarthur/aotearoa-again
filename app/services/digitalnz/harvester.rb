@@ -1,3 +1,5 @@
+require "vips"
+
 module Digitalnz
   class Harvester
     MAX_ATTEMPTS = 5
@@ -28,7 +30,7 @@ module Digitalnz
         end
 
         return persist(attrs, file)
-      rescue ImageDownloader::Error
+      rescue ImageDownloader::Error, Vips::Error
         next
       end
 
@@ -44,6 +46,7 @@ module Digitalnz
 
       candidate = source_item.candidates.create!(status: "pending_review")
       candidate.original_image.attach(**file)
+      remember(attrs[:digitalnz_id])
       candidate
     end
 
@@ -52,6 +55,11 @@ module Digitalnz
       source_item.assign_attributes(attrs)
       source_item.save!
       source_item.discard! unless source_item.discarded?
+      remember(attrs[:digitalnz_id])
+    end
+
+    def remember(id)
+      @selector.exclude(id) if @selector.respond_to?(:exclude)
     end
   end
 end
