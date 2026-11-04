@@ -55,11 +55,18 @@ module Digitalnz
       types.any? { |type| matches_any?(type, includes) }
     end
 
+    PEOPLE_SUBJECTS = [ "*people*", "*person*" ].freeze
+
     def excluded_record?(record)
       record = record.with_indifferent_access
       RECORD_FIELDS.any? do |field, key|
         any_value_matches?(record[key], exclude_list(field))
       end
+    end
+
+    def people_record?(record)
+      record = record.with_indifferent_access
+      any_value_matches?(record[:subject], PEOPLE_SUBJECTS)
     end
 
     private

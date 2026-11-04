@@ -10,10 +10,11 @@ module Digitalnz
     ANONYMOUS_MAX_PAGE = 100
     AUTHENTICATED_MAX_PAGE = 500
 
-    def initialize(client: Client.new, exclude_ids: nil, authenticated: AppConfig.digitalnz_api_key.present?)
+    def initialize(client: Client.new, exclude_ids: nil, authenticated: AppConfig.digitalnz_api_key.present?, allow_people: true)
       @client = client
       @exclude_ids = Set.new((exclude_ids || SourceItem.pluck(:digitalnz_id)).map(&:to_s))
       @authenticated = authenticated
+      @allow_people = allow_people
     end
 
     def call
@@ -28,12 +29,16 @@ module Digitalnz
         next unless page
 
         records = fetch_page(partner, decade, page)
-        record = records.find { |r| acceptable_new?(r) }
+        record = pick_record(records)
         return record if record
       rescue Client::Error
         next
       end
       nil
+    end
+
+    def allow_people=(value)
+      @allow_people = value
     end
 
     private
@@ -114,6 +119,17 @@ module Digitalnz
 
     def partner_filters(partner)
       search_filters.merge("and[content_partner]" => [ partner ])
+    end
+
+    def pick_record(records)
+      acceptable = records.select { |record| acceptable_new?(record) }
+      acceptable = acceptable.reject { |record| people_record?(record) } unless @allow_people
+      preferred = acceptable.reject { |record| people_record?(record) }
+      (preferred.presence || acceptable).sample
+    end
+
+    def people_record?(record)
+      HarvestConfig.current.people_record?(record)
     end
 
     def acceptable_new?(record)
