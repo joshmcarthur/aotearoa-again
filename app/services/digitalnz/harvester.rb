@@ -5,10 +5,12 @@ module Digitalnz
     def initialize(
       client: Client.new,
       selector: nil,
-      downloader: ImageDownloader.new
+      downloader: ImageDownloader.new,
+      allow_people: true
     )
       @client = client
-      @selector = selector || RandomSelector.new(client: client)
+      @selector = selector || RandomSelector.new(client: client, allow_people: allow_people)
+      @selector.allow_people = allow_people if @selector.respond_to?(:allow_people=)
       @downloader = downloader
     end
 

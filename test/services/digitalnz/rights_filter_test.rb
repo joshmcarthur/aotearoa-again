@@ -75,6 +75,7 @@ module Digitalnz
       assert_not RightsFilter.acceptable?(reusable(subject: [ "Men" ]))
       assert_not RightsFilter.acceptable?(reusable(dc_type: [ "Portrait photographs." ]))
       assert_not RightsFilter.acceptable?(reusable(title: "Portrait of Mr James Coutt Crawford"))
+      assert_not RightsFilter.acceptable?(reusable(description: "A framed black and white portrait of a couple"))
     end
 
     test "does not treat clothing or description mentions as portraits" do
