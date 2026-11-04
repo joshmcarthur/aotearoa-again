@@ -21,6 +21,7 @@ module Digitalnz
 
       response = @http.get(url)
       raise Error, "Download failed (#{response.status})" unless response.success?
+      raise Error, "Empty download body" if response.body.blank?
 
       content_type = response.headers["content-type"].to_s.split(";").first.presence || "image/jpeg"
       path = URI.parse(url).path.to_s

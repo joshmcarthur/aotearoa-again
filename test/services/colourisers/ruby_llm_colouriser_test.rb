@@ -36,7 +36,10 @@ class Colourisers::RubyLlmColouriserTest < ActiveSupport::TestCase
     assert_equal @model.model_id, captured[:model]
     assert_equal :openrouter, captured[:provider]
     assert_equal @candidate.original_image, captured[:with]
-    refute captured.key?(:provider_options)
+    assert_equal(
+      { max_tokens: Colourisers::RubyLlmColouriser::MAX_OUTPUT_TOKENS, n: 1 },
+      captured[:provider_options]
+    )
     assert_equal "PNGDATA", result[:io].read
     assert_equal "image/png", result[:content_type]
     assert_equal({ "input_tokens" => 11, "output_tokens" => 22, "cost" => 0.04 }, result[:usage])

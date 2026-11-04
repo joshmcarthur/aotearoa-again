@@ -75,6 +75,18 @@ module Digitalnz
       assert_not RightsFilter.acceptable?(reusable(subject: [ "Men" ]))
       assert_not RightsFilter.acceptable?(reusable(dc_type: [ "Portrait photographs." ]))
       assert_not RightsFilter.acceptable?(reusable(title: "Portrait of Mr James Coutt Crawford"))
+      assert_not RightsFilter.acceptable?(reusable(description: "A framed black and white portrait of a couple"))
+    end
+
+    test "rejects newspaper scans and poster photographs" do
+      assert_not RightsFilter.acceptable?(reusable(title: "Otago Daily Times newspaper, 12 May 1910"))
+      assert_not RightsFilter.acceptable?(reusable(title: "Copy: Abortion, Apartheid, Unions, Nuclear (posters, handouts, protests)"))
+      assert_not RightsFilter.acceptable?(reusable(subject: [ "Newspapers" ]))
+      assert_not RightsFilter.acceptable?(reusable(dc_type: [ "Newspaper" ]))
+    end
+
+    test "keeps a photograph that only quotes a newspaper" do
+      assert RightsFilter.acceptable?(reusable(description: "The wedding report in the newspaper said she was the granddaughter"))
     end
 
     test "does not treat clothing or description mentions as portraits" do
