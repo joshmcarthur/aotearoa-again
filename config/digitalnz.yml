@@ -43,11 +43,15 @@ shared:
       - "*portrait*"
       - "*colour*"
       - "*color*"
+      - "*newspaper*"
+      - "*poster*"
     types:
       - Transparency
       - Photograph slide
       - Map
       - Poster
+      - "*poster*"
+      - "*newspaper*"
       - Specimen
       - Art work
       - Card
@@ -56,6 +60,8 @@ shared:
       - "*portrait*"
       - "*colour*"
       - "*color*"
+      - "*newspaper*"
+      - "*poster*"
     description:
       - "*colour*"
       - "*color*"
