@@ -16,7 +16,10 @@ module Digitalnz
     end
 
     def colour_photograph?
-      image = Vips::Image.new_from_buffer(read_bytes, "")
+      bytes = read_bytes
+      raise Vips::Error, "empty buffer" if bytes.blank?
+
+      image = Vips::Image.new_from_buffer(bytes, "")
       return false if image.bands < 3
 
       lab = image.thumbnail_image(THUMBNAIL_SIZE).colourspace(:lab)
