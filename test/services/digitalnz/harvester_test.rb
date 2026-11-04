@@ -91,6 +91,29 @@ module Digitalnz
       assert SourceItem.find_by(digitalnz_id: "colour-2").discarded?
     end
 
+    test "discards a large-face photograph and harvests the next record" do
+      face = photograph_record("face-1", title: "Sitter")
+      mono = photograph_record("harvest-4", title: "Queen Street")
+      body = File.binread(Rails.root.join("test/fixtures/files/mono_plate.jpg"))
+      calls = 0
+
+      harvester = Harvester.new(
+        selector: SequenceSelector.new([ face, mono ]),
+        downloader: FakeDownloader.new(body)
+      )
+
+      candidate = FacePhotographCheck.stub(:portrait?, ->(io) {
+        io.rewind if io.respond_to?(:rewind)
+        calls += 1
+        calls == 1
+      }) do
+        harvester.call
+      end
+
+      assert_equal "harvest-4", candidate.source_item.digitalnz_id
+      assert SourceItem.find_by(digitalnz_id: "face-1").discarded?
+    end
+
     private
 
     def photograph_record(id, title: "Queen Street")
