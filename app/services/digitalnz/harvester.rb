@@ -1,3 +1,5 @@
+require "vips"
+
 module Digitalnz
   class Harvester
     MAX_ATTEMPTS = 5
@@ -5,10 +7,12 @@ module Digitalnz
     def initialize(
       client: Client.new,
       selector: nil,
-      downloader: ImageDownloader.new
+      downloader: ImageDownloader.new,
+      allow_people: true
     )
       @client = client
-      @selector = selector || RandomSelector.new(client: client)
+      @selector = selector || RandomSelector.new(client: client, allow_people: allow_people)
+      @selector.allow_people = allow_people if @selector.respond_to?(:allow_people=)
       @downloader = downloader
     end
 
@@ -22,13 +26,13 @@ module Digitalnz
         next unless RightsFilter.acceptable?(record)
 
         file = @downloader.call(attrs[:image_url])
-        if ColourPhotographCheck.colour_photograph?(file[:io])
+        if ColourPhotographCheck.colour_photograph?(file[:io]) || FacePhotographCheck.portrait?(file[:io])
           discard_source(attrs)
           next
         end
 
         return persist(attrs, file)
-      rescue ImageDownloader::Error
+      rescue ImageDownloader::Error, Vips::Error
         next
       end
 
@@ -44,6 +48,7 @@ module Digitalnz
 
       candidate = source_item.candidates.create!(status: "pending_review")
       candidate.original_image.attach(**file)
+      remember(attrs[:digitalnz_id])
       candidate
     end
 
@@ -52,6 +57,11 @@ module Digitalnz
       source_item.assign_attributes(attrs)
       source_item.save!
       source_item.discard! unless source_item.discarded?
+      remember(attrs[:digitalnz_id])
+    end
+
+    def remember(id)
+      @selector.exclude(id) if @selector.respond_to?(:exclude)
     end
   end
 end

@@ -1,6 +1,38 @@
 # frozen_string_literal: true
 
-require 'generators/ruby_llm/upgrade/legacy_content_sql'
+# Copied from ruby_llm 2.0.0 (removed in 2.1.x); used only while backfilling legacy content_raw.
+module RubyLLM
+  module Generators
+    class LegacyContentSQL # :nodoc:
+      SPACE = [ 9, 10, 11, 12, 13, 32, 133, 160, 5760, *8192..8202, 8232, 8233, 8239, 8287, 12_288 ].pack('U*').freeze
+
+      def initialize(connection)
+        @connection = connection
+      end
+
+      def render(content:, raw:)
+        normalized, rendered, nonblank = expressions(raw)
+        present = "#{normalized} NOT IN ('null', 'false', '[]', '{}') AND #{nonblank}"
+        "CASE WHEN #{present} THEN #{rendered} ELSE #{content} END"
+      end
+
+      private
+
+      def expressions(raw)
+        case @connection.adapter_name
+        when 'PostgreSQL'
+          [ "(#{raw}::jsonb)::text", "#{raw}::text",
+           "btrim(#{raw}::jsonb #>> '{}', #{@connection.quote(SPACE)}) <> ''" ]
+        when 'Mysql2'
+          [ "CAST(#{raw} AS CHAR)", "CAST(#{raw} AS CHAR)",
+           "JSON_UNQUOTE(#{raw}) NOT REGEXP '^[[:space:]]*$'" ]
+        else
+          [ "json(#{raw})", raw, "trim(json_extract(#{raw}, '$'), #{@connection.quote(SPACE)}) <> ''" ]
+        end
+      end
+    end
+  end
+end
 
 class BackfillRubyLlmV2Data < ActiveRecord::Migration[8.1]
   disable_ddl_transaction!

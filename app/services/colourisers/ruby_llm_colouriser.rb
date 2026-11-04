@@ -4,6 +4,11 @@ module Colourisers
   class RubyLlmColouriser
     class Error < StandardError; end
 
+    # OpenRouter reserves this many completion tokens when the field is absent.
+    # 4096 covers a 4K Gemini image (2520 tokens) plus minimal thinking.
+    # The model maximum (~32k) reserves about $2 at image-token rates.
+    MAX_OUTPUT_TOKENS = 4096
+
     def call(attachment:, model:, prompt: Prompt::TEXT)
       raise Error, "Original image missing" unless attachment&.attached?
       raise Error, "Model required" unless model
@@ -12,7 +17,8 @@ module Colourisers
         prompt,
         model: model.model_id,
         provider: model.provider.to_sym,
-        with: attachment
+        with: attachment,
+        provider_options: { max_tokens: MAX_OUTPUT_TOKENS, n: 1 }
       )
       image = painted.is_a?(Array) ? painted.first : painted
       raise Error, "Empty colourised image" if image.blank?
