@@ -22,7 +22,7 @@ module Digitalnz
         next unless RightsFilter.acceptable?(record)
 
         file = @downloader.call(attrs[:image_url])
-        if ColourPhotographCheck.colour_photograph?(file[:io])
+        if ColourPhotographCheck.colour_photograph?(file[:io]) || FacePhotographCheck.portrait?(file[:io])
           discard_source(attrs)
           next
         end
