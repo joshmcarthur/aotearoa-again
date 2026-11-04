@@ -7,10 +7,12 @@ module Digitalnz
     def initialize(
       client: Client.new,
       selector: nil,
-      downloader: ImageDownloader.new
+      downloader: ImageDownloader.new,
+      allow_people: true
     )
       @client = client
-      @selector = selector || RandomSelector.new(client: client)
+      @selector = selector || RandomSelector.new(client: client, allow_people: allow_people)
+      @selector.allow_people = allow_people if @selector.respond_to?(:allow_people=)
       @downloader = downloader
     end
 
@@ -24,7 +26,7 @@ module Digitalnz
         next unless RightsFilter.acceptable?(record)
 
         file = @downloader.call(attrs[:image_url])
-        if ColourPhotographCheck.colour_photograph?(file[:io])
+        if ColourPhotographCheck.colour_photograph?(file[:io]) || FacePhotographCheck.portrait?(file[:io])
           discard_source(attrs)
           next
         end

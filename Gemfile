@@ -41,6 +41,7 @@ gem "foreman", require: false
 gem "image_processing", "~> 2.2"
 # Soft dependency of image_processing 2.x; required for share image composition (`require "vips"`)
 gem "ruby-vips", "~> 2.2", require: false
+gem "onnxruntime", require: false
 
 gem "ruby_llm"
 gem "faraday"

@@ -79,6 +79,23 @@ class HarvestCandidatesJobTest < ActiveJob::TestCase
     assert_equal 6, calls
   end
 
+  test "stops taking people photos after one third of the target" do
+    source = create_source_item(raw_metadata: { "subject" => [ "People and Families" ] })
+    source.candidates.create!(status: "pending_review")
+    flags = []
+    harvester = Object.new
+    harvester.define_singleton_method(:call) { nil }
+
+    Digitalnz::Harvester.stub(:new, ->(*_, **kwargs) {
+      flags << kwargs[:allow_people]
+      harvester
+    }) do
+      assert_equal 0, HarvestCandidatesJob.perform_now(target: 3)
+    end
+
+    assert_equal [ false ] * HarvestCandidatesJob::MAX_CONSECUTIVE_MISSES, flags
+  end
+
   private
 
   def build_harvested_candidate
