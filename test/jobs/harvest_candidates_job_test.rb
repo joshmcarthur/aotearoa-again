@@ -36,6 +36,49 @@ class HarvestCandidatesJobTest < ActiveJob::TestCase
     end
   end
 
+  test "continues after an empty harvest" do
+    calls = 0
+    test_case = self
+    harvester = sequenced_harvester do
+      calls += 1
+      calls == 1 ? nil : test_case.send(:build_harvested_candidate)
+    end
+
+    Digitalnz::Harvester.stub(:new, ->(*_, **_) { harvester }) do
+      assert_equal 1, HarvestCandidatesJob.perform_now(target: 1)
+    end
+    assert_equal 2, calls
+  end
+
+  test "does not count a rate limit as an empty harvest" do
+    calls = 0
+    test_case = self
+    harvester = sequenced_harvester do
+      calls += 1
+      raise Digitalnz::Client::RateLimited, "blocked" if calls <= 6
+
+      test_case.send(:build_harvested_candidate)
+    end
+
+    Digitalnz::Harvester.stub(:new, ->(*_, **_) { harvester }) do
+      assert_equal 1, HarvestCandidatesJob.perform_now(target: 1)
+    end
+    assert_equal 7, calls
+  end
+
+  test "stops after six empty harvests" do
+    calls = 0
+    harvester = sequenced_harvester do
+      calls += 1
+      nil
+    end
+
+    Digitalnz::Harvester.stub(:new, ->(*_, **_) { harvester }) do
+      assert_equal 0, HarvestCandidatesJob.perform_now(target: 30)
+    end
+    assert_equal 6, calls
+  end
+
   test "stops taking people photos after one third of the target" do
     source = create_source_item(raw_metadata: { "subject" => [ "People and Families" ] })
     source.candidates.create!(status: "pending_review")
@@ -50,7 +93,7 @@ class HarvestCandidatesJobTest < ActiveJob::TestCase
       assert_equal 0, HarvestCandidatesJob.perform_now(target: 3)
     end
 
-    assert_equal [ false ], flags
+    assert_equal [ false ] * HarvestCandidatesJob::MAX_CONSECUTIVE_MISSES, flags
   end
 
   private
@@ -67,6 +110,12 @@ class HarvestCandidatesJobTest < ActiveJob::TestCase
     test_case = self
     Object.new.tap do |harvester|
       harvester.define_singleton_method(:call) { test_case.send(:build_harvested_candidate) }
+    end
+  end
+
+  def sequenced_harvester(&block)
+    Object.new.tap do |harvester|
+      harvester.define_singleton_method(:call, &block)
     end
   end
 end

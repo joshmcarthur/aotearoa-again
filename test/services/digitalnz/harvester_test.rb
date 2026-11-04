@@ -91,6 +91,31 @@ module Digitalnz
       assert SourceItem.find_by(digitalnz_id: "colour-2").discarded?
     end
 
+    test "skips an unreadable download and harvests the next record" do
+      bad = photograph_record("bad-1")
+      mono = photograph_record("harvest-3", title: "Queen Street")
+      bodies = {
+        "https://example.com/bad-1.jpg" => "not-an-image",
+        "https://example.com/harvest-3.jpg" => File.binread(Rails.root.join("test/fixtures/files/mono_plate.jpg"))
+      }
+
+      harvester = Harvester.new(
+        selector: SequenceSelector.new([ bad, mono ]),
+        downloader: lambda do |url|
+          {
+            io: StringIO.new(bodies.fetch(url)),
+            filename: "original.jpg",
+            content_type: "image/jpeg"
+          }
+        end
+      )
+
+      candidate = harvester.call
+
+      assert_equal "harvest-3", candidate.source_item.digitalnz_id
+      assert_nil SourceItem.find_by(digitalnz_id: "bad-1")
+    end
+
     test "discards a large-face photograph and harvests the next record" do
       face = photograph_record("face-1", title: "Sitter")
       mono = photograph_record("harvest-4", title: "Queen Street")
