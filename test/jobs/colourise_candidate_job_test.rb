@@ -27,6 +27,27 @@ class ColouriseCandidateJobTest < ActiveJob::TestCase
     attach_fixture_image(@candidate)
   end
 
+  test "skips pending_review candidates" do
+    @candidate.update!(status: "pending_review")
+
+    ColouriseCandidateJob.perform_now(@candidate.id)
+
+    assert_equal "pending_review", @candidate.reload.status
+    assert_equal 0, @candidate.variants.count
+  end
+
+  test "colourises a ready candidate for regenerate" do
+    @candidate.update!(status: "ready")
+    Colourisers::RubyLlmColouriser.define_singleton_method(:new) { FakeColouriser.new }
+
+    ColouriseCandidateJob.perform_now(@candidate.id, model_ids: [ @model.id ], replace: true)
+
+    assert_equal "ready", @candidate.reload.status
+    assert @candidate.variants.first.colourised_image.attached?
+  ensure
+    Colourisers::RubyLlmColouriser.singleton_class.remove_method(:new)
+  end
+
   test "enqueues compose share image job after colourise" do
     Colourisers::RubyLlmColouriser.define_singleton_method(:new) { FakeColouriser.new }
 

@@ -8,7 +8,8 @@ module Digitalnz
         description: "Looking north",
         rights: [ "No known copyright restrictions" ],
         usage: [ "Modify", "Share", "Use commercially" ],
-        content_partner: [ "Alexander Turnbull Library" ]
+        content_partner: [ "Alexander Turnbull Library" ],
+        dc_type: [ "Photograph - print" ]
       }.merge(overrides)
     end
 
@@ -53,6 +54,10 @@ module Digitalnz
       assert_not RightsFilter.acceptable?(reusable(dc_type: [ "Map" ]))
       assert_not RightsFilter.acceptable?(reusable(dc_type: [ "Poster" ]))
       assert_not RightsFilter.acceptable?(reusable(dc_type: [ "Specimen" ]))
+      assert_not RightsFilter.acceptable?(reusable(dc_type: [ "Art work" ]))
+      assert_not RightsFilter.acceptable?(reusable(dc_type: [ "Watercolors." ]))
+      assert_not RightsFilter.acceptable?(reusable(dc_type: []))
+      assert_not RightsFilter.acceptable?(reusable.except(:dc_type))
     end
 
     test "accepts photograph negatives prints and lantern slides" do

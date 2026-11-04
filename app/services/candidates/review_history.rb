@@ -2,7 +2,7 @@ module Candidates
   Event = Data.define(:at, :kind, :label, :detail)
 
   class ReviewHistory
-    STATUSES = %i[needs_review scheduled published failed rejected].freeze
+    STATUSES = %i[awaiting_clearance needs_review scheduled published failed rejected].freeze
 
     def initialize(candidate)
       @candidate = candidate
@@ -10,6 +10,7 @@ module Candidates
 
     def status
       return :rejected if @candidate.status == "rejected"
+      return :awaiting_clearance if @candidate.status == "pending_review"
 
       edition = current_edition
       return :needs_review unless edition
@@ -25,6 +26,7 @@ module Candidates
 
     def status_label
       {
+        awaiting_clearance: "Awaiting clearance",
         needs_review: "Needs review",
         scheduled: "Scheduled",
         published: "Published",
@@ -39,6 +41,8 @@ module Candidates
       parts << (variant_count == 1 ? "1 variant" : "#{variant_count} variants") if variant_count.positive?
 
       case status
+      when :awaiting_clearance
+        parts << "not cleared"
       when :needs_review
         parts << "not reviewed"
       when :scheduled

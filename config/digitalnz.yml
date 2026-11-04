@@ -18,6 +18,9 @@ shared:
       - "*Libraries*"
       - MOTAT
       - Puke Ariki
+    types:
+      - "Photograph*"
+      - "Lantern slides*"
 
   exclude:
     partners:

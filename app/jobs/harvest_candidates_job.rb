@@ -3,12 +3,10 @@ class HarvestCandidatesJob < ApplicationJob
 
   def perform(target: AppConfig.harvest_pipeline_target)
     created = 0
-    while Candidate.ready_or_in_pipeline.count < target
-      candidate = Digitalnz::Harvester.new.call
-      break unless candidate
+    while Candidate.pending_review.count < target
+      break unless Digitalnz::Harvester.new.call
 
       created += 1
-      ColouriseCandidateJob.perform_later(candidate.id)
     end
     created
   end

@@ -95,6 +95,31 @@ module Digitalnz
       assert_not config.allowed_partner?("University of Otago")
     end
 
+    test "include then exclude types with globs and exact names" do
+      config = HarvestConfig.new(
+        "include" => { "types" => [ "Photograph*", "Lantern slides*" ] },
+        "exclude" => { "types" => [ "Photograph slide", "*portrait*" ] }
+      )
+
+      assert config.allowed_type?([ "Photograph - print" ])
+      assert config.allowed_type?([ "Photograph - negative" ])
+      assert config.allowed_type?([ "Lantern slides." ])
+      assert_not config.allowed_type?([ "Photograph slide" ])
+      assert_not config.allowed_type?([ "Portrait photographs." ])
+      assert_not config.allowed_type?([ "Art work" ])
+      assert_not config.allowed_type?([ "Watercolors." ])
+      assert_not config.allowed_type?([])
+      assert_not config.allowed_type?(nil)
+    end
+
+    test "empty type include allows any type that is not excluded" do
+      config = HarvestConfig.new("exclude" => { "types" => [ "Map" ] })
+
+      assert config.allowed_type?([ "Art work" ])
+      assert config.allowed_type?(nil)
+      assert_not config.allowed_type?([ "Map" ])
+    end
+
     test "excludes records by title, description, subject, and type patterns" do
       config = HarvestConfig.new(
         "exclude" => {
@@ -144,6 +169,11 @@ module Digitalnz
       assert_not config.allowed_partner?("National Library of New Zealand")
       assert config.excluded_record?(title: "Street", subject: [ "studio portraits" ], dc_type: [])
       assert config.excluded_record?(title: "Hand coloured postcard", subject: [], dc_type: [])
+      assert config.allowed_type?([ "Photograph - print" ])
+      assert config.allowed_type?([ "Lantern slides." ])
+      assert_not config.allowed_type?([ "Art work" ])
+      assert_not config.allowed_type?([ "Watercolors." ])
+      assert_not config.allowed_type?([])
     end
   end
 end

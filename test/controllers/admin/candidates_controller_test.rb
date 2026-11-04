@@ -26,6 +26,44 @@ module Admin
       assert_response :success
       assert_match @source.title, response.body
       assert_match "Needs review", response.body
+      assert_match "Choose colour", response.body
+    end
+
+    test "index lists pending_review originals for clearance" do
+      source = create_source_item(title: "Street scene for clearance")
+      candidate = source.candidates.create!(status: "pending_review")
+      attach_fixture_image(candidate)
+
+      get admin_candidates_url, headers: basic_auth
+      assert_response :success
+      assert_match "Clear originals", response.body
+      assert_match "Street scene for clearance", response.body
+    end
+
+    test "queue_colourise moves pending_review to pending_colour" do
+      source = create_source_item
+      candidate = source.candidates.create!(status: "pending_review")
+      attach_fixture_image(candidate)
+
+      assert_enqueued_with(job: ColouriseCandidateJob, args: [ candidate.id ]) do
+        post queue_colourise_admin_candidate_url(candidate), headers: basic_auth
+      end
+
+      assert_redirected_to admin_candidates_path
+      assert_equal "pending_colour", candidate.reload.status
+      assert_equal "Colourisation queued", flash[:notice]
+    end
+
+    test "show pending_review offers original clearance" do
+      source = create_source_item(title: "Uncleared original")
+      candidate = source.candidates.create!(status: "pending_review")
+      attach_fixture_image(candidate)
+
+      get admin_candidate_url(candidate), headers: basic_auth
+      assert_response :success
+      assert_match "Approve original", response.body
+      assert_no_match "Approve this variant", response.body
+      assert_no_match "Regenerate colour", response.body
     end
 
     test "show displays history timeline" do

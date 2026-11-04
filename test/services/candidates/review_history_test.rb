@@ -14,6 +14,15 @@ module Candidates
       attach_fixture_image(@candidate)
     end
 
+    test "awaiting_clearance when pending_review" do
+      @candidate.update!(status: "pending_review")
+      history = ReviewHistory.new(@candidate)
+
+      assert_equal :awaiting_clearance, history.status
+      assert_equal "Awaiting clearance", history.status_label
+      assert_includes history.summary, "not cleared"
+    end
+
     test "needs_review when ready with variants but no edition" do
       @candidate.variants.create!(model: @model, prompt: "colourise")
       history = ReviewHistory.new(@candidate)

@@ -17,6 +17,7 @@ module Digitalnz
 
     def acceptable?
       @config.allowed_partner?(partner) &&
+        @config.allowed_type?(@record[:dc_type]) &&
         rights.present? &&
         required_usage_met? &&
         !@config.excluded_record?(@record)

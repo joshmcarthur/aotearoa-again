@@ -7,6 +7,7 @@ module Admin
     test "renders harvest candidates button" do
       @runway_days = 0
       @pending = 0
+      @clearance_candidates = Candidate.none
       @candidates = Candidate.none
 
       render template: "admin/candidates/index"
