@@ -111,6 +111,21 @@ module Digitalnz
       assert partner_queries.all? { |params| Array(params["and[content_partner]"]) == [ "Wellington City Council Archives" ] }
     end
 
+    test "prefers a non-people record on the same page" do
+      person = FakeClient::WHARF.merge("id" => 1, "subject" => [ "People and Families" ], "title" => "Mrs Foster")
+      street = FakeClient::WHARF.merge("id" => 2, "subject" => [ "Streets" ], "title" => "Queen Street")
+      selector = RandomSelector.new(client: page_client([ person, street ]), exclude_ids: [])
+
+      assert_equal 2, selector.call["id"]
+    end
+
+    test "skips people records when the people cap is full" do
+      person = FakeClient::WHARF.merge("id" => 1, "subject" => [ "People and Families" ])
+      selector = RandomSelector.new(client: page_client([ person ]), exclude_ids: [], allow_people: false)
+
+      assert_nil selector.call
+    end
+
     test "caps anonymous pagination at page 100" do
       client = Object.new
       def client.search(params)
@@ -125,6 +140,22 @@ module Digitalnz
       pages = 50.times.map { selector.send(:pick_page, "Alexander Turnbull Library", "1980") }
       assert pages.all? { |page| page.between?(1, 100) }
       assert pages.max <= RandomSelector::ANONYMOUS_MAX_PAGE
+    end
+
+    private
+
+    def page_client(records)
+      client = Object.new
+      client.define_singleton_method(:search) do |params|
+        if params[:facets] == "content_partner" || params["facets"] == "content_partner"
+          { "search" => { "facets" => { "content_partner" => { "Alexander Turnbull Library" => 10 } } } }
+        elsif params[:facets] == "decade" || params["facets"] == "decade"
+          { "search" => { "facets" => { "decade" => { "1910" => 10 } } } }
+        else
+          { "search" => { "result_count" => records.size, "results" => records } }
+        end
+      end
+      client
     end
   end
 end
