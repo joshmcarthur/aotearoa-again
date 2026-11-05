@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.24.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.23.0...v0.24.0) (2026-11-05)
+
+
+### Features
+
+* cap people photographs in a harvest run ([#179](https://github.com/joshmcarthur/aotearoa-again/issues/179)) ([9d07f8d](https://github.com/joshmcarthur/aotearoa-again/commit/9d07f8d9cb576f7fd3a94abb5d3bf862a3588e41))
+* clear originals before colourise and reject colour photos ([#165](https://github.com/joshmcarthur/aotearoa-again/issues/165)) ([82fb4e1](https://github.com/joshmcarthur/aotearoa-again/commit/82fb4e1f322a2a7a50585d2d4e93ea1eeb856ac4))
+* exclude newspaper scans and poster photographs ([#175](https://github.com/joshmcarthur/aotearoa-again/issues/175)) ([dafee00](https://github.com/joshmcarthur/aotearoa-again/commit/dafee0071032b0739982372e2a5ce28aa8f9c1d5))
+* skip harvest portraits with a face detector ([#177](https://github.com/joshmcarthur/aotearoa-again/issues/177)) ([3359e94](https://github.com/joshmcarthur/aotearoa-again/commit/3359e9422f04098f91c612f9fcb1af16c39735b7))
+
+
+### Bug Fixes
+
+* cap OpenRouter colourise requests at 4096 tokens ([#174](https://github.com/joshmcarthur/aotearoa-again/issues/174)) ([b9a63cc](https://github.com/joshmcarthur/aotearoa-again/commit/b9a63cc619cbb0ea36dd707b35f46a6479c6c4e2))
+* inline the RubyLLM v2 content SQL helper ([#176](https://github.com/joshmcarthur/aotearoa-again/issues/176)) ([f7a1855](https://github.com/joshmcarthur/aotearoa-again/commit/f7a18555aae07c30524d5a1e5ff990fe790fa724))
+* retry DigitalNZ rate limits and stop after repeated misses ([#178](https://github.com/joshmcarthur/aotearoa-again/issues/178)) ([d0fde47](https://github.com/joshmcarthur/aotearoa-again/commit/d0fde47d5e9e95d8f425f98c18b086382a146f91))
+
 ## [0.23.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.22.1...v0.23.0) (2026-10-19)
 
 
