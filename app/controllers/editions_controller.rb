@@ -2,14 +2,11 @@ class EditionsController < ApplicationController
   include EdgeCacheable
 
   def today
-    @edition = Edition.published.find_by(publish_on: Time.zone.today)
-    if @edition
-      @copy = @edition.copy
-      set_adjacent_editions
-      render :show
-    elsif (@latest_edition = Edition.published.order(publish_on: :desc).first)
+    if (edition = Edition.published.find_by(publish_on: Time.zone.today))
+      redirect_to edition_path(edition)
+    elsif (latest_edition = Edition.published.order(publish_on: :desc).first)
       cache_briefly
-      render :unavailable, status: :not_found
+      redirect_to edition_path(latest_edition)
     else
       cache_briefly
       render :empty

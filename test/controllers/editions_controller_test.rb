@@ -21,8 +21,11 @@ class EditionsControllerTest < ActionDispatch::IntegrationTest
     )
   end
 
-  test "today shows published edition with AI transparency details" do
+  test "today redirects to the published edition with AI transparency details" do
     get root_url
+    assert_redirected_to edition_path(@edition)
+
+    follow_redirect!
     assert_response :success
     assert_match "Published plate", response.body
     assert_match "AI colourised", response.body
@@ -32,24 +35,19 @@ class EditionsControllerTest < ActionDispatch::IntegrationTest
     assert_match "Alexander Turnbull Library", response.body
   end
 
-  test "today without edition for today shows unavailable with link to latest" do
+  test "today without edition for today redirects to the latest edition" do
     @edition.update!(publish_on: 2.days.ago.to_date)
 
     get root_url
-    assert_response :not_found
-    assert_match "Today's edition isn't ready yet", response.body
-    assert_match I18n.l(Time.zone.today, format: :long), response.body
-    assert_match I18n.l(@edition.publish_on, format: :long), response.body
-    assert_match edition_path(@edition), response.body
-    assert_no_match "Published plate", response.body
+    assert_redirected_to edition_path(@edition)
   end
 
-  test "today is edge cached until the next publish without setting a cookie" do
+  test "today redirect is edge cached until the next publish without setting a cookie" do
     travel_to Time.zone.today.in_time_zone.change(hour: 8) do
       get root_url
     end
 
-    assert_response :success
+    assert_response :found
     cache_control = response.headers["Cache-Control"]
     assert_includes cache_control, "public"
     assert_includes cache_control, "max-age=300"
@@ -68,11 +66,11 @@ class EditionsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.headers["Cache-Control"], "s-maxage=120"
   end
 
-  test "today without edition for today is cached briefly" do
+  test "today redirect to the latest edition is cached briefly" do
     @edition.update!(publish_on: 2.days.ago.to_date)
 
     get root_url
-    assert_response :not_found
+    assert_response :found
     assert_equal "max-age=60, public, s-maxage=60", response.headers["Cache-Control"]
   end
 
