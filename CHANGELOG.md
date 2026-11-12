@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.25.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.24.0...v0.25.0) (2026-11-12)
+
+
+### Features
+
+* redirect homepage to the dated edition URL ([#181](https://github.com/joshmcarthur/aotearoa-again/issues/181)) ([13db2bb](https://github.com/joshmcarthur/aotearoa-again/commit/13db2bb573d8b2187f98acd570e4045d056fad85))
+
 ## [0.24.0](https://github.com/joshmcarthur/aotearoa-again/compare/v0.23.0...v0.24.0) (2026-11-05)
 
 
